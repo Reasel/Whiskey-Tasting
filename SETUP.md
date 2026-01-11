@@ -33,7 +33,7 @@ Get up and running in 5 minutes:
 
 ```bash
 # 1. Clone and enter directory
-git clone <INSERT THE GIT REPO HERE EVENTUALLY>
+git clone https://github.com/reasel/Whiskey-Tasting.git
 cd Whiskey-Tasting
 
 # 2. Start backend (Terminal 1)
@@ -55,7 +55,7 @@ Open **<http://localhost:3000>** - you're ready to go!
 
 ### 1. Clone Repository
 ```bash
-git clone <INSERT THE GIT REPO HERE EVENTUALLY>
+git clone https://github.com/reasel/Whiskey-Tasting.git
 cd Whiskey-Tasting
 ```
 
