@@ -1,0 +1,26 @@
+services:
+  whiskey-tasting:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: whiskey-tasting
+    container_name: whiskey-tasting
+    ports:
+      - "3000:3000"   # Frontend
+      - "8000:8000"   # Backend API
+    volumes:
+      - whiskey-data:/app/backend/data
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  resume-data:
+    driver: local
