@@ -114,3 +114,4 @@ The built-in browser tool fails on NixOS due to incompatible Chromium binaries. 
 - Not all router modules are mounted in `main.py` (tastings, whiskeys, users routers exist but not included)
 - Test seed data references unimplemented endpoints (e.g., PUT `/themes/{theme_id}/whiskeys`)
 - Backend includes Windows-specific asyncio fix for Playwright compatibility
+- When modifying Python dependencies in `apps/backend/pyproject.toml` or `apps/backend/requirements.txt`, also update `nix/pythonShell.nix` to maintain consistency across environments

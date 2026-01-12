@@ -95,13 +95,13 @@ status "Data directory setup complete"
 echo ""
 info "Starting backend server..."
 cd /app/backend
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8010 &
 BACKEND_PID=$!
 
 # Wait for backend to be ready
 info "Waiting for backend to be ready..."
 for i in {1..30}; do
-    if curl -s http://localhost:8000/api/v1/health > /dev/null 2>&1; then
+    if curl -s http://localhost:8010/api/v1/health > /dev/null 2>&1; then
         status "Backend is ready (PID: $BACKEND_PID)"
         break
     fi
@@ -124,9 +124,9 @@ echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 status "Whiskey Tasting is running!"
 echo ""
-echo -e "  ${BOLD}Frontend:${NC}  http://localhost:3000"
-echo -e "  ${BOLD}Backend:${NC}   http://localhost:8000"
-echo -e "  ${BOLD}API Docs:${NC}  http://localhost:8000/docs"
+echo -e "  ${BOLD}Frontend:${NC}  http://localhost:3010"
+echo -e "  ${BOLD}Backend:${NC}   http://localhost:8010"
+echo -e "  ${BOLD}API Docs:${NC}  http://localhost:8010/docs"
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
