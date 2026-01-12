@@ -52,6 +52,9 @@ apps/backend/data/config.json
 .cursor/
 .cursorrules
 
+# roo related files
+.roo/mcp.json
+
 .DS_Store
 
 

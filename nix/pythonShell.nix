@@ -10,6 +10,7 @@ pkgs.mkShell {
       ps.pytest
       ps.pytest-asyncio
       ps.pytest-cov
+      ps.playwright
       ps.httpx
     ]))
     uv
