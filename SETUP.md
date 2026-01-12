@@ -23,6 +23,14 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Windows
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# NixOs
+# Wrap all python commands with:
+nix-shell ./nix/pythonShell.nix --run "<YOUR COMMAND HERE>"
+# Or simply open a new shell for use with
+nix-shell ./nix/pythonShell.nix
+# note for all python commands using nix
+# All uv commands require `--python python3` flag (uv sync/troubleshooting via pip if fails)
 ```
 
 ---

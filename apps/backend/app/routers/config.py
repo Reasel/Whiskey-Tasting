@@ -18,7 +18,7 @@ router = APIRouter(prefix="/config", tags=["Configuration"])
 
 def _get_config_path() -> Path:
     """Get path to config storage file."""
-    return settings.config_path
+    return settings.data_dir / "config.json"
 
 
 def _load_config() -> dict:

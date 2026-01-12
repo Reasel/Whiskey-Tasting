@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     data_dir: Path = Path(__file__).parent.parent / "data"
 
     @property
+    @property
+    def config_path(self) -> Path:
+        """Path to configuration file."""
+        return self.data_dir / "config.json"
+
     def db_path(self) -> Path:
         """Path to TinyDB database file."""
         return self.data_dir / "database.json"
