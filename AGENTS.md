@@ -10,6 +10,83 @@ This file provides guidance to agents when working with code in this repository.
 - In Nix environment: `nix-shell ./nix/pythonShell.nix` before running Python commands
 - All uv commands require `--python python3` flag (uv sync/troubleshooting via pip if fails)
 
+## Testing Suite
+
+The backend includes a comprehensive test suite that must pass before any changes are merged. The test suite covers unit tests, API endpoint tests, integration tests, and error handling scenarios.
+
+### Test Structure
+
+- **Unit Tests** (`test_database.py`): Test individual database operations and business logic
+- **API Tests** (`test_api.py`): Test all REST API endpoints using FastAPI TestClient
+- **Integration Tests** (`test_integration.py`): Test complete workflows from theme creation to results
+- **Error Handling Tests** (`test_error_handling.py`): Test edge cases, invalid inputs, and error conditions
+- **Seed Data Test** (`test_seed_data.py`): Integration test that populates sample data and verifies scoring
+
+### Running Tests
+
+#### Full Test Suite
+```bash
+# Using Nix (recommended)
+nix-shell ./nix/pythonShell.nix && cd apps/backend && python3 -m pip install -e .[dev] && pytest
+
+# Using uv (if venv set up)
+cd apps/backend && uv run --python python3 pytest
+
+# Specific test file
+cd apps/backend && uv run --python python3 pytest tests/test_api.py
+
+# Single test
+cd apps/backend && uv run --python python3 pytest tests/test_seed_data.py::test_seed_sample_data -v
+```
+
+#### Test Options
+- `-v`: Verbose output
+- `-k "test_name"`: Run tests matching pattern
+- `--tb=short`: Shorter traceback format
+- `-x`: Stop on first failure
+- `--cov=app`: Generate coverage report (requires pytest-cov)
+
+### Test Coverage
+
+The test suite provides comprehensive coverage of:
+
+- **Database Operations**: All CRUD operations for themes, whiskeys, users, and tastings
+- **API Endpoints**: All REST endpoints including success and error cases
+- **Business Logic**: Theme activation, scoring calculations, user management
+- **Data Validation**: Input validation, boundary conditions, malformed data
+- **Integration Flows**: Complete user workflows from setup to results
+- **Error Scenarios**: Invalid inputs, missing data, concurrent operations
+
+### Definition of Done
+
+Before merging any backend changes:
+
+1. All tests must pass: `pytest` returns exit code 0
+2. No new test failures introduced
+3. Test coverage maintained (target: >80%)
+4. New features include corresponding tests
+5. Edge cases and error conditions tested
+
+### Adding New Tests
+
+When adding new features:
+
+1. Add unit tests for new database operations in `test_database.py`
+2. Add API tests for new endpoints in `test_api.py`
+3. Add integration tests for complete workflows in `test_integration.py`
+4. Test error conditions in `test_error_handling.py`
+5. Update fixtures in `conftest.py` if needed
+
+### Test Fixtures
+
+Common test fixtures available:
+
+- `test_db`: Isolated database instance for each test
+- `sample_theme`: Pre-created theme with default whiskeys
+- `sample_whiskeys`: List of whiskeys for the sample theme
+- `sample_users`: Pre-created test users
+- `test_client`: FastAPI test client with isolated database
+
 ## Browser Testing (NixOS)
 
 The built-in browser tool fails on NixOS due to incompatible Chromium binaries. Use the custom Puppeteer script for browser automation and testing:

@@ -8,6 +8,7 @@ async def test_seed_sample_data(api_client):
     """Seed the backend with sample tasting data for testing purposes."""
     # Step 1: Create a theme
     theme_data = {
+    "num_whiskeys": 4,
         "name": "Sample Bourbon Tasting",
         "notes": "A sample tasting night with bourbon whiskeys"
     }
