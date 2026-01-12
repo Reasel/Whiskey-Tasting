@@ -47,6 +47,8 @@ export {
 export {
   fetchThemes,
   createTheme,
+  updateTheme,
+  updateWhiskeys,
   type Theme,
   type ThemeListResponse,
   type CreateThemeRequest,

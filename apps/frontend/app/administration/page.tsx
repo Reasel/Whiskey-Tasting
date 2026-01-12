@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/toast';
 
 const PASSWORD = 'admin';
 
 export default function Administration() {
+  const { showToast } = useToast();
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -25,7 +27,7 @@ export default function Administration() {
       localStorage.setItem('adminAuthenticated', 'true');
       setIsAuthenticated(true);
     } else {
-      alert('Incorrect password');
+      showToast('Incorrect password', 'error');
     }
   };
 

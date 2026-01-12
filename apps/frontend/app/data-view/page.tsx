@@ -105,17 +105,24 @@ export default function DataView() {
 }
 
 function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
-  // Collect all whiskeys with their scores
+  // Collect all whiskeys with their scores, only from themes that have submissions
   const allWhiskeys: { whiskey: any; theme: string; scores: any[] }[] = [];
 
   themesScores.forEach((themeScore) => {
-    themeScore.whiskeys.forEach((whiskey) => {
-      allWhiskeys.push({
-        whiskey,
-        theme: themeScore.theme.name,
-        scores: whiskey.scores,
+    // Only include themes that have at least one submission
+    const hasSubmissions = themeScore.whiskeys.some(whiskey => whiskey.scores.length > 0);
+    if (hasSubmissions) {
+      themeScore.whiskeys.forEach((whiskey) => {
+        // Only include whiskeys with proof set and > 0
+        if (whiskey.proof && whiskey.proof > 0) {
+          allWhiskeys.push({
+            whiskey,
+            theme: themeScore.theme.name,
+            scores: whiskey.scores,
+          });
+        }
       });
-    });
+    }
   });
 
   if (allWhiskeys.length === 0) {
@@ -134,6 +141,7 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
             <tr className="border-b-2 border-black">
               <th className="text-left py-3 px-2 font-bold uppercase tracking-wider">Whiskey</th>
               <th className="text-left py-3 px-2 font-bold uppercase tracking-wider">Theme</th>
+              <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Proof</th>
               <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Avg Score</th>
               <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Tasters</th>
             </tr>
@@ -143,9 +151,9 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
               <tr key={index} className="border-b border-black">
                 <td className="py-3 px-2">
                   <div className="font-bold text-black">{item.whiskey.whiskey_name}</div>
-                  {item.whiskey.proof && <div className="text-xs text-muted-text uppercase tracking-wider">{item.whiskey.proof}% ABV</div>}
                 </td>
                 <td className="py-3 px-2">{item.theme}</td>
+                <td className="text-center py-3 px-2 font-bold">{item.whiskey.proof}%</td>
                 <td className="text-center py-3 px-2 font-bold">{item.whiskey.average_score.toFixed(1)}</td>
                 <td className="text-center py-3 px-2 font-bold">{item.scores.length}</td>
               </tr>
@@ -180,6 +188,7 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
               <thead>
                 <tr className="border-b-2 border-black">
                   <th className="text-left py-3 px-2 font-bold uppercase tracking-wider">Whiskey</th>
+                  <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Proof</th>
                   <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Avg Score</th>
                   <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Rank</th>
                   <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Tasters</th>
@@ -190,8 +199,8 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
                   <tr key={whiskey.whiskey_id} className="border-b border-black">
                     <td className="py-3 px-2">
                       <div className="font-bold text-black">{whiskey.whiskey_name}</div>
-                      {whiskey.proof && <div className="text-xs text-muted-text uppercase tracking-wider">{whiskey.proof}% ABV</div>}
                     </td>
+                    <td className="text-center py-3 px-2 font-bold">{whiskey.proof || '??'}%</td>
                     <td className="text-center py-3 px-2 font-bold">{whiskey.average_score.toFixed(1)}</td>
                     <td className="text-center py-3 px-2 font-bold">{whiskey.rank_by_average}</td>
                     <td className="text-center py-3 px-2 font-bold">{whiskey.scores.length}</td>
@@ -208,7 +217,7 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
 
 function PersonView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
   // Group scores by user
-  const userScores: Record<string, { theme: string; whiskeys: Record<string, { scores: any[]; average: number }> }> = {};
+  const userScores: Record<string, { theme: string; whiskeys: Record<string, { scores: any[]; average: number; proof: number | null }> }> = {};
 
   themesScores.forEach((themeScore) => {
     themeScore.whiskeys.forEach((whiskey) => {
@@ -218,7 +227,7 @@ function PersonView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
           userScores[userName] = { theme: themeScore.theme.name, whiskeys: {} };
         }
         if (!userScores[userName].whiskeys[whiskey.whiskey_name]) {
-          userScores[userName].whiskeys[whiskey.whiskey_name] = { scores: [], average: 0 };
+          userScores[userName].whiskeys[whiskey.whiskey_name] = { scores: [], average: 0, proof: whiskey.proof };
         }
         userScores[userName].whiskeys[whiskey.whiskey_name].scores.push(score);
         userScores[userName].whiskeys[whiskey.whiskey_name].average = score.average_score;
@@ -248,6 +257,7 @@ function PersonView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
               <thead>
                 <tr className="border-b-2 border-black">
                   <th className="text-left py-3 px-2 font-bold uppercase tracking-wider">Whiskey</th>
+                  <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Proof</th>
                   <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Aroma</th>
                   <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Flavor</th>
                   <th className="text-center py-3 px-2 font-bold uppercase tracking-wider">Finish</th>
@@ -259,6 +269,7 @@ function PersonView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
                 {Object.entries(data.whiskeys).map(([whiskeyName, whiskeyData]) => (
                   <tr key={whiskeyName} className="border-b border-black">
                     <td className="py-3 px-2 font-bold text-black">{whiskeyName}</td>
+                    <td className="text-center py-3 px-2 font-bold">{whiskeyData.proof || '??'}%</td>
                     <td className="text-center py-3 px-2">{whiskeyData.scores[0]?.aroma_score || '-'}</td>
                     <td className="text-center py-3 px-2">{whiskeyData.scores[0]?.flavor_score || '-'}</td>
                     <td className="text-center py-3 px-2">{whiskeyData.scores[0]?.finish_score || '-'}</td>

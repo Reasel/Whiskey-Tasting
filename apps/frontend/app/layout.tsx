@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Merriweather, JetBrains_Mono } from 'next/font/google';
 import './(default)/css/globals.css';
+import { ToastProvider } from '@/components/ui/toast';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const merriweather = Merriweather({
@@ -26,7 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body
         className={`${inter.variable} ${merriweather.variable} ${jetbrains.variable} antialiased min-h-full`}
       >
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

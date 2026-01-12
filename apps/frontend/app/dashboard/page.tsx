@@ -5,8 +5,10 @@ import { fetchAllThemesScores, fetchActiveTheme, fetchWhiskeysByTheme, submitTas
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/toast';
 
 export default function Dashboard() {
+  const { showToast } = useToast();
   const [themesScores, setThemesScores] = useState<ThemeScoresResponse[]>([]);
   const [activeTheme, setActiveTheme] = useState<ThemeResponse | null>(null);
   const [whiskeys, setWhiskeys] = useState<Whiskey[]>([]);
@@ -62,13 +64,13 @@ export default function Dashboard() {
         whiskey_scores: scores,
       };
       await submitTasting(request);
-      alert('Tasting submitted successfully!');
+      showToast('Tasting submitted successfully!', 'success');
       setUserName('');
       // Reload data to show updated scores
       await loadData();
     } catch (error) {
       console.error('Failed to submit tasting:', error);
-      alert('Failed to submit tasting. Please try again.');
+      showToast('Failed to submit tasting. Please try again.', 'error');
     } finally {
       setSubmitting(false);
     }

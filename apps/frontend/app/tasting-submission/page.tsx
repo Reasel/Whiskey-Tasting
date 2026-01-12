@@ -6,8 +6,10 @@ import { fetchUsers, fetchThemes, fetchActiveTheme, fetchWhiskeysByTheme, submit
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/toast';
 
 export default function TastingSubmission() {
+  const { showToast } = useToast();
   const [users, setUsers] = useState<string[]>([]);
   const [themes, setThemes] = useState<Theme[]>([]);
   const [activeTheme, setActiveTheme] = useState<Theme | null>(null);
@@ -147,7 +149,7 @@ export default function TastingSubmission() {
       };
       await submitTasting(request);
       if (!silent) {
-        alert('Tasting submitted successfully!');
+        showToast('Tasting submitted successfully!', 'success');
         // Reset form but keep user selected
         setNewUserName('');
         resetScores();
@@ -155,7 +157,7 @@ export default function TastingSubmission() {
     } catch (error) {
       if (!silent) {
         console.error('Failed to submit tasting:', error);
-        alert('Failed to submit tasting. Please try again.');
+        showToast('Failed to submit tasting. Please try again.', 'error');
       }
     } finally {
       if (!silent) setSubmitting(false);

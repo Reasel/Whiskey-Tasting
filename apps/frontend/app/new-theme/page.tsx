@@ -8,9 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/toast';
 
 export default function NewTheme() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [themeName, setThemeName] = useState('');
   const [themeNotes, setThemeNotes] = useState('');
   const [numWhiskeys, setNumWhiskeys] = useState(3);
@@ -39,7 +41,7 @@ export default function NewTheme() {
       router.push('/');
     } catch (error) {
       console.error('Failed to create theme:', error);
-      alert('Failed to create theme. Please try again.');
+      showToast('Failed to create theme. Please try again.', 'error');
     } finally {
       setSubmitting(false);
     }
