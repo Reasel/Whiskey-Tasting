@@ -1,5 +1,5 @@
 [project]
-name = "rm-backend"
+name = "wt-backend"
 version = "1.0.0"
 description = "Whiskey Tasting Backend API"
 requires-python = ">=3.13"
