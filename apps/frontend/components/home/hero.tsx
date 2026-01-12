@@ -16,14 +16,14 @@ export default function Hero() {
     >
       <div className="flex h-full w-full flex-col items-center justify-center border border-black text-blue-700 bg-[#F0F0E8] shadow-[12px_12px_0px_0px_rgba(0,0,0,0.1)]">
         <h1 className="mb-12 text-center font-mono text-6xl font-bold uppercase leading-none tracking-tighter md:text-8xl lg:text-9xl selection:bg-blue-700 selection:text-white">
-          Resume
+          Whiskey
           <br />
-          Matcher
+          Tasting
         </h1>
 
         <div className="flex flex-col gap-4 md:flex-row md:gap-12">
           <a
-            href="https://github.com/srbhr/Resume-Matcher"
+            href="https://github.com/reasel/Whiskey-Tasting"
             target="_blank"
             rel="noopener noreferrer"
             className={buttonClass}
@@ -31,12 +31,12 @@ export default function Hero() {
             GitHub
           </a>
           <a
-            href="https://resumematcher.fyi"
+            href="/docs"
             target="_blank"
             rel="noopener noreferrer"
             className={buttonClass}
           >
-            Docs
+            API Docs
           </a>
           <Link href="/dashboard" className={buttonClass}>
             Launch App

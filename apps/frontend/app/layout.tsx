@@ -1,31 +1,30 @@
 import type { Metadata } from 'next';
-import { Geist, Space_Grotesk } from 'next/font/google';
+import { Inter, Merriweather, JetBrains_Mono } from 'next/font/google';
 import './(default)/css/globals.css';
 
-const spaceGrotesk = Space_Grotesk({
-  variable: '--font-space-grotesk',
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const merriweather = Merriweather({
+  weight: ['400', '700'],
   subsets: ['latin'],
-  display: 'swap',
+  variable: '--font-serif'
 });
-
-const geist = Geist({
-  variable: '--font-geist',
+const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
-  display: 'swap',
+  variable: '--font-mono'
 });
 
 export const metadata: Metadata = {
-  title: 'Resume Matcher',
-  description: 'Build your resume with Resume Matcher',
-  applicationName: 'Resume Matcher',
-  keywords: ['resume', 'matcher', 'job', 'application'],
+  title: 'Whiskey Tasting',
+  description: 'Log Whiskey Tasting entries for the night',
+  applicationName: 'Whiskey Tasting',
+  keywords: ['whiskey', 'tasting'],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-US" className="h-full">
       <body
-        className={`${geist.variable} ${spaceGrotesk.variable} antialiased bg-[#F0F0E8] text-gray-900 min-h-full`}
+        className={`${inter.variable} ${merriweather.variable} ${jetbrains.variable} antialiased min-h-full`}
       >
         {children}
       </body>

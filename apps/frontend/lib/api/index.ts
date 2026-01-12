@@ -13,7 +13,6 @@ export {
   apiPatch,
   apiPut,
   apiDelete,
-  getUploadUrl,
 } from './client';
 
 // Config operations (simplified)
@@ -22,3 +21,34 @@ export {
   type DatabaseStats,
   type SystemStatus,
 } from './config';
+
+// Tasting operations
+export {
+  fetchAllThemesScores,
+  submitTasting,
+  fetchActiveTheme,
+  fetchWhiskeysByTheme,
+  fetchUserTastingsForTheme,
+  type ThemeScoresResponse,
+  type SubmitTastingRequest,
+  type Whiskey,
+  type ThemeResponse,
+  type UserTastingsResponse,
+} from './tastings';
+
+// User operations
+export {
+  fetchUsers,
+  type User,
+  type UserListResponse,
+} from './users';
+
+// Theme operations
+export {
+  fetchThemes,
+  createTheme,
+  type Theme,
+  type ThemeListResponse,
+  type CreateThemeRequest,
+  type ThemeCreateResponse,
+} from './themes';

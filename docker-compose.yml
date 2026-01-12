@@ -6,21 +6,23 @@ services:
     image: whiskey-tasting
     container_name: whiskey-tasting
     ports:
-      - "3000:3000"   # Frontend
-      - "8000:8000"   # Backend API
+      - "3010:3000"   # Frontend
+      - "8010:8000"   # Backend API
     volumes:
       - whiskey-data:/app/backend/data
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8010/api/v1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
 
 volumes:
-  resume-data:
+  whiskey-data:
     driver: local

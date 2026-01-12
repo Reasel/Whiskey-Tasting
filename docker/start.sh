@@ -60,7 +60,7 @@ error() {
 # Cleanup function for graceful shutdown
 cleanup() {
     echo ""
-    info "Shutting down Resume Matcher..."
+    info "Shutting down Whiskey Tasting..."
 
     # Kill backend if running
     if [ -n "$BACKEND_PID" ] && kill -0 "$BACKEND_PID" 2>/dev/null; then
@@ -88,17 +88,8 @@ else
     status "Data directory exists: $DATA_DIR"
 fi
 
-# Check for Playwright browsers
-info "Checking Playwright browsers..."
-if [ -d "/root/.cache/ms-playwright" ] || [ -d "/home/appuser/.cache/ms-playwright" ]; then
-    status "Playwright browsers found"
-else
-    warn "Installing Playwright Chromium (this may take a moment)..."
-    cd /app/backend && python -m playwright install chromium 2>/dev/null || {
-        warn "Playwright installation had warnings (this is usually OK)"
-    }
-    status "Playwright setup complete"
-fi
+# Data directory setup complete
+status "Data directory setup complete"
 
 # Start backend
 echo ""
@@ -131,7 +122,7 @@ FRONTEND_PID=$!
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-status "Resume Matcher is running!"
+status "Whiskey Tasting is running!"
 echo ""
 echo -e "  ${BOLD}Frontend:${NC}  http://localhost:3000"
 echo -e "  ${BOLD}Backend:${NC}   http://localhost:8000"

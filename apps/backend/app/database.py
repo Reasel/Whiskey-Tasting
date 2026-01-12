@@ -1,9 +1,8 @@
-"""TinyDB database layer for JSON storage."""
+"""TinyDB database layer for whiskey tasting data."""
 
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from uuid import uuid4
 
 from tinydb import Query, TinyDB
 from tinydb.table import Table
@@ -27,19 +26,24 @@ class Database:
         return self._db
 
     @property
-    def resumes(self) -> Table:
-        """Resumes table."""
-        return self.db.table("resumes")
+    def themes(self) -> Table:
+        """Themes table."""
+        return self.db.table("themes")
 
     @property
-    def jobs(self) -> Table:
-        """Job descriptions table."""
-        return self.db.table("jobs")
+    def whiskeys(self) -> Table:
+        """Whiskeys table."""
+        return self.db.table("whiskeys")
 
     @property
-    def improvements(self) -> Table:
-        """Improvement results table."""
-        return self.db.table("improvements")
+    def users(self) -> Table:
+        """Users table."""
+        return self.db.table("users")
+
+    @property
+    def tastings(self) -> Table:
+        """Tastings table."""
+        return self.db.table("tastings")
 
     def close(self) -> None:
         """Close database connection."""
@@ -47,168 +51,232 @@ class Database:
             self._db.close()
             self._db = None
 
-    # Resume operations
-    def create_resume(
-        self,
-        content: str,
-        content_type: str = "md",
-        filename: str | None = None,
-        is_master: bool = False,
-        parent_id: str | None = None,
-        processed_data: dict[str, Any] | None = None,
-        processing_status: str = "pending",
-        cover_letter: str | None = None,
-        outreach_message: str | None = None,
-    ) -> dict[str, Any]:
-        """Create a new resume entry.
-
-        processing_status: "pending", "processing", "ready", "failed"
-        """
-        resume_id = str(uuid4())
+    # Theme operations
+    def create_theme(self, name: str, notes: str = "") -> dict[str, Any]:
+        """Create a new tasting theme."""
         now = datetime.now(timezone.utc).isoformat()
 
         doc = {
-            "resume_id": resume_id,
-            "content": content,
-            "content_type": content_type,
-            "filename": filename,
-            "is_master": is_master,
-            "parent_id": parent_id,
-            "processed_data": processed_data,
-            "processing_status": processing_status,
-            "cover_letter": cover_letter,
-            "outreach_message": outreach_message,
+            "id": None,  # Will be set by autoincrement
+            "name": name,
+            "notes": notes,
             "created_at": now,
-            "updated_at": now,
         }
-        self.resumes.insert(doc)
+        theme_id = self.themes.insert(doc)
+        doc["id"] = theme_id
+        self.themes.update({"id": theme_id}, doc_ids=[theme_id])
         return doc
 
-    def get_resume(self, resume_id: str) -> dict[str, Any] | None:
-        """Get resume by ID."""
-        Resume = Query()
-        result = self.resumes.search(Resume.resume_id == resume_id)
+    def get_theme(self, theme_id: int) -> dict[str, Any] | None:
+        """Get theme by ID."""
+        Theme = Query()
+        result = self.themes.search(Theme.id == theme_id)
         return result[0] if result else None
 
-    def get_master_resume(self) -> dict[str, Any] | None:
-        """Get the master resume if exists."""
-        Resume = Query()
-        result = self.resumes.search(Resume.is_master == True)
-        return result[0] if result else None
+    def get_current_theme(self) -> dict[str, Any] | None:
+        """Get the most recent theme."""
+        all_themes = self.themes.all()
+        if not all_themes:
+            return None
+        # Sort by created_at descending and return the first (most recent)
+        return sorted(all_themes, key=lambda x: x.get("created_at", ""), reverse=True)[0]
 
-    def update_resume(
-        self, resume_id: str, updates: dict[str, Any]
-    ) -> dict[str, Any] | None:
-        """Update resume by ID."""
-        Resume = Query()
-        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
-        self.resumes.update(updates, Resume.resume_id == resume_id)
-        return self.get_resume(resume_id)
+    def list_themes(self) -> list[dict[str, Any]]:
+        """List all themes."""
+        return list(self.themes.all())
 
-    def delete_resume(self, resume_id: str) -> bool:
-        """Delete resume by ID."""
-        Resume = Query()
-        removed = self.resumes.remove(Resume.resume_id == resume_id)
+    def get_active_theme(self) -> dict[str, Any] | None:
+        """Get the active theme (alias for get_current_theme)."""
+        return self.get_current_theme()
+
+    def set_active_theme(self, theme_id: int) -> bool:
+        """Set a theme as active by updating its timestamp."""
+        theme = self.get_theme(theme_id)
+        if not theme:
+            return False
+
+        # Update the theme's created_at to make it the most recent
+        now = datetime.now(timezone.utc).isoformat()
+        Theme = Query()
+        self.themes.update({"created_at": now}, Theme.id == theme_id)
+        return True
+
+    def update_theme(self, theme_id: int, updates: dict[str, Any]) -> dict[str, Any] | None:
+        """Update theme by ID."""
+        Theme = Query()
+        self.themes.update(updates, Theme.id == theme_id)
+        return self.get_theme(theme_id)
+
+    def delete_theme(self, theme_id: int) -> bool:
+        """Delete theme by ID."""
+        Theme = Query()
+        removed = self.themes.remove(Theme.id == theme_id)
+        if removed:
+            # Also delete associated whiskeys and tastings
+            self.delete_whiskeys_by_theme(theme_id)
+            # Note: tastings are deleted via cascade when whiskeys are deleted
         return len(removed) > 0
 
-    def list_resumes(self) -> list[dict[str, Any]]:
-        """List all resumes."""
-        return list(self.resumes.all())
-
-    def set_master_resume(self, resume_id: str) -> bool:
-        """Set a resume as the master, unsetting any existing master."""
-        Resume = Query()
-        # Unset current master
-        self.resumes.update({"is_master": False}, Resume.is_master == True)
-        # Set new master
-        updated = self.resumes.update(
-            {"is_master": True}, Resume.resume_id == resume_id
-        )
-        return len(updated) > 0
-
-    # Job operations
-    def create_job(
-        self, content: str, resume_id: str | None = None
-    ) -> dict[str, Any]:
-        """Create a new job description entry."""
-        job_id = str(uuid4())
+    # Whiskey operations
+    def create_whiskey(self, theme_id: int, name: str, proof: float | None = None) -> dict[str, Any]:
+        """Create a new whiskey."""
         now = datetime.now(timezone.utc).isoformat()
 
         doc = {
-            "job_id": job_id,
-            "content": content,
-            "resume_id": resume_id,
+            "id": None,  # Will be set by autoincrement
+            "theme_id": theme_id,
+            "name": name,
+            "proof": proof,
             "created_at": now,
         }
-        self.jobs.insert(doc)
+        whiskey_id = self.whiskeys.insert(doc)
+        doc["id"] = whiskey_id
+        self.whiskeys.update({"id": whiskey_id}, doc_ids=[whiskey_id])
         return doc
 
-    def get_job(self, job_id: str) -> dict[str, Any] | None:
-        """Get job by ID."""
-        Job = Query()
-        result = self.jobs.search(Job.job_id == job_id)
+    def get_whiskey(self, whiskey_id: int) -> dict[str, Any] | None:
+        """Get whiskey by ID."""
+        Whiskey = Query()
+        result = self.whiskeys.search(Whiskey.id == whiskey_id)
         return result[0] if result else None
 
-    # Improvement operations
-    def create_improvement(
+    def get_whiskeys_by_theme(self, theme_id: int) -> list[dict[str, Any]]:
+        """Get all whiskeys for a theme."""
+        Whiskey = Query()
+        return self.whiskeys.search(Whiskey.theme_id == theme_id)
+
+    def update_whiskey(self, whiskey_id: int, updates: dict[str, Any]) -> dict[str, Any] | None:
+        """Update whiskey by ID."""
+        Whiskey = Query()
+        self.whiskeys.update(updates, Whiskey.id == whiskey_id)
+        return self.get_whiskey(whiskey_id)
+
+    def delete_whiskeys_by_theme(self, theme_id: int) -> int:
+        """Delete all whiskeys for a theme."""
+        Whiskey = Query()
+        removed = self.whiskeys.remove(Whiskey.theme_id == theme_id)
+        return len(removed)
+
+    # User operations
+    def get_or_create_user(self, name: str) -> dict[str, Any]:
+        """Get user by name or create if doesn't exist."""
+        User = Query()
+        result = self.users.search(User.name == name)
+        if result:
+            return result[0]
+
+        # Create new user
+        now = datetime.now(timezone.utc).isoformat()
+        doc = {
+            "id": None,
+            "name": name,
+            "created_at": now,
+        }
+        user_id = self.users.insert(doc)
+        doc["id"] = user_id
+        self.users.update({"id": user_id}, doc_ids=[user_id])
+        return doc
+
+    def get_user(self, user_id: int) -> dict[str, Any] | None:
+        """Get user by ID."""
+        User = Query()
+        result = self.users.search(User.id == user_id)
+        return result[0] if result else None
+
+    def get_user_by_name(self, name: str) -> dict[str, Any] | None:
+        """Get user by name."""
+        User = Query()
+        result = self.users.search(User.name == name)
+        return result[0] if result else None
+
+    def list_users(self) -> list[str]:
+        """List all user names."""
+        return [user["name"] for user in self.users.all()]
+
+    # Tasting operations
+    def create_or_update_tasting(
         self,
-        original_resume_id: str,
-        tailored_resume_id: str,
-        job_id: str,
-        improvements: list[dict[str, Any]],
+        user_id: int,
+        whiskey_id: int,
+        aroma_score: int,
+        flavor_score: int,
+        finish_score: int,
+        personal_rank: int,
     ) -> dict[str, Any]:
-        """Create an improvement result entry."""
-        request_id = str(uuid4())
+        """Create or update a tasting entry."""
         now = datetime.now(timezone.utc).isoformat()
 
+        Tasting = Query()
+        existing = self.tastings.search(
+            (Tasting.user_id == user_id) & (Tasting.whiskey_id == whiskey_id)
+        )
+
         doc = {
-            "request_id": request_id,
-            "original_resume_id": original_resume_id,
-            "tailored_resume_id": tailored_resume_id,
-            "job_id": job_id,
-            "improvements": improvements,
-            "created_at": now,
+            "user_id": user_id,
+            "whiskey_id": whiskey_id,
+            "aroma_score": aroma_score,
+            "flavor_score": flavor_score,
+            "finish_score": finish_score,
+            "personal_rank": personal_rank,
+            "updated_at": now,
         }
-        self.improvements.insert(doc)
+
+        if existing:
+            # Update existing
+            tasting_id = existing[0].doc_id
+            self.tastings.update(doc, doc_ids=[tasting_id])
+            doc["id"] = tasting_id
+            doc["created_at"] = existing[0]["created_at"]
+        else:
+            # Create new
+            doc["created_at"] = now
+            tasting_id = self.tastings.insert(doc)
+            doc["id"] = tasting_id
+            self.tastings.update({"id": tasting_id}, doc_ids=[tasting_id])
+
         return doc
 
-    def get_improvement_by_tailored_resume(
-        self, tailored_resume_id: str
-    ) -> dict[str, Any] | None:
-        """Get improvement record by tailored resume ID.
+    def get_tastings_by_theme(self, theme_id: int) -> list[dict[str, Any]]:
+        """Get all tastings for whiskeys in a theme."""
+        # First get all whiskey IDs for this theme
+        whiskeys = self.get_whiskeys_by_theme(theme_id)
+        whiskey_ids = [w["id"] for w in whiskeys]
 
-        This is used to retrieve the job context for on-demand
-        cover letter and outreach message generation.
-        """
-        Improvement = Query()
-        result = self.improvements.search(
-            Improvement.tailored_resume_id == tailored_resume_id
+        if not whiskey_ids:
+            return []
+
+        Tasting = Query()
+        return self.tastings.search(Tasting.whiskey_id.one_of(whiskey_ids))
+
+    def get_user_tastings_for_theme(self, user_id: int, theme_id: int) -> list[dict[str, Any]]:
+        """Get all tastings by a user for a theme."""
+        whiskeys = self.get_whiskeys_by_theme(theme_id)
+        whiskey_ids = [w["id"] for w in whiskeys]
+
+        if not whiskey_ids:
+            return []
+
+        Tasting = Query()
+        return self.tastings.search(
+            (Tasting.user_id == user_id) & (Tasting.whiskey_id.one_of(whiskey_ids))
         )
-        return result[0] if result else None
 
     # Stats
     def get_stats(self) -> dict[str, Any]:
         """Get database statistics."""
         return {
-            "total_resumes": len(self.resumes),
-            "total_jobs": len(self.jobs),
-            "total_improvements": len(self.improvements),
-            "has_master_resume": self.get_master_resume() is not None,
+            "total_themes": len(self.themes),
+            "total_whiskeys": len(self.whiskeys),
+            "total_users": len(self.users),
+            "total_tastings": len(self.tastings),
         }
 
     def reset_database(self) -> None:
-        """Reset the database by truncating all tables and clearing uploads."""
-        # Truncate tables
-        self.resumes.truncate()
-        self.jobs.truncate()
-        self.improvements.truncate()
-
-        # Clear uploads directory
-        uploads_dir = settings.data_dir / "uploads"
-        if uploads_dir.exists():
-            import shutil
-            shutil.rmtree(uploads_dir)
-            uploads_dir.mkdir(parents=True, exist_ok=True)
+        """Reset the database by truncating all tables."""
+        self.themes.truncate()
+        self.whiskeys.truncate()
+        self.users.truncate()
+        self.tastings.truncate()
 
 
 # Global database instance

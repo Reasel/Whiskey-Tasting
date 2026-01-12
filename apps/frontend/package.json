@@ -1,5 +1,5 @@
 {
-  "name": "resume-matcher-ui",
+  "name": "whiskey-tasting-ui",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -34,6 +34,7 @@
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.0",
     "prettier": "^3.5.3",
+    "puppeteer": "^23.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

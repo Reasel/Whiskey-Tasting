@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException
 from app.database import db
 from app.schemas.models import (
     ApiResponse,
-    ThemeCreateRequest,
+    CreateThemeRequest,
     ThemeCreateResponse,
     ThemeListResponse,
     ThemeResponse,
@@ -18,13 +18,20 @@ router = APIRouter()
 
 
 @router.post("/themes", response_model=ThemeCreateResponse)
-async def create_theme(request: ThemeCreateRequest) -> ThemeCreateResponse:
+async def create_theme(request: CreateThemeRequest) -> ThemeCreateResponse:
     """Create a new tasting theme."""
     try:
         theme = db.create_theme(
             name=request.name,
             notes=request.notes,
         )
+        # Create placeholder whiskeys
+        for i in range(1, request.num_whiskeys + 1):
+            db.create_whiskey(
+                theme_id=theme["id"],
+                name=f"Whiskey {i}",
+                proof=None,
+            )
         return ThemeCreateResponse(
             message="Theme created successfully",
             theme=ThemeResponse(**theme),

@@ -5,336 +5,106 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
-# Section Type Enum for dynamic sections
-class SectionType(str, Enum):
-    """Types of resume sections."""
-
-    PERSONAL_INFO = "personalInfo"  # Special: always first, not reorderable
-    TEXT = "text"  # Single text block (like summary)
-    ITEM_LIST = "itemList"  # Array of items with fields (like experience)
-    STRING_LIST = "stringList"  # Array of strings (like skills)
-
-
-# Resume Data Models (matching frontend types in resume-component.tsx)
-class PersonalInfo(BaseModel):
-    """Personal information section."""
-
-    name: str = ""
-    title: str = ""
-    email: str = ""
-    phone: str = ""
-    location: str = ""
-    website: str | None = None
-    linkedin: str | None = None
-    github: str | None = None
-
-
-class Experience(BaseModel):
-    """Work experience entry."""
-
-    id: int = 0
-    title: str = ""
-    company: str = ""
-    location: str | None = None
-    years: str = ""
-    description: list[str] = Field(default_factory=list)
-
-
-class Education(BaseModel):
-    """Education entry."""
-
-    id: int = 0
-    institution: str = ""
-    degree: str = ""
-    years: str = ""
-    description: str | None = None
-
-
-class Project(BaseModel):
-    """Personal project entry."""
-
-    id: int = 0
-    name: str = ""
-    role: str = ""
-    years: str = ""
-    github: str | None = None
-    website: str | None = None
-    description: list[str] = Field(default_factory=list)
-
-
-class AdditionalInfo(BaseModel):
-    """Additional information section."""
-
-    technicalSkills: list[str] = Field(default_factory=list)
-    languages: list[str] = Field(default_factory=list)
-    certificationsTraining: list[str] = Field(default_factory=list)
-    awards: list[str] = Field(default_factory=list)
-
-
-# Section Metadata Models for dynamic section management
-class SectionMeta(BaseModel):
-    """Metadata for a resume section."""
-
-    id: str  # Unique identifier (e.g., "summary", "custom_1")
-    key: str  # Data key (matches ResumeData field or customSections key)
-    displayName: str  # User-visible name
-    sectionType: SectionType  # Type of section
-    isDefault: bool = True  # True for built-in sections
-    isVisible: bool = True  # Whether to show in resume
-    order: int = 0  # Display order (0 = first after personalInfo)
-
-
-class CustomSectionItem(BaseModel):
-    """Generic item for custom item-based sections."""
-
-    id: int = 0
-    title: str = ""  # Primary title
-    subtitle: str | None = None  # Secondary info (company, institution, etc.)
-    location: str | None = None
-    years: str = ""
-    description: list[str] = Field(default_factory=list)
-
-
-class CustomSection(BaseModel):
-    """Custom section data container."""
-
-    sectionType: SectionType
-    items: list[CustomSectionItem] | None = None  # For ITEM_LIST
-    strings: list[str] | None = None  # For STRING_LIST
-    text: str | None = None  # For TEXT
-
-
-# Default section metadata for backward compatibility
-DEFAULT_SECTION_META: list[dict[str, Any]] = [
-    {
-        "id": "personalInfo",
-        "key": "personalInfo",
-        "displayName": "Personal Info",
-        "sectionType": SectionType.PERSONAL_INFO,
-        "isDefault": True,
-        "isVisible": True,
-        "order": 0,
-    },
-    {
-        "id": "summary",
-        "key": "summary",
-        "displayName": "Summary",
-        "sectionType": SectionType.TEXT,
-        "isDefault": True,
-        "isVisible": True,
-        "order": 1,
-    },
-    {
-        "id": "workExperience",
-        "key": "workExperience",
-        "displayName": "Experience",
-        "sectionType": SectionType.ITEM_LIST,
-        "isDefault": True,
-        "isVisible": True,
-        "order": 2,
-    },
-    {
-        "id": "education",
-        "key": "education",
-        "displayName": "Education",
-        "sectionType": SectionType.ITEM_LIST,
-        "isDefault": True,
-        "isVisible": True,
-        "order": 3,
-    },
-    {
-        "id": "personalProjects",
-        "key": "personalProjects",
-        "displayName": "Projects",
-        "sectionType": SectionType.ITEM_LIST,
-        "isDefault": True,
-        "isVisible": True,
-        "order": 4,
-    },
-    {
-        "id": "additional",
-        "key": "additional",
-        "displayName": "Skills & Awards",
-        "sectionType": SectionType.STRING_LIST,
-        "isDefault": True,
-        "isVisible": True,
-        "order": 5,
-    },
-]
-
-
-def normalize_resume_data(data: dict[str, Any]) -> dict[str, Any]:
-    """Ensure resume data has section metadata (migration helper).
-
-    This function is used for lazy migration of existing resumes
-    that don't have sectionMeta or customSections fields.
-    """
-    if not data.get("sectionMeta"):
-        # Use deepcopy to avoid shared mutable reference bug
-        # Without this, all resumes would share the same list reference
-        data["sectionMeta"] = copy.deepcopy(DEFAULT_SECTION_META)
-    if "customSections" not in data:
-        data["customSections"] = {}
-    return data
-
-
-class ResumeData(BaseModel):
-    """Complete structured resume data."""
-
-    # Existing fields (kept for backward compatibility)
-    personalInfo: PersonalInfo = Field(default_factory=PersonalInfo)
-    summary: str = ""
-    workExperience: list[Experience] = Field(default_factory=list)
-    education: list[Education] = Field(default_factory=list)
-    personalProjects: list[Project] = Field(default_factory=list)
-    additional: AdditionalInfo = Field(default_factory=AdditionalInfo)
-
-    # NEW: Section metadata and custom sections
-    sectionMeta: list[SectionMeta] = Field(default_factory=list)
-    customSections: dict[str, CustomSection] = Field(default_factory=dict)
-
-
-# API Response Models
-class ResumeUploadResponse(BaseModel):
-    """Response for resume upload."""
-
-    message: str
-    request_id: str
-    resume_id: str
-
-
-class RawResume(BaseModel):
-    """Raw resume data from database."""
+# Whiskey Tasting Models
+class Theme(BaseModel):
+    """Tasting theme/night information."""
 
     id: int | None = None
-    content: str
-    content_type: str = "md"
-    created_at: str
-    processing_status: str = "pending"  # pending, processing, ready, failed
+    name: str
+    notes: str = ""
+    created_at: str | None = None
 
 
-class ResumeFetchData(BaseModel):
-    """Data payload for resume fetch response."""
+class Whiskey(BaseModel):
+    """Whiskey information."""
 
-    resume_id: str
-    raw_resume: RawResume
-    processed_resume: ResumeData | None = None
-    cover_letter: str | None = None
-    outreach_message: str | None = None
-    parent_id: str | None = None  # For determining if resume is tailored
-
-
-class ResumeFetchResponse(BaseModel):
-    """Response for resume fetch."""
-
-    request_id: str
-    data: ResumeFetchData
+    id: int | None = None
+    theme_id: int
+    name: str
+    proof: float | None = None
+    created_at: str | None = None
 
 
-class ResumeSummary(BaseModel):
-    """Summary details for listing resumes."""
+class User(BaseModel):
+    """Taster/user information."""
 
-    resume_id: str
-    filename: str | None = None
-    is_master: bool = False
-    parent_id: str | None = None
-    processing_status: str = "pending"
-    created_at: str
-    updated_at: str
+    id: int | None = None
+    name: str
+    created_at: str | None = None
 
 
-class ResumeListResponse(BaseModel):
-    """Response for resume list."""
+class Tasting(BaseModel):
+    """Individual tasting score submission."""
 
-    request_id: str
-    data: list[ResumeSummary]
-
-
-# Job Description Models
-class JobUploadRequest(BaseModel):
-    """Request to upload job descriptions."""
-
-    job_descriptions: list[str]
-    resume_id: str | None = None
-
-
-class JobUploadResponse(BaseModel):
-    """Response for job upload."""
-
-    message: str
-    job_id: list[str]
-    request: dict[str, Any]
+    id: int | None = None
+    user_id: int
+    whiskey_id: int
+    aroma_score: int  # 1-5
+    flavor_score: int  # 1-5
+    finish_score: int  # 1-5
+    personal_rank: int  # 1-N ranking
+    created_at: str | None = None
+    updated_at: str | None = None
 
 
-# Improvement Models
-class ImproveResumeRequest(BaseModel):
-    """Request to improve/tailor a resume."""
+# API Request/Response Models
+class CreateThemeRequest(BaseModel):
+    """Request to create a new tasting theme."""
 
-    resume_id: str
-    job_id: str
-
-
-class ImprovementSuggestion(BaseModel):
-    """Single improvement suggestion."""
-
-    suggestion: str
-    lineNumber: int | None = None
+    name: str
+    notes: str = ""
+    num_whiskeys: int = Field(..., ge=1, le=20)  # Number of whiskeys for the theme
 
 
-class ImproveResumeData(BaseModel):
-    """Data payload for improve response."""
+class UpdateWhiskeysRequest(BaseModel):
+    """Request to update whiskeys for a theme."""
 
-    request_id: str
-    resume_id: str
-    job_id: str
-    resume_preview: ResumeData
-    improvements: list[ImprovementSuggestion]
-    markdownOriginal: str | None = None
-    markdownImproved: str | None = None
-    cover_letter: str | None = None
-    outreach_message: str | None = None
+    whiskeys: list[dict[str, Any]]  # List of {name: str, proof: float}
 
 
-class ImproveResumeResponse(BaseModel):
-    """Response for resume improvement."""
+class SubmitTastingRequest(BaseModel):
+    """Request to submit tasting scores."""
 
-    request_id: str
-    data: ImproveResumeData
+    user_name: str  # Will create user if doesn't exist
+    whiskey_scores: dict[int, dict[str, int]]  # whiskey_id -> {aroma_score, flavor_score, finish_score, personal_rank}
+
+
+class TastingScore(BaseModel):
+    """Individual tasting score with calculated average."""
+
+    user_name: str
+    aroma_score: int
+    flavor_score: int
+    finish_score: int
+    average_score: float
+    personal_rank: int
+
+
+class WhiskeyScores(BaseModel):
+    """All scores for a whiskey."""
+
+    whiskey_id: int
+    whiskey_name: str
+    proof: float | None
+    scores: list[TastingScore]
+    average_score: float
+    rank_by_average: int
+
+
+class ThemeScoresResponse(BaseModel):
+    """Response with all scores for a theme."""
+
+    theme: Theme
+    whiskeys: list[WhiskeyScores]
+
+
+class UserListResponse(BaseModel):
+    """Response with list of users."""
+
+    users: list[str]
 
 
 # Config Models
-class LLMConfigRequest(BaseModel):
-    """Request to update LLM configuration."""
-
-    provider: str | None = None
-    model: str | None = None
-    api_key: str | None = None
-    api_base: str | None = None
-
-
-class LLMConfigResponse(BaseModel):
-    """Response for LLM configuration."""
-
-    provider: str
-    model: str
-    api_key: str  # Masked
-    api_base: str | None = None
-
-
-class FeatureConfigRequest(BaseModel):
-    """Request to update feature settings."""
-
-    enable_cover_letter: bool | None = None
-    enable_outreach_message: bool | None = None
-
-
-class FeatureConfigResponse(BaseModel):
-    """Response for feature settings."""
-
-    enable_cover_letter: bool = False
-    enable_outreach_message: bool = False
-
-
 class LanguageConfigRequest(BaseModel):
     """Request to update language settings."""
 
@@ -350,62 +120,10 @@ class LanguageConfigResponse(BaseModel):
     supported_languages: list[str] = ["en", "es", "zh", "ja"]
 
 
-# API Key Management Models
-class ApiKeyProviderStatus(BaseModel):
-    """Status of a single API key provider."""
-
-    provider: str  # openai, anthropic, google, etc.
-    configured: bool
-    masked_key: str | None = None  # Shows last 4 chars if configured
-
-
-class ApiKeyStatusResponse(BaseModel):
-    """Response for API key status check."""
-
-    providers: list[ApiKeyProviderStatus]
-
-
-class ApiKeysUpdateRequest(BaseModel):
-    """Request to update API keys."""
-
-    openai: str | None = None
-    anthropic: str | None = None
-    google: str | None = None
-    openrouter: str | None = None
-    deepseek: str | None = None
-
-
-class ApiKeysUpdateResponse(BaseModel):
-    """Response after updating API keys."""
-
-    message: str
-    updated_providers: list[str]
-
-
-# Update Cover Letter/Outreach Models
-class UpdateCoverLetterRequest(BaseModel):
-    """Request to update cover letter content."""
-
-    content: str
-
-
-class UpdateOutreachMessageRequest(BaseModel):
-    """Request to update outreach message content."""
-
-    content: str
-
-
 class ResetDatabaseRequest(BaseModel):
     """Request to reset database with confirmation."""
 
     confirm: str | None = None
-
-
-class GenerateContentResponse(BaseModel):
-    """Response for on-demand content generation."""
-
-    content: str
-    message: str
 
 
 # Health/Status Models
@@ -413,14 +131,47 @@ class HealthResponse(BaseModel):
     """Health check response."""
 
     status: str
-    llm: dict[str, Any]
 
 
-class StatusResponse(BaseModel):
-    """Application status response."""
+# API Response Models
+class ApiResponse(BaseModel):
+    """Generic API response."""
 
-    status: str
-    llm_configured: bool
-    llm_healthy: bool
-    has_master_resume: bool
-    database_stats: dict[str, Any]
+    message: str
+
+
+class ThemeResponse(BaseModel):
+    """Theme response model."""
+
+    id: int
+    name: str
+    notes: str
+    created_at: str
+
+
+class ThemeCreateResponse(BaseModel):
+    """Response for theme creation."""
+
+    message: str
+    theme: ThemeResponse
+
+
+class ThemeListResponse(BaseModel):
+    """Response for theme listing."""
+
+    themes: list[ThemeResponse]
+
+
+class ThemeUpdateRequest(BaseModel):
+    """Request to update a theme."""
+
+    name: str | None = None
+    notes: str | None = None
+
+
+class UserTastingsResponse(BaseModel):
+    """Response with user's tastings for a theme."""
+
+    user_name: str
+    theme: Theme
+    tastings: dict[int, dict[str, int]]  # whiskey_id -> {aroma_score, flavor_score, finish_score, personal_rank}

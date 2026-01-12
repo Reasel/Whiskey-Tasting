@@ -39,7 +39,7 @@ cd Whiskey-Tasting
 # 2. Start backend (Terminal 1)
 cd apps/backend
 uv sync
-uv run uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8010
 
 # 3. Start frontend (Terminal 2)
 cd apps/frontend
@@ -47,7 +47,7 @@ npm install
 npm run dev
 ```
 
-Open **<http://localhost:3000>** - you're ready to go!
+Open **<http://localhost:3010>** - you're ready to go!
 
 ---
 
@@ -63,7 +63,7 @@ cd Whiskey-Tasting
 ```bash
 cd apps/backend
 uv sync  # Install dependencies
-uv run uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8010
 ```
 
 ### 3. Frontend Setup
@@ -92,17 +92,17 @@ docker-compose down
 
 ## Using the Application
 
-1. **Admin Setup**: Go to **<http://localhost:3000/admin>**
+1. **Admin Setup**: Go to **<http://localhost:3010/admin>**
    - Create a tasting theme (e.g., "Bourbon Night")
    - Add whiskeys to the theme
    - Set theme as "active"
 
-2. **Tasting**: Go to **<http://localhost:3000/tasting>**
+2. **Tasting**: Go to **<http://localhost:3010/tasting>**
    - Select your name (or add new)
    - Rate whiskeys on aroma/flavor/finish (1-5)
    - Add personal ranking
 
-3. **View Scores**: Go to **<http://localhost:3000/scores>**
+3. **View Scores**: Go to **<http://localhost:3010/scores>**
    - See rankings and statistics
    - Sort by different criteria
    - Filter by user
@@ -115,7 +115,7 @@ docker-compose down
 ```bash
 cd apps/backend
 uv sync                    # Install deps
-uv run uvicorn app.main:app --reload --port 8000  # Start dev server
+uv run uvicorn app.main:app --reload --port 8010  # Start dev server
 ```
 
 ### Frontend
@@ -134,6 +134,13 @@ ls data/                  # View database files
 rm -rf data/             # Reset all data
 ```
 
+### Testing
+```bash
+cd apps/backend
+uv run pytest tests/test_seed_data.py  # Seed database with sample data
+uv run pytest tests/                   # Run all tests
+```
+
 ---
 
 ## Troubleshooting
@@ -145,7 +152,7 @@ uv run uvicorn app.main:app --reload
 ```
 
 **Frontend connection issues:**
-- Ensure backend is running on port 8000
+- Ensure backend is running on port 8010
 - Check CORS settings if needed
 
 **Database issues:**

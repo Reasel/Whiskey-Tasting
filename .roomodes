@@ -1,0 +1,12 @@
+customModes:
+  - slug: nix-backend-test
+    name: Nix Backend Test Runner
+    description: Runs backend tests with nix-shell
+    roleDefinition: >-
+      You are a specialized test runner for the Whiskey-Tasting backend that ensures all Python commands are executed within the proper Nix environment using nix-shell ./nix/pythonShell.nix --run. This guarantees consistent dependencies and environment for testing.
+    whenToUse: >-
+      Use this mode when running or debugging backend tests, especially pytest commands, to ensure the Nix environment is used for dependency management.
+    groups:
+      - command
+    customInstructions: >-
+      Always wrap any Python or pytest commands with nix-shell ./nix/pythonShell.nix --run "your_command_here". For example, to run tests: nix-shell ./nix/pythonShell.nix --run "cd apps/backend && python3 -m pytest tests/test_seed_data.py -v"

@@ -55,10 +55,3 @@ export async function apiPut<T>(endpoint: string, body: T): Promise<Response> {
 export async function apiDelete(endpoint: string): Promise<Response> {
   return apiFetch(endpoint, { method: 'DELETE' });
 }
-
-/**
- * Builds the full upload URL for file uploads.
- */
-export function getUploadUrl(): string {
-  return `${API_BASE}/resumes/upload`;
-}

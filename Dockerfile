@@ -18,7 +18,7 @@ RUN npm ci
 COPY apps/frontend/ ./
 
 # Set environment variable for production build
-ENV NEXT_PUBLIC_API_URL=http://localhost:8000
+ENV NEXT_PUBLIC_API_URL=http://localhost:8010
 
 # Build the frontend
 RUN npm run build
@@ -116,7 +116,7 @@ USER appuser
 RUN python -m playwright install chromium
 
 # Expose ports
-EXPOSE 3000 8000
+EXPOSE 3010 8010
 
 # Volume for persistent data
 VOLUME ["/app/backend/data"]
