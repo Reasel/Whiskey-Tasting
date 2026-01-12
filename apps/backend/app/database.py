@@ -1,5 +1,6 @@
 """TinyDB database layer for whiskey tasting data."""
 
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -9,13 +10,30 @@ from tinydb.table import Table
 
 from app.config import settings
 
+logger = logging.getLogger(__name__)
+
 
 class Database:
     """TinyDB wrapper for whiskey tasting data."""
 
     def __init__(self, db_path: Path | None = None):
         self.db_path = db_path or settings.db_path()
+        logger.info(f"Initializing database at path: {self.db_path}")
+        logger.info(f"Database directory exists: {self.db_path.parent.exists()}")
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Database directory created/exists: {self.db_path.parent.exists()}")
+        logger.info(f"Database file exists: {self.db_path.exists()}")
+
+        # Check permissions
+        try:
+            # Try to write a test file to check if directory is writable
+            test_file = self.db_path.parent / ".write_test"
+            test_file.write_text("test")
+            test_file.unlink()
+            logger.info("Database directory is writable")
+        except Exception as e:
+            logger.error(f"Database directory is not writable: {e}")
+
         self._db: TinyDB | None = None
 
     @property
@@ -54,6 +72,7 @@ class Database:
     # Theme operations
     def create_theme(self, name: str, notes: str = "") -> dict[str, Any]:
         """Create a new tasting theme."""
+        logger.info(f"Creating theme: name='{name}', notes='{notes}'")
         now = datetime.now(timezone.utc).isoformat()
 
         doc = {
@@ -62,10 +81,16 @@ class Database:
             "notes": notes,
             "created_at": now,
         }
-        theme_id = self.themes.insert(doc)
-        doc["id"] = theme_id
-        self.themes.update({"id": theme_id}, doc_ids=[theme_id])
-        return doc
+        try:
+            theme_id = self.themes.insert(doc)
+            logger.info(f"Theme inserted with ID: {theme_id}")
+            doc["id"] = theme_id
+            self.themes.update({"id": theme_id}, doc_ids=[theme_id])
+            logger.info(f"Theme creation successful: {doc}")
+            return doc
+        except Exception as e:
+            logger.error(f"Failed to create theme: {e}")
+            raise
 
     def get_theme(self, theme_id: int) -> dict[str, Any] | None:
         """Get theme by ID."""
@@ -120,6 +145,7 @@ class Database:
     # Whiskey operations
     def create_whiskey(self, theme_id: int, name: str, proof: float | None = None) -> dict[str, Any]:
         """Create a new whiskey."""
+        logger.info(f"Creating whiskey: theme_id={theme_id}, name='{name}', proof={proof}")
         now = datetime.now(timezone.utc).isoformat()
 
         doc = {
@@ -129,10 +155,16 @@ class Database:
             "proof": proof,
             "created_at": now,
         }
-        whiskey_id = self.whiskeys.insert(doc)
-        doc["id"] = whiskey_id
-        self.whiskeys.update({"id": whiskey_id}, doc_ids=[whiskey_id])
-        return doc
+        try:
+            whiskey_id = self.whiskeys.insert(doc)
+            logger.info(f"Whiskey inserted with ID: {whiskey_id}")
+            doc["id"] = whiskey_id
+            self.whiskeys.update({"id": whiskey_id}, doc_ids=[whiskey_id])
+            logger.info(f"Whiskey creation successful: {doc}")
+            return doc
+        except Exception as e:
+            logger.error(f"Failed to create whiskey: {e}")
+            raise
 
     def get_whiskey(self, whiskey_id: int) -> dict[str, Any] | None:
         """Get whiskey by ID."""

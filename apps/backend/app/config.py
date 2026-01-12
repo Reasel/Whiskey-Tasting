@@ -18,11 +18,16 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8010
 
-    # CORS Configuration
-    cors_origins: list[str] = [
-        "http://localhost:3010",
-        "http://127.0.0.1:3010",
-    ]
+    # CORS Configuration - comma-separated list of additional allowed origins
+    cors_origins_additional_str: str = ""
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """Parse CORS origins from comma-separated string and add defaults."""
+        origins = [origin.strip() for origin in self.cors_origins_additional_str.split(",") if origin.strip()]
+        # Always include localhost origins for development
+        default_origins = ["http://localhost:3010", "http://127.0.0.1:3010"]
+        return list(set(default_origins + origins))  # Use set to avoid duplicates
 
     # Paths
     data_dir: Path = Path(__file__).parent.parent / "data"

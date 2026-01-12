@@ -12,9 +12,6 @@ services:
       - whiskey-data:/app/backend/data
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://localhost:8010
-      - PORT=3010
-      - HOSTNAME=0.0.0.0
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8010/api/v1/health"]
