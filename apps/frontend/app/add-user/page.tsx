@@ -7,9 +7,11 @@ import { createUser } from '@/lib/api/users';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/toast';
 
 export default function AddUser() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [userName, setUserName] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -31,7 +33,7 @@ export default function AddUser() {
       router.push('/administration');
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to add user');
+      showToast('Failed to add user', 'error');
     } finally {
       setSubmitting(false);
     }

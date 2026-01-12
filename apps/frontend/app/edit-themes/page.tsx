@@ -3,14 +3,16 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchThemes, fetchWhiskeysByTheme, type Theme, type Whiskey } from '@/lib/api';
+import { fetchThemes, fetchWhiskeysByTheme, updateTheme, updateWhiskeys, type Theme, type Whiskey } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/toast';
 
 export default function EditThemes() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
   const [whiskeys, setWhiskeys] = useState<Whiskey[]>([]);
@@ -55,6 +57,35 @@ export default function EditThemes() {
 
   const handleThemeSelect = (theme: Theme) => {
     setSelectedTheme(theme);
+  };
+
+  const handleSaveTheme = async () => {
+    if (!selectedTheme) return;
+    try {
+      await updateTheme(selectedTheme.id!, { name: selectedTheme.name, notes: selectedTheme.notes });
+      showToast('Theme updated successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to update theme:', error);
+      showToast('Failed to update theme.', 'error');
+    }
+  };
+
+  const handleWhiskeyChange = (index: number, field: 'name' | 'proof', value: string | number | null) => {
+    const updatedWhiskeys = [...whiskeys];
+    updatedWhiskeys[index] = { ...updatedWhiskeys[index], [field]: value };
+    setWhiskeys(updatedWhiskeys);
+  };
+
+  const handleSaveWhiskeys = async () => {
+    if (!selectedTheme) return;
+    try {
+      const whiskeysData = whiskeys.map(w => ({ name: w.name, proof: w.proof }));
+      await updateWhiskeys(selectedTheme.id!, whiskeysData);
+      showToast('Whiskeys updated successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to update whiskeys:', error);
+      showToast('Failed to update whiskeys.', 'error');
+    }
   };
 
   if (loading) {
@@ -138,7 +169,7 @@ export default function EditThemes() {
                     />
                   </div>
 
-                  <Button>Save Changes</Button>
+                  <Button onClick={handleSaveTheme}>Save Changes</Button>
                 </div>
               </div>
 
@@ -153,18 +184,25 @@ export default function EditThemes() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label>Name</Label>
-                          <Input value={whiskey.name} />
+                          <Input
+                            value={whiskey.name}
+                            onChange={(e) => handleWhiskeyChange(index, 'name', e.target.value)}
+                          />
                         </div>
                         <div className="space-y-2">
                           <Label>Proof (%)</Label>
-                          <Input type="number" value={whiskey.proof || ''} />
+                          <Input
+                            type="number"
+                            value={whiskey.proof || ''}
+                            onChange={(e) => handleWhiskeyChange(index, 'proof', parseFloat(e.target.value) || null)}
+                          />
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <Button className="mt-4">Save Whiskey Changes</Button>
+                <Button className="mt-4" onClick={handleSaveWhiskeys}>Save Whiskey Changes</Button>
               </div>
             </div>
           )}
