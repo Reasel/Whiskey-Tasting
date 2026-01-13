@@ -30,7 +30,13 @@ See [SETUP.md](SETUP.md) for instructions on how to get the application running 
 
 ### Using Published Docker Image
 
-The application is available as a pre-built Docker image at `reasel/whiskey-tasting:latest`. This is the recommended way to deploy the application in production.
+The application is available as pre-built Docker images on Docker Hub. Automated CI/CD pipelines ensure images are built and deployed on every code change.
+
+- **Production**: `reasel/whiskey-tasting:latest` (latest stable release)
+- **Staging**: `reasel/whiskey-tasting:staging` (latest from master branch)
+- **Versioned**: `reasel/whiskey-tasting:v0.1.1` (specific release versions)
+
+GitHub releases are automatically created for each versioned deployment, providing a paired release for every deployed version.
 
 #### Quick Start with Docker Compose
 

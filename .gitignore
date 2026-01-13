@@ -39,6 +39,7 @@ uv.lock
 .coverage
 coverage.xml
 htmlcov/
+*.csv
 
 # Local instance or config files specific to backend
 instance/
