@@ -74,7 +74,7 @@ async def get_active_theme() -> ThemeResponse | None:
 async def set_active_theme(theme_id: str) -> ApiResponse:
     """Set a theme as active."""
     try:
-        success = db.set_active_theme(theme_id)
+        success = db.set_active_theme(int(theme_id))
         if not success:
             raise HTTPException(status_code=404, detail="Theme not found")
         return ApiResponse(message="Theme set as active")
@@ -89,7 +89,7 @@ async def update_theme(theme_id: str, request: ThemeUpdateRequest) -> ThemeRespo
     """Update a theme."""
     try:
         updates = request.model_dump(exclude_unset=True)
-        theme = db.update_theme(theme_id, updates)
+        theme = db.update_theme(int(theme_id), updates)
         if not theme:
             raise HTTPException(status_code=404, detail="Theme not found")
         return ThemeResponse(**theme)
@@ -103,7 +103,7 @@ async def update_theme(theme_id: str, request: ThemeUpdateRequest) -> ThemeRespo
 async def delete_theme(theme_id: str) -> ApiResponse:
     """Delete a theme."""
     try:
-        success = db.delete_theme(theme_id)
+        success = db.delete_theme(int(theme_id))
         if not success:
             raise HTTPException(status_code=404, detail="Theme not found")
         return ApiResponse(message="Theme deleted successfully")
