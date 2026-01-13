@@ -59,3 +59,13 @@ export const updateWhiskeys = async (themeId: number, whiskeys: { name: string; 
   }
   return response.json();
 };
+
+export const deleteTheme = async (themeId: number): Promise<{ message: string }> => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/themes/${themeId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to delete theme: ${response.statusText}`);
+  }
+  return response.json();
+};

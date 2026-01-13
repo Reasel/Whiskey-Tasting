@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchThemes, fetchWhiskeysByTheme, updateTheme, updateWhiskeys, type Theme, type Whiskey } from '@/lib/api';
+import { deleteTheme } from '@/lib/api/themes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/toast';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 export default function EditThemes() {
   const router = useRouter();
@@ -17,6 +19,7 @@ export default function EditThemes() {
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
   const [whiskeys, setWhiskeys] = useState<Whiskey[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     const auth = localStorage.getItem('adminAuthenticated');
@@ -85,6 +88,19 @@ export default function EditThemes() {
     } catch (error) {
       console.error('Failed to update whiskeys:', error);
       showToast('Failed to update whiskeys.', 'error');
+    }
+  };
+
+  const handleDeleteTheme = async () => {
+    if (!selectedTheme) return;
+    try {
+      await deleteTheme(selectedTheme.id!);
+      showToast('Theme deleted successfully!', 'success');
+      setSelectedTheme(null);
+      loadThemes(); // Refresh the themes list
+    } catch (error) {
+      console.error('Failed to delete theme:', error);
+      showToast('Failed to delete theme.', 'error');
     }
   };
 
@@ -169,7 +185,10 @@ export default function EditThemes() {
                     />
                   </div>
 
-                  <Button onClick={handleSaveTheme}>Save Changes</Button>
+                  <div className="flex gap-4">
+                    <Button onClick={handleSaveTheme}>Save Changes</Button>
+                    <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)}>Delete Theme</Button>
+                  </div>
                 </div>
               </div>
 
@@ -208,6 +227,17 @@ export default function EditThemes() {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Delete Theme"
+        description={`Are you sure you want to delete the theme "${selectedTheme?.name}"? This action cannot be undone and will remove all associated data.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteTheme}
+      />
     </div>
   );
 }
