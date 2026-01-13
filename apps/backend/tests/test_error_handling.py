@@ -33,9 +33,9 @@ class TestAPIErrorHandling:
             "user_name": "Test User",
             "whiskey_scores": {
                 "999": {  # Non-existent whiskey ID
-                    "aroma_score": 4,
-                    "flavor_score": 4,
-                    "finish_score": 4,
+                    "aroma_score": 4.0,
+                    "flavor_score": 4.0,
+                    "finish_score": 4.0,
                     "personal_rank": 1
                 }
             }
@@ -82,9 +82,9 @@ class TestAPIErrorHandling:
         # Submit tastings for all whiskeys
         whiskey_scores = {
             str(w["id"]): {
-                "aroma_score": 4,
-                "flavor_score": 4,
-                "finish_score": 4,
+                "aroma_score": 4.0,
+                "flavor_score": 4.0,
+                "finish_score": 4.0,
                 "personal_rank": i + 1
             } for i, w in enumerate(whiskeys)
         }

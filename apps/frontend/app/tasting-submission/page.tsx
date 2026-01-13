@@ -271,7 +271,7 @@ export default function TastingSubmission() {
                   </h2>
                 </div>
                 <p className="text-sm text-gray-600 mb-6">
-                  Rate each whiskey on a scale of 1-5 (1 being worst, 5 being best) for Aroma, Flavor, and Finish.
+                  Rate each whiskey on a scale of 1-5 (1 being worst, 5 being best) for Aroma, Flavor, and Finish. 
                   Then rank them from 1 to N (1 being your favorite of the night, N being the least favorite).
                 </p>
 
@@ -283,14 +283,15 @@ export default function TastingSubmission() {
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor={`aroma-${whiskey.id}`}>Aroma (1-5)</Label>
-                          <Input
+                           <Label htmlFor={`aroma-${whiskey.id}`}>Aroma (1-5)</Label>
+                           <Input
                             id={`aroma-${whiskey.id}`}
                             type="number"
                             min="1"
                             max="5"
+                            step="0.1"
                             value={scores[whiskey.id!]?.aroma_score || 3}
-                            onChange={(e) => updateScore(whiskey.id!, 'aroma_score', parseInt(e.target.value))}
+                            onChange={(e) => updateScore(whiskey.id!, 'aroma_score', parseFloat(e.target.value))}
                           />
                         </div>
                         <div className="space-y-2">
@@ -300,8 +301,9 @@ export default function TastingSubmission() {
                             type="number"
                             min="1"
                             max="5"
+                            step="0.1"
                             value={scores[whiskey.id!]?.flavor_score || 3}
-                            onChange={(e) => updateScore(whiskey.id!, 'flavor_score', parseInt(e.target.value))}
+                            onChange={(e) => updateScore(whiskey.id!, 'flavor_score', parseFloat(e.target.value))}
                           />
                         </div>
                         <div className="space-y-2">
@@ -311,8 +313,9 @@ export default function TastingSubmission() {
                             type="number"
                             min="1"
                             max="5"
+                            step="0.1"
                             value={scores[whiskey.id!]?.finish_score || 3}
-                            onChange={(e) => updateScore(whiskey.id!, 'finish_score', parseInt(e.target.value))}
+                            onChange={(e) => updateScore(whiskey.id!, 'finish_score', parseFloat(e.target.value))}
                           />
                         </div>
                         <div className="space-y-2">

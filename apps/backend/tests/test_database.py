@@ -211,16 +211,16 @@ class TestDatabaseTastings:
         tasting = test_db.create_or_update_tasting(
             user_id=user["id"],
             whiskey_id=whiskey["id"],
-            aroma_score=4,
-            flavor_score=4,
-            finish_score=3,
+            aroma_score=4.2,
+            flavor_score=4.1,
+            finish_score=3.5,
             personal_rank=2
         )
         assert tasting["user_id"] == user["id"]
         assert tasting["whiskey_id"] == whiskey["id"]
-        assert tasting["aroma_score"] == 4
-        assert tasting["flavor_score"] == 4
-        assert tasting["finish_score"] == 3
+        assert tasting["aroma_score"] == 4.2
+        assert tasting["flavor_score"] == 4.1
+        assert tasting["finish_score"] == 3.5
         assert tasting["personal_rank"] == 2
 
     def test_create_or_update_tasting_update(self, test_db):
@@ -232,9 +232,9 @@ class TestDatabaseTastings:
         tasting1 = test_db.create_or_update_tasting(
             user_id=user["id"],
             whiskey_id=whiskey["id"],
-            aroma_score=4,
-            flavor_score=4,
-            finish_score=3,
+            aroma_score=4.2,
+            flavor_score=4.1,
+            finish_score=3.5,
             personal_rank=2
         )
 
@@ -242,14 +242,14 @@ class TestDatabaseTastings:
         tasting2 = test_db.create_or_update_tasting(
             user_id=user["id"],
             whiskey_id=whiskey["id"],
-            aroma_score=5,
-            flavor_score=5,
-            finish_score=4,
+            aroma_score=5.0,
+            flavor_score=5.0,
+            finish_score=4.0,
             personal_rank=1
         )
 
         assert tasting2["id"] == tasting1["id"]
-        assert tasting2["aroma_score"] == 5
+        assert tasting2["aroma_score"] == 5.0
         assert tasting2["personal_rank"] == 1
 
     def test_get_tastings_by_theme(self, test_db):
@@ -263,9 +263,9 @@ class TestDatabaseTastings:
                 test_db.create_or_update_tasting(
                     user_id=user["id"],
                     whiskey_id=whiskey["id"],
-                    aroma_score=4,
-                    flavor_score=4,
-                    finish_score=4,
+                    aroma_score=4.0,
+                    flavor_score=4.0,
+                    finish_score=4.0,
                     personal_rank=1
                 )
 
@@ -282,9 +282,9 @@ class TestDatabaseTastings:
             test_db.create_or_update_tasting(
                 user_id=user["id"],
                 whiskey_id=whiskey["id"],
-                aroma_score=4,
-                flavor_score=4,
-                finish_score=4,
+                aroma_score=4.0,
+                flavor_score=4.0,
+                finish_score=4.0,
                 personal_rank=1
             )
 
@@ -319,9 +319,9 @@ class TestDatabaseStats:
         test_db.create_or_update_tasting(
             user_id=user["id"],
             whiskey_id=whiskey["id"],
-            aroma_score=4,
-            flavor_score=4,
-            finish_score=4,
+            aroma_score=4.0,
+            flavor_score=4.0,
+            finish_score=4.0,
             personal_rank=1
         )
 
