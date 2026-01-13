@@ -101,7 +101,7 @@ class ThemeScoresResponse(BaseModel):
 class UserListResponse(BaseModel):
     """Response with list of users."""
 
-    users: list[str]
+    users: list[User]
 
 
 # Config Models

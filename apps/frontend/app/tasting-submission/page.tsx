@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { fetchUsers, fetchThemes, fetchActiveTheme, fetchWhiskeysByTheme, submitTasting, fetchUserTastingsForTheme, type Theme, type Whiskey, type SubmitTastingRequest } from '@/lib/api';
+import { fetchUsers, fetchThemes, fetchActiveTheme, fetchWhiskeysByTheme, submitTasting, fetchUserTastingsForTheme, type Theme, type Whiskey, type SubmitTastingRequest, type User } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +10,7 @@ import { useToast } from '@/components/ui/toast';
 
 export default function TastingSubmission() {
   const { showToast } = useToast();
-  const [users, setUsers] = useState<string[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [themes, setThemes] = useState<Theme[]>([]);
   const [activeTheme, setActiveTheme] = useState<Theme | null>(null);
   const [whiskeys, setWhiskeys] = useState<Whiskey[]>([]);
@@ -220,8 +220,8 @@ export default function TastingSubmission() {
               >
                 <option value="">Choose a user...</option>
                 {users.map((user) => (
-                  <option key={user} value={user}>
-                    {user}
+                  <option key={user.id} value={user.name}>
+                    {user.name}
                   </option>
                 ))}
                 <option value="new">+ Add New User</option>

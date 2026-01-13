@@ -94,6 +94,11 @@ export default function Administration() {
                 ADD USER
               </Button>
             </Link>
+            <Link href="/delete-user">
+              <Button variant="destructive" className="w-full h-24 text-lg font-mono uppercase">
+                DELETE USER
+              </Button>
+            </Link>
             <Link href="/data-view">
               <Button variant="default" className="w-full h-24 text-lg font-mono uppercase">
                 VIEW RESULTS

@@ -2,7 +2,7 @@
  * Theme management API functions
  */
 
-import { apiFetch, apiPost, apiPut } from './client';
+import { apiFetch, apiPost, apiPut, apiDelete } from './client';
 
 // Types
 export interface Theme {
@@ -56,6 +56,14 @@ export const updateWhiskeys = async (themeId: number, whiskeys: { name: string; 
   const response = await apiPut(`/themes/${themeId}/whiskeys`, { whiskeys });
   if (!response.ok) {
     throw new Error(`Failed to update whiskeys: ${response.statusText}`);
+  }
+  return response.json();
+};
+
+export const deleteTheme = async (themeId: number): Promise<{ message: string }> => {
+  const response = await apiDelete(`/themes/${themeId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to delete theme: ${response.statusText}`);
   }
   return response.json();
 };

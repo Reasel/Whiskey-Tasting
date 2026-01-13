@@ -4,10 +4,10 @@ This file provides guidance to agents when working with code in this repository.
 
 ## Build/Lint/Test Commands
 
-- Backend testing via nix-shell: `nix-shell ./nix/pythonShell.nix && cd apps/backend && python3 -m pip install -e .[dev] && pytest` (fast local testing alternative to Docker rebuild; installs deps & runs tests via pip)
+- Backend testing via nix-shell: `nix-shell ./nix/pythonShell.nix --run "cd apps/backend && python3 -m pytest"` (fast local testing alternative to Docker rebuild; installs deps & runs tests via pip)
 - Run single test (if venv set up): `cd apps/backend && uv run --python python3 pytest tests/test_seed_data.py`
 - Frontend dev with turbopack: `cd apps/frontend && npm run dev`
-- In Nix environment: `nix-shell ./nix/pythonShell.nix` before running Python commands
+- In Nix environment: `nix-shell ./nix/pythonShell.nix -run "<Commands here>"` before running Python commands
 - All uv commands require `--python python3` flag (uv sync/troubleshooting via pip if fails)
 
 ## Testing Suite
