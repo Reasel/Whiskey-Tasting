@@ -2,7 +2,7 @@
  * User management API functions
  */
 
-import { apiFetch, apiPost } from './client';
+import { apiFetch, apiPost, apiDelete } from './client';
 
 // Types
 export interface User {
@@ -11,7 +11,7 @@ export interface User {
 }
 
 export interface UserListResponse {
-  users: string[];
+  users: User[];
 }
 
 // API Functions
@@ -27,6 +27,14 @@ export const createUser = async (name: string): Promise<{ message: string }> => 
   const response = await apiPost('/users', { name });
   if (!response.ok) {
     throw new Error(`Failed to create user: ${response.statusText}`);
+  }
+  return response.json();
+};
+
+export const deleteUser = async (userId: number): Promise<{ message: string }> => {
+  const response = await apiDelete(`/users/${userId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to delete user: ${response.statusText}`);
   }
   return response.json();
 };

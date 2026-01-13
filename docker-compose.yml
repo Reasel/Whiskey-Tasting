@@ -1,6 +1,6 @@
 services:
   whiskey-tasting:
-    image: reasel/whiskey-tasting:0.0.3
+    build: .
     container_name: whiskey-tasting
     ports:
       - 3010:3010

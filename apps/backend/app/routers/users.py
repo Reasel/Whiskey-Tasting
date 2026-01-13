@@ -25,7 +25,28 @@ async def create_user(request: dict) -> ApiResponse:
 async def list_users() -> UserListResponse:
     """List all users."""
     try:
-        users = db.list_users()
+        # Get full user objects instead of just names
+        all_users = db.users.all()
+        users = [user for user in all_users]  # Each user is already a dict with id, name, created_at
         return UserListResponse(users=users)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to list users: {str(e)}")
+
+
+@router.delete("/users/{user_id}", response_model=ApiResponse)
+async def delete_user(user_id: int) -> ApiResponse:
+    """Delete a user by ID."""
+    try:
+        user = db.get_user(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        success = db.delete_user(user_id)
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to delete user")
+
+        return ApiResponse(message="User deleted successfully")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete user: {str(e)}")

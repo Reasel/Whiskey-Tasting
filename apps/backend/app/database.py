@@ -225,6 +225,16 @@ class Database:
         """List all user names."""
         return [user["name"] for user in self.users.all()]
 
+    def delete_user(self, user_id: int) -> bool:
+        """Delete user by ID and their associated tastings."""
+        User = Query()
+        removed = self.users.remove(User.id == user_id)
+        if removed:
+            # Also delete associated tastings
+            Tasting = Query()
+            self.tastings.remove(Tasting.user_id == user_id)
+        return len(removed) > 0
+
     # Tasting operations
     def create_or_update_tasting(
         self,
