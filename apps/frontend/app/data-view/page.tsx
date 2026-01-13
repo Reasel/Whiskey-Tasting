@@ -108,8 +108,21 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
   const [sortBy, setSortBy] = useState<string>('whiskey');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+  // Helper function to calculate averages for a whiskey
+  const calculateAverages = (scores: any[]) => {
+    if (scores.length === 0) return { avgAroma: 0, avgFlavor: 0, avgFinish: 0 };
+    const totalAroma = scores.reduce((sum, score) => sum + score.aroma_score, 0);
+    const totalFlavor = scores.reduce((sum, score) => sum + score.flavor_score, 0);
+    const totalFinish = scores.reduce((sum, score) => sum + score.finish_score, 0);
+    return {
+      avgAroma: totalAroma / scores.length,
+      avgFlavor: totalFlavor / scores.length,
+      avgFinish: totalFinish / scores.length,
+    };
+  };
+
   // Collect all whiskeys with their scores, only from themes that have submissions
-  const allWhiskeys: { whiskey: any; theme: string; scores: any[] }[] = [];
+  const allWhiskeys: { whiskey: any; theme: string; scores: any[]; averages: { avgAroma: number; avgFlavor: number; avgFinish: number } }[] = [];
 
   themesScores.forEach((themeScore) => {
     // Only include themes that have at least one submission
@@ -122,6 +135,7 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
             whiskey,
             theme: themeScore.theme.name,
             scores: whiskey.scores,
+            averages: calculateAverages(whiskey.scores),
           });
         }
       });
@@ -153,6 +167,18 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
       case 'proof':
         aVal = a.whiskey.proof;
         bVal = b.whiskey.proof;
+        break;
+      case 'aroma':
+        aVal = a.averages.avgAroma;
+        bVal = b.averages.avgAroma;
+        break;
+      case 'flavor':
+        aVal = a.averages.avgFlavor;
+        bVal = b.averages.avgFlavor;
+        break;
+      case 'finish':
+        aVal = a.averages.avgFinish;
+        bVal = b.averages.avgFinish;
         break;
       case 'avgScore':
         aVal = a.whiskey.average_score;
@@ -193,8 +219,17 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
               <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('proof')}>
                 Proof {sortBy === 'proof' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
+              <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('aroma')}>
+                Aroma {sortBy === 'aroma' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
+              <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('flavor')}>
+                Flavor {sortBy === 'flavor' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
+              <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('finish')}>
+                Finish {sortBy === 'finish' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </th>
               <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('avgScore')}>
-                Avg Score {sortBy === 'avgScore' && (sortDirection === 'asc' ? '↑' : '↓')}
+                Overall {sortBy === 'avgScore' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
               <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('tasters')}>
                 Tasters {sortBy === 'tasters' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -209,6 +244,9 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
                 </td>
                 <td className="py-3 px-2">{item.theme}</td>
                 <td className="text-center py-3 px-2 font-bold">{item.whiskey.proof}</td>
+                <td className="text-center py-3 px-2 font-bold">{item.averages.avgAroma.toFixed(1)}</td>
+                <td className="text-center py-3 px-2 font-bold">{item.averages.avgFlavor.toFixed(1)}</td>
+                <td className="text-center py-3 px-2 font-bold">{item.averages.avgFinish.toFixed(1)}</td>
                 <td className="text-center py-3 px-2 font-bold">{item.whiskey.average_score.toFixed(1)}</td>
                 <td className="text-center py-3 px-2 font-bold">{item.scores.length}</td>
               </tr>
@@ -223,6 +261,19 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
 function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
   const [sortBy, setSortBy] = useState<string>('whiskey');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Helper function to calculate averages for a whiskey
+  const calculateAverages = (scores: any[]) => {
+    if (scores.length === 0) return { avgAroma: 0, avgFlavor: 0, avgFinish: 0 };
+    const totalAroma = scores.reduce((sum, score) => sum + score.aroma_score, 0);
+    const totalFlavor = scores.reduce((sum, score) => sum + score.flavor_score, 0);
+    const totalFinish = scores.reduce((sum, score) => sum + score.finish_score, 0);
+    return {
+      avgAroma: totalAroma / scores.length,
+      avgFlavor: totalFlavor / scores.length,
+      avgFinish: totalFinish / scores.length,
+    };
+  };
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
@@ -244,8 +295,19 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
   return (
     <div className="space-y-8">
       {themesScores.map((themeScore) => {
+        // Calculate theme averages
+        const whiskeysWithScores = themeScore.whiskeys.filter(w => w.scores.length > 0);
+        const themeAverages = whiskeysWithScores.length > 0 ? {
+          avgAroma: whiskeysWithScores.reduce((sum, w) => sum + calculateAverages(w.scores).avgAroma, 0) / whiskeysWithScores.length,
+          avgFlavor: whiskeysWithScores.reduce((sum, w) => sum + calculateAverages(w.scores).avgFlavor, 0) / whiskeysWithScores.length,
+          avgFinish: whiskeysWithScores.reduce((sum, w) => sum + calculateAverages(w.scores).avgFinish, 0) / whiskeysWithScores.length,
+          avgOverall: whiskeysWithScores.reduce((sum, w) => sum + w.average_score, 0) / whiskeysWithScores.length,
+        } : { avgAroma: 0, avgFlavor: 0, avgFinish: 0, avgOverall: 0 };
+
         const sortedWhiskeys = [...themeScore.whiskeys].sort((a, b) => {
           let aVal: any, bVal: any;
+          const aAverages = calculateAverages(a.scores);
+          const bAverages = calculateAverages(b.scores);
           switch (sortBy) {
             case 'whiskey':
               aVal = a.whiskey_name.toLowerCase();
@@ -254,6 +316,18 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
             case 'proof':
               aVal = a.proof || 0;
               bVal = b.proof || 0;
+              break;
+            case 'aroma':
+              aVal = aAverages.avgAroma;
+              bVal = bAverages.avgAroma;
+              break;
+            case 'flavor':
+              aVal = aAverages.avgFlavor;
+              bVal = bAverages.avgFlavor;
+              break;
+            case 'finish':
+              aVal = aAverages.avgFinish;
+              bVal = bAverages.avgFinish;
               break;
             case 'avgScore':
               aVal = a.average_score;
@@ -277,9 +351,17 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
 
         return (
           <div key={themeScore.theme.id} className="border border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] p-8">
-            <h2 className="font-serif text-3xl font-bold text-black mb-2">
-              {themeScore.theme.name}
-            </h2>
+            <div className="flex justify-between items-start mb-2">
+              <h2 className="font-serif text-3xl font-bold text-black">
+                {themeScore.theme.name}
+              </h2>
+              <div className="text-right font-mono text-sm">
+                <div>Avg Aroma: {themeAverages.avgAroma.toFixed(1)}</div>
+                <div>Avg Flavor: {themeAverages.avgFlavor.toFixed(1)}</div>
+                <div>Avg Finish: {themeAverages.avgFinish.toFixed(1)}</div>
+                <div>Avg Overall: {themeAverages.avgOverall.toFixed(1)}</div>
+              </div>
+            </div>
             <p className="font-sans text-sm text-[#6B7280] mb-6">{themeScore.theme.notes}</p>
 
             <div className="overflow-x-auto">
@@ -292,8 +374,17 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
                     <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('proof')}>
                       Proof {sortBy === 'proof' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
+                    <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('aroma')}>
+                      Aroma {sortBy === 'aroma' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('flavor')}>
+                      Flavor {sortBy === 'flavor' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('finish')}>
+                      Finish {sortBy === 'finish' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
                     <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('avgScore')}>
-                      Avg Score {sortBy === 'avgScore' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      Overall {sortBy === 'avgScore' && (sortDirection === 'asc' ? '↑' : '↓')}
                     </th>
                     <th className="text-center py-3 px-2 font-bold uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('rank')}>
                       Rank {sortBy === 'rank' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -304,17 +395,23 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedWhiskeys.map((whiskey) => (
-                    <tr key={whiskey.whiskey_id} className="border-b border-black">
-                      <td className="py-3 px-2">
-                        <div className="font-bold text-black">{whiskey.whiskey_name}</div>
-                      </td>
-                      <td className="text-center py-3 px-2 font-bold">{whiskey.proof || '??'}</td>
-                      <td className="text-center py-3 px-2 font-bold">{whiskey.average_score.toFixed(1)}</td>
-                      <td className="text-center py-3 px-2 font-bold">{whiskey.rank_by_average}</td>
-                      <td className="text-center py-3 px-2 font-bold">{whiskey.scores.length}</td>
-                    </tr>
-                  ))}
+                  {sortedWhiskeys.map((whiskey) => {
+                    const whiskeyAverages = calculateAverages(whiskey.scores);
+                    return (
+                      <tr key={whiskey.whiskey_id} className="border-b border-black">
+                        <td className="py-3 px-2">
+                          <div className="font-bold text-black">{whiskey.whiskey_name}</div>
+                        </td>
+                        <td className="text-center py-3 px-2 font-bold">{whiskey.proof || '??'}</td>
+                        <td className="text-center py-3 px-2 font-bold">{whiskeyAverages.avgAroma.toFixed(1)}</td>
+                        <td className="text-center py-3 px-2 font-bold">{whiskeyAverages.avgFlavor.toFixed(1)}</td>
+                        <td className="text-center py-3 px-2 font-bold">{whiskeyAverages.avgFinish.toFixed(1)}</td>
+                        <td className="text-center py-3 px-2 font-bold">{whiskey.average_score.toFixed(1)}</td>
+                        <td className="text-center py-3 px-2 font-bold">{whiskey.rank_by_average}</td>
+                        <td className="text-center py-3 px-2 font-bold">{whiskey.scores.length}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
