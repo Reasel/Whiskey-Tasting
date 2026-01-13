@@ -4,10 +4,20 @@
  * Single source of truth for API configuration and base fetch utilities.
  */
 
-// Support relative URLs for reverse proxy setups
-const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8010';
-export const API_URL = configuredApiUrl;
-export const API_BASE = configuredApiUrl === 'relative' ? '/api/v1' : `${API_URL}/api/v1`;
+const getApiUrl = () => {
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${window.location.hostname}`;
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost';
+};
+
+export const API_URL = getApiUrl();
+export const API_BASE = `${API_URL}/api/v1`;
+
+// Debug log
+if (typeof window !== 'undefined') {
+  console.log('API_URL:', API_URL);
+}
 
 /**
  * Standard fetch wrapper with common error handling.

@@ -125,6 +125,8 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
     }
   });
 
+  console.log('allWhiskeys:', allWhiskeys);
+
   if (allWhiskeys.length === 0) {
     return (
       <p className="font-mono text-sm text-muted-text uppercase tracking-wider">

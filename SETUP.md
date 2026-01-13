@@ -85,6 +85,58 @@ npm run dev  # Start dev server
 
 ## Docker Setup (Alternative)
 
+### Using Pre-built Image
+For quick deployment without building from source, you can use the pre-built Docker image. Create a `docker-compose.yml` file with the following content:
+
+```yaml
+services:
+  whiskey-tasting:
+    image: reasel/whiskey-tasting:0.0.3
+    container_name: whiskey-tasting
+    ports:
+      - 3010:3010
+      - 8010:8010
+    volumes:
+      - whiskey-data:/app/backend/data
+    environment:
+      - NODE_ENV=production
+      - HOSTNAME=0.0.0.0
+      - HOST=<YourHostnameHere>
+      - PORT=3010
+      - NEXT_PUBLIC_API_URL=${HOST}:8010
+      - CORS_ORIGINS_STR_ADDITIONAL=${HOST}:${PORT}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8010/api/v1/health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+volumes:
+  whiskey-data:
+    driver: local
+```
+
+Then run:
+```bash
+# Replace <YourHostnameHere> with your actual hostname/IP
+HOST=localhost docker-compose up -d
+
+# Or for remote deployment
+HOST=yourdomain.com docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
+```
+
+### Local Development
 ```bash
 # Build and run with Docker Compose
 docker-compose up -d
@@ -95,6 +147,25 @@ docker-compose logs -f
 # Stop containers
 docker-compose down
 ```
+
+### Remote Deployment
+For deploying on a remote machine, specify the host IP or domain:
+
+```bash
+# Set the HOST environment variable to your server's IP or domain
+HOST=192.168.1.47 docker-compose up -d
+
+# Or for a domain
+HOST=yourdomain.com docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
+```
+
+The application will automatically configure API calls and CORS to use the specified host.
 
 ---
 

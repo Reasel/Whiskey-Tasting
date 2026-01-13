@@ -121,7 +121,7 @@ done
 echo ""
 info "Starting frontend server..."
 cd /app/frontend
-npm start &
+PORT=3010 npm start &
 FRONTEND_PID=$!
 
 echo ""
