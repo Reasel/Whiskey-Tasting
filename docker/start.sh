@@ -88,6 +88,11 @@ else
     status "Data directory exists: $DATA_DIR"
 fi
 
+# Ensure correct ownership of data directory (important for volume mounts)
+info "Ensuring correct ownership of data directory..."
+chown -R appuser:appuser "$DATA_DIR" 2>/dev/null || warn "Could not change ownership (may be expected with volume mounts)"
+ls -la "$DATA_DIR"
+
 # Data directory setup complete
 status "Data directory setup complete"
 

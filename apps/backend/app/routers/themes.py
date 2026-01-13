@@ -1,5 +1,6 @@
 """Theme management endpoints."""
 
+import logging
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -14,29 +15,36 @@ from app.schemas.models import (
     ThemeUpdateRequest,
 )
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 
 @router.post("/themes", response_model=ThemeCreateResponse)
 async def create_theme(request: CreateThemeRequest) -> ThemeCreateResponse:
     """Create a new tasting theme."""
+    logger.info(f"Received theme creation request: {request.model_dump()}")
     try:
         theme = db.create_theme(
             name=request.name,
             notes=request.notes,
         )
+        logger.info(f"Theme created: {theme}")
         # Create placeholder whiskeys
         for i in range(1, request.num_whiskeys + 1):
+            logger.info(f"Creating whiskey {i} for theme {theme['id']}")
             db.create_whiskey(
                 theme_id=theme["id"],
                 name=f"Whiskey {i}",
                 proof=None,
             )
+        logger.info(f"Theme creation completed successfully")
         return ThemeCreateResponse(
             message="Theme created successfully",
             theme=ThemeResponse(**theme),
         )
     except Exception as e:
+        logger.error(f"Failed to create theme: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to create theme: {str(e)}")
 
 
