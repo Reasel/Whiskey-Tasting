@@ -1,8 +1,11 @@
 """Application configuration using pydantic-settings."""
 
+import logging
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
@@ -19,10 +22,26 @@ class Settings(BaseSettings):
     port: int = 8010
 
     # CORS Configuration
-    cors_origins: list[str] = [
-        "http://localhost:3010",
-        "http://127.0.0.1:3010",
-    ]
+    cors_origins_str: str = ""
+    cors_origins_str_additional: str = ""
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """CORS origins from environment variables."""
+        origins = [
+            "http://localhost:3010",
+            "http://127.0.0.1:3010",
+            "http://localhost",
+            "http://localhost:80",
+            "http://127.0.0.1",
+            "http://127.0.0.1:80",
+        ]
+        logger.info(f"CORS_ORIGINS_STR_ADDITIONAL: {self.cors_origins_str_additional}")
+        if self.cors_origins_str:
+            origins.extend(self.cors_origins_str.split(","))
+        if self.cors_origins_str_additional:
+            origins.extend(self.cors_origins_str_additional.split(","))
+        return list(set(origins))  # Remove duplicates
 
     # Paths
     data_dir: Path = Path(__file__).parent.parent / "data"

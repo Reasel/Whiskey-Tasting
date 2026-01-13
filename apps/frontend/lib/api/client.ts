@@ -4,8 +4,20 @@
  * Single source of truth for API configuration and base fetch utilities.
  */
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8010';
+const getApiUrl = () => {
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${window.location.hostname}`;
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost';
+};
+
+export const API_URL = getApiUrl();
 export const API_BASE = `${API_URL}/api/v1`;
+
+// Debug log
+if (typeof window !== 'undefined') {
+  console.log('API_URL:', API_URL);
+}
 
 /**
  * Standard fetch wrapper with common error handling.
