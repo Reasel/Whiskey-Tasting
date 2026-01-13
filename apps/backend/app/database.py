@@ -240,9 +240,9 @@ class Database:
         self,
         user_id: int,
         whiskey_id: int,
-        aroma_score: int,
-        flavor_score: int,
-        finish_score: int,
+        aroma_score: float,
+        flavor_score: float,
+        finish_score: float,
         personal_rank: int,
     ) -> dict[str, Any]:
         """Create or update a tasting entry."""

@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   description: 'Log Whiskey Tasting entries for the night',
   applicationName: 'Whiskey Tasting',
   keywords: ['whiskey', 'tasting'],
+  icons: {
+    icon: '/logo.svg',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

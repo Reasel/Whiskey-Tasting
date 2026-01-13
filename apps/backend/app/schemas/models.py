@@ -39,9 +39,9 @@ class Tasting(BaseModel):
     id: int | None = None
     user_id: int
     whiskey_id: int
-    aroma_score: int  # 1-5
-    flavor_score: int  # 1-5
-    finish_score: int  # 1-5
+    aroma_score: float  # 1-5, allows decimals
+    flavor_score: float  # 1-5, allows decimals
+    finish_score: float  # 1-5, allows decimals
     personal_rank: int  # 1-N ranking
     created_at: str | None = None
     updated_at: str | None = None
@@ -66,16 +66,16 @@ class SubmitTastingRequest(BaseModel):
     """Request to submit tasting scores."""
 
     user_name: str  # Will create user if doesn't exist
-    whiskey_scores: dict[int, dict[str, int]]  # whiskey_id -> {aroma_score, flavor_score, finish_score, personal_rank}
+    whiskey_scores: dict[int, dict[str, float]]  # whiskey_id -> {aroma_score, flavor_score, finish_score, personal_rank}
 
 
 class TastingScore(BaseModel):
     """Individual tasting score with calculated average."""
 
     user_name: str
-    aroma_score: int
-    flavor_score: int
-    finish_score: int
+    aroma_score: float
+    flavor_score: float
+    finish_score: float
     average_score: float
     personal_rank: int
 
@@ -174,4 +174,4 @@ class UserTastingsResponse(BaseModel):
 
     user_name: str
     theme: Theme
-    tastings: dict[int, dict[str, int]]  # whiskey_id -> {aroma_score, flavor_score, finish_score, personal_rank}
+    tastings: dict[int, dict[str, float]]  # whiskey_id -> {aroma_score, flavor_score, finish_score, personal_rank}

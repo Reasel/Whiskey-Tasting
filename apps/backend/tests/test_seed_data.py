@@ -41,28 +41,28 @@ async def test_seed_sample_data(api_client):
         {
             "user_name": "Alice Johnson",
             "whiskey_scores": {
-                whiskey_ids[0]: {"aroma_score": 4, "flavor_score": 4, "finish_score": 3, "personal_rank": 2},
-                whiskey_ids[1]: {"aroma_score": 5, "flavor_score": 5, "finish_score": 4, "personal_rank": 1},
-                whiskey_ids[2]: {"aroma_score": 3, "flavor_score": 4, "finish_score": 4, "personal_rank": 3},
-                whiskey_ids[3]: {"aroma_score": 4, "flavor_score": 3, "finish_score": 3, "personal_rank": 4}
+                whiskey_ids[0]: {"aroma_score": 4.0, "flavor_score": 4.0, "finish_score": 3.0, "personal_rank": 2},
+                whiskey_ids[1]: {"aroma_score": 5.0, "flavor_score": 5.0, "finish_score": 4.0, "personal_rank": 1},
+                whiskey_ids[2]: {"aroma_score": 3.0, "flavor_score": 4.0, "finish_score": 4.0, "personal_rank": 3},
+                whiskey_ids[3]: {"aroma_score": 4.0, "flavor_score": 3.0, "finish_score": 3.0, "personal_rank": 4}
             }
         },
         {
             "user_name": "Bob Smith",
             "whiskey_scores": {
-                whiskey_ids[0]: {"aroma_score": 3, "flavor_score": 3, "finish_score": 4, "personal_rank": 3},
-                whiskey_ids[1]: {"aroma_score": 4, "flavor_score": 4, "finish_score": 5, "personal_rank": 1},
-                whiskey_ids[2]: {"aroma_score": 4, "flavor_score": 5, "finish_score": 4, "personal_rank": 2},
-                whiskey_ids[3]: {"aroma_score": 2, "flavor_score": 3, "finish_score": 2, "personal_rank": 4}
+                whiskey_ids[0]: {"aroma_score": 3.0, "flavor_score": 3.0, "finish_score": 4.0, "personal_rank": 3},
+                whiskey_ids[1]: {"aroma_score": 4.0, "flavor_score": 4.0, "finish_score": 5.0, "personal_rank": 1},
+                whiskey_ids[2]: {"aroma_score": 4.0, "flavor_score": 5.0, "finish_score": 4.0, "personal_rank": 2},
+                whiskey_ids[3]: {"aroma_score": 2.0, "flavor_score": 3.0, "finish_score": 2.0, "personal_rank": 4}
             }
         },
         {
             "user_name": "Charlie Brown",
             "whiskey_scores": {
-                whiskey_ids[0]: {"aroma_score": 4, "flavor_score": 4, "finish_score": 3, "personal_rank": 2},
-                whiskey_ids[1]: {"aroma_score": 3, "flavor_score": 3, "finish_score": 3, "personal_rank": 4},
-                whiskey_ids[2]: {"aroma_score": 5, "flavor_score": 5, "finish_score": 5, "personal_rank": 1},
-                whiskey_ids[3]: {"aroma_score": 4, "flavor_score": 4, "finish_score": 4, "personal_rank": 3}
+                whiskey_ids[0]: {"aroma_score": 4.0, "flavor_score": 4.0, "finish_score": 3.0, "personal_rank": 2},
+                whiskey_ids[1]: {"aroma_score": 3.0, "flavor_score": 3.0, "finish_score": 3.0, "personal_rank": 4},
+                whiskey_ids[2]: {"aroma_score": 5.0, "flavor_score": 5.0, "finish_score": 5.0, "personal_rank": 1},
+                whiskey_ids[3]: {"aroma_score": 4.0, "flavor_score": 4.0, "finish_score": 4.0, "personal_rank": 3}
             }
         }
     ]

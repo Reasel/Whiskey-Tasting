@@ -162,9 +162,9 @@ class TestTastingsAPI:
             "user_name": "Test User",
             "whiskey_scores": {
                 str(sample_whiskeys[0]["id"]): {
-                    "aroma_score": 4,
-                    "flavor_score": 4,
-                    "finish_score": 3,
+                    "aroma_score": 4.2,
+                    "flavor_score": 4.1,
+                    "finish_score": 3.5,
                     "personal_rank": 2
                 }
             }

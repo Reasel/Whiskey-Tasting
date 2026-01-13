@@ -62,7 +62,7 @@ async def get_theme_scores(theme_id: int) -> ThemeScoresResponse:
                     "aroma_score": tasting["aroma_score"],
                     "flavor_score": tasting["flavor_score"],
                     "finish_score": tasting["finish_score"],
-                    "average_score": (tasting["aroma_score"] + tasting["flavor_score"] + tasting["finish_score"]) / 3,
+                    "average_score": round((tasting["aroma_score"] + tasting["flavor_score"] + tasting["finish_score"]) / 3, 1),
                     "personal_rank": tasting["personal_rank"],
                 })
 
@@ -72,7 +72,7 @@ async def get_theme_scores(theme_id: int) -> ThemeScoresResponse:
             wid = whiskey["id"]
             scores = whiskey_scores.get(wid, [])
             if scores:
-                avg_score = sum(s["average_score"] for s in scores) / len(scores)
+                avg_score = round(sum(s["average_score"] for s in scores) / len(scores), 1)
                 rank_by_avg = sorted([w for w in whiskeys_list if w["scores"]], key=lambda x: x["average_score"], reverse=True)
                 rank = next((i+1 for i, w in enumerate(rank_by_avg) if w["whiskey_id"] == wid), len(rank_by_avg)+1)
             else:
@@ -131,7 +131,7 @@ async def get_all_themes_scores() -> list[ThemeScoresResponse]:
                         "aroma_score": tasting["aroma_score"],
                         "flavor_score": tasting["flavor_score"],
                         "finish_score": tasting["finish_score"],
-                        "average_score": (tasting["aroma_score"] + tasting["flavor_score"] + tasting["finish_score"]) / 3,
+                        "average_score": round((tasting["aroma_score"] + tasting["flavor_score"] + tasting["finish_score"]) / 3, 1),
                         "personal_rank": tasting["personal_rank"],
                     })
 
@@ -141,7 +141,7 @@ async def get_all_themes_scores() -> list[ThemeScoresResponse]:
                 wid = whiskey["id"]
                 scores = whiskey_scores.get(wid, [])
                 if scores:
-                    avg_score = sum(s["average_score"] for s in scores) / len(scores)
+                    avg_score = round(sum(s["average_score"] for s in scores) / len(scores), 1)
                 else:
                     avg_score = 0.0
 
