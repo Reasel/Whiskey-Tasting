@@ -3,10 +3,9 @@ name: CI/CD
 on:
   push:
     branches: [ "master" ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ "master" ]
-  push:
-    tags: [ 'v*' ]
 
 env:
   REGISTRY: docker.io
