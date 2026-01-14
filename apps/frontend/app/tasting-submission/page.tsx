@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { fetchUsers, fetchThemes, fetchActiveTheme, fetchWhiskeysByTheme, submitTasting, fetchUserTastingsForTheme, type Theme, type Whiskey, type SubmitTastingRequest, type User } from '@/lib/api';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ export default function TastingSubmission() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    console.log('useEffect loadInitialData');
     loadInitialData();
   }, []);
 
@@ -47,6 +48,7 @@ export default function TastingSubmission() {
   }, [selectedUser, selectedThemeId, scores]);
 
   useEffect(() => {
+    console.log('useEffect selectedThemeId:', selectedThemeId);
     if (selectedThemeId) {
       loadWhiskeys(selectedThemeId);
     }
@@ -61,13 +63,15 @@ export default function TastingSubmission() {
     }
   }, [selectedUser, selectedThemeId]);
 
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
+    console.log('loadInitialData called');
     try {
       const [usersData, themesData, activeThemeData] = await Promise.all([
         fetchUsers(),
         fetchThemes(),
         fetchActiveTheme(),
       ]);
+      console.log('Fetched data:', { users: usersData.users.length, themes: themesData.themes.length, activeTheme: activeThemeData });
       setUsers(usersData.users);
       setThemes(themesData.themes);
       setActiveTheme(activeThemeData);
@@ -77,19 +81,21 @@ export default function TastingSubmission() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadWhiskeys = async (themeId: number) => {
+  const loadWhiskeys = useCallback(async (themeId: number) => {
+    console.log('loadWhiskeys called with themeId:', themeId);
     try {
       const whiskeysData = await fetchWhiskeysByTheme(themeId);
+      console.log('Fetched whiskeys:', whiskeysData.length);
       setWhiskeys(whiskeysData);
       resetScores();
     } catch (error) {
       console.error('Failed to load whiskeys:', error);
     }
-  };
+  }, []);
 
-  const loadExistingTastings = async () => {
+  const loadExistingTastings = useCallback(async () => {
     if (!selectedUser || !selectedThemeId || selectedUser === 'new') return;
 
     try {
@@ -114,9 +120,9 @@ export default function TastingSubmission() {
       console.error('Failed to load existing tastings:', error);
       resetScores();
     }
-  };
+  }, [whiskeys, selectedUser, selectedThemeId]);
 
-  const resetScores = () => {
+  const resetScores = useCallback(() => {
     const initialScores: Record<number, { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }> = {};
     whiskeys.forEach((whiskey, index) => {
       initialScores[whiskey.id!] = {
@@ -127,16 +133,16 @@ export default function TastingSubmission() {
       };
     });
     setScores(initialScores);
-  };
+  }, [whiskeys]);
 
-  const handleUserChange = (value: string) => {
+  const handleUserChange = useCallback((value: string) => {
     setSelectedUser(value);
     if (value !== 'new') {
       setNewUserName('');
     }
-  };
+  }, []);
 
-  const handleSubmitTasting = async (e: React.FormEvent, silent = false) => {
+  const handleSubmitTasting = useCallback(async (e: React.FormEvent, silent = false) => {
     if (!silent) e.preventDefault();
     const userName = selectedUser === 'new' ? newUserName.trim() : selectedUser;
     if (!userName || !selectedThemeId) return;
@@ -162,9 +168,9 @@ export default function TastingSubmission() {
     } finally {
       if (!silent) setSubmitting(false);
     }
-  };
+  }, [selectedUser, newUserName, selectedThemeId, scores, showToast, resetScores]);
 
-  const updateScore = (whiskeyId: number, field: string, value: number) => {
+  const updateScore = useCallback((whiskeyId: number, field: string, value: number) => {
     setScores(prev => ({
       ...prev,
       [whiskeyId]: {
@@ -172,7 +178,7 @@ export default function TastingSubmission() {
         [field]: value,
       },
     }));
-  };
+  }, []);
 
   if (loading) {
     return (
