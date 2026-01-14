@@ -207,8 +207,13 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
       default:
         return 0;
     }
-    if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
-    if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+    if (aVal == null && bVal == null) return 0;
+    if (aVal == null) return sortDirection === 'asc' ? -1 : 1;
+    if (bVal == null) return sortDirection === 'asc' ? 1 : -1;
+    if ((aVal as string | number) < (bVal as string | number))
+      return sortDirection === 'asc' ? -1 : 1;
+    if ((aVal as string | number) > (bVal as string | number))
+      return sortDirection === 'asc' ? 1 : -1;
     return 0;
   });
 
