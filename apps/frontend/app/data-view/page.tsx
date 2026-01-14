@@ -170,7 +170,7 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
   };
 
   const sortedWhiskeys = [...allWhiskeys].sort((a, b) => {
-    let aVal: string | number | null, bVal: string | number | null;
+    let aVal: string | number, bVal: string | number;
     switch (sortBy) {
       case 'whiskey':
         aVal = a.whiskey.whiskey_name.toLowerCase();
@@ -181,8 +181,8 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
         bVal = b.theme.toLowerCase();
         break;
       case 'proof':
-        aVal = a.whiskey.proof;
-        bVal = b.whiskey.proof;
+        aVal = a.whiskey.proof || 0;
+        bVal = b.whiskey.proof || 0;
         break;
       case 'aroma':
         aVal = a.averages.avgAroma;

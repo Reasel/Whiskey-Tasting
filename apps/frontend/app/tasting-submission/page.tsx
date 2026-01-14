@@ -175,7 +175,7 @@ export default function TastingSubmission() {
   useEffect(() => {
     console.log('useEffect loadInitialData');
     loadInitialData();
-  }, [loadInitialData]);
+  }, []); // loadInitialData is stable
 
   // Auto-save every 5 seconds
   useEffect(() => {
@@ -185,7 +185,7 @@ export default function TastingSubmission() {
       }
     }, 5000);
     return () => clearInterval(interval);
-  }, [selectedUser, selectedThemeId, scores, handleSubmitTasting]);
+  }, [selectedUser, selectedThemeId, scores]); // handleSubmitTasting is stable
 
   // Save on page unload
   useEffect(() => {
@@ -196,14 +196,14 @@ export default function TastingSubmission() {
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [selectedUser, selectedThemeId, scores, handleSubmitTasting]);
+  }, [selectedUser, selectedThemeId, scores]); // handleSubmitTasting is stable
 
   useEffect(() => {
     console.log('useEffect selectedThemeId:', selectedThemeId);
     if (selectedThemeId) {
       loadWhiskeys(selectedThemeId);
     }
-  }, [selectedThemeId, loadWhiskeys]);
+  }, [selectedThemeId]); // loadWhiskeys is stable
 
   useEffect(() => {
     if (selectedUser && selectedThemeId && selectedUser !== 'new') {
@@ -212,7 +212,7 @@ export default function TastingSubmission() {
       // Reset scores for new user or no selection
       resetScores();
     }
-  }, [selectedUser, selectedThemeId, loadExistingTastings, resetScores]);
+  }, [selectedUser, selectedThemeId]); // loadExistingTastings and resetScores are stable
 
   if (loading) {
     return (

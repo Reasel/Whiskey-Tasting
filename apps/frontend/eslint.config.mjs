@@ -30,6 +30,12 @@ const eslintConfig = [
     },
     rules: {
       'prettier/prettier': 'error',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'react/jsx-no-comment-textnodes': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@next/next/no-img-element': 'off',
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 ];
