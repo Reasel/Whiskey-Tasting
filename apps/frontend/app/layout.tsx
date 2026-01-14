@@ -7,11 +7,11 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const merriweather = Merriweather({
   weight: ['400', '700'],
   subsets: ['latin'],
-  variable: '--font-serif'
+  variable: '--font-serif',
 });
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-mono'
+  variable: '--font-mono',
 });
 
 export const metadata: Metadata = {
@@ -30,9 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body
         className={`${inter.variable} ${merriweather.variable} ${jetbrains.variable} antialiased min-h-full`}
       >
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );
