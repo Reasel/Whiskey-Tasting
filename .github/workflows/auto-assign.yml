@@ -12,6 +12,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Assign reviewers
+        if: github.event.pull_request.user.login != 'Reasel'
         run: gh pr edit ${{ github.event.pull_request.number }} --add-reviewer Reasel
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
