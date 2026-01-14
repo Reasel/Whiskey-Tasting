@@ -8,6 +8,9 @@ jobs:
   assign-reviewers:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Assign reviewers
         run: gh pr edit ${{ github.event.pull_request.number }} --add-reviewer Reasel
         env:
