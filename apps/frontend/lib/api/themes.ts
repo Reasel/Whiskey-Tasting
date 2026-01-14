@@ -44,7 +44,10 @@ export const createTheme = async (request: CreateThemeRequest): Promise<ThemeCre
   return response.json();
 };
 
-export const updateTheme = async (themeId: number, request: { name?: string; notes?: string }): Promise<Theme> => {
+export const updateTheme = async (
+  themeId: number,
+  request: { name?: string; notes?: string }
+): Promise<Theme> => {
   const response = await apiPut(`/themes/${themeId}`, request);
   if (!response.ok) {
     throw new Error(`Failed to update theme: ${response.statusText}`);
@@ -52,7 +55,10 @@ export const updateTheme = async (themeId: number, request: { name?: string; not
   return response.json();
 };
 
-export const updateWhiskeys = async (themeId: number, whiskeys: { name: string; proof: number | null }[]): Promise<{ message: string }> => {
+export const updateWhiskeys = async (
+  themeId: number,
+  whiskeys: { name: string; proof: number | null }[]
+): Promise<{ message: string }> => {
   const response = await apiPut(`/themes/${themeId}/whiskeys`, { whiskeys });
   if (!response.ok) {
     throw new Error(`Failed to update whiskeys: ${response.statusText}`);

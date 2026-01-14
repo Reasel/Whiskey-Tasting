@@ -5,7 +5,6 @@ This file provides guidance to agents when working with code in this repository.
 ## Build/Lint/Test Commands
 
 - Backend testing via nix-shell: `nix-shell ./nix/pythonShell.nix --run "cd apps/backend && python3 -m pytest"` (fast local testing alternative to Docker rebuild; installs deps & runs tests via pip)
-- Run single test (if venv set up): `cd apps/backend && uv run --python python3 pytest tests/test_seed_data.py`
 - Frontend dev with turbopack: `cd apps/frontend && npm run dev`
 - In Nix environment: `nix-shell ./nix/pythonShell.nix -run "<Commands here>"` before running Python commands
 - All uv commands require `--python python3` flag (uv sync/troubleshooting via pip if fails)
@@ -20,7 +19,6 @@ The backend includes a comprehensive test suite that must pass before any change
 - **API Tests** (`test_api.py`): Test all REST API endpoints using FastAPI TestClient
 - **Integration Tests** (`test_integration.py`): Test complete workflows from theme creation to results
 - **Error Handling Tests** (`test_error_handling.py`): Test edge cases, invalid inputs, and error conditions
-- **Seed Data Test** (`test_seed_data.py`): Integration test that populates sample data and verifies scoring
 
 ### Running Tests
 
@@ -34,9 +32,6 @@ cd apps/backend && uv run --python python3 pytest
 
 # Specific test file
 cd apps/backend && uv run --python python3 pytest tests/test_api.py
-
-# Single test
-cd apps/backend && uv run --python python3 pytest tests/test_seed_data.py::test_seed_sample_data -v
 ```
 
 #### Test Options
@@ -112,6 +107,5 @@ The built-in browser tool fails on NixOS due to incompatible Chromium binaries. 
 - Active theme determined by most recent `created_at` timestamp, not explicit active flag
 - Database operations are synchronous (TinyDB), but FastAPI endpoints are async
 - Not all router modules are mounted in `main.py` (tastings, whiskeys, users routers exist but not included)
-- Test seed data references unimplemented endpoints (e.g., PUT `/themes/{theme_id}/whiskeys`)
 - Backend includes Windows-specific asyncio fix for Playwright compatibility
 - When modifying Python dependencies in `apps/backend/pyproject.toml` or `apps/backend/requirements.txt`, also update `nix/pythonShell.nix` to maintain consistency across environments

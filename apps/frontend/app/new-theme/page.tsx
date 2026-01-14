@@ -47,7 +47,6 @@ export default function NewTheme() {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-[#F0F0E8] flex justify-center items-start py-12 px-4 md:px-8">
       <div className="w-full max-w-4xl border border-black bg-[#F0F0E8] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]">
@@ -110,7 +109,12 @@ export default function NewTheme() {
               />
             </div>
 
-            <Button type="submit" variant="default" disabled={submitting} className="w-full md:w-auto">
+            <Button
+              type="submit"
+              variant="default"
+              disabled={submitting}
+              className="w-full md:w-auto"
+            >
               {submitting ? 'CREATING...' : 'CREATE THEME'}
             </Button>
           </form>

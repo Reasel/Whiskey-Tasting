@@ -5,22 +5,10 @@
  */
 
 // Client utilities
-export {
-  API_URL,
-  API_BASE,
-  apiFetch,
-  apiPost,
-  apiPatch,
-  apiPut,
-  apiDelete,
-} from './client';
+export { API_URL, API_BASE, apiFetch, apiPost, apiPatch, apiPut, apiDelete } from './client';
 
 // Config operations (simplified)
-export {
-  fetchSystemStatus,
-  type DatabaseStats,
-  type SystemStatus,
-} from './config';
+export { fetchSystemStatus, type DatabaseStats, type SystemStatus } from './config';
 
 // Tasting operations
 export {
@@ -37,11 +25,7 @@ export {
 } from './tastings';
 
 // User operations
-export {
-  fetchUsers,
-  type User,
-  type UserListResponse,
-} from './users';
+export { fetchUsers, type User, type UserListResponse } from './users';
 
 // Theme operations
 export {

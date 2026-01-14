@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+import puppeteer from 'puppeteer';
 
 let browser;
 let page;
@@ -9,7 +9,7 @@ async function launchBrowser(url) {
   browser = await puppeteer.launch({
     executablePath: '/run/current-system/sw/bin/chromium',
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
   page = await browser.newPage();
@@ -40,7 +40,6 @@ async function run() {
       await takeScreenshot();
       const title = await page.title();
       console.log(`Page title: ${title}`);
-
     } else if (action === 'click') {
       const selector = args[1];
       if (!page || !selector) {
@@ -50,7 +49,6 @@ async function run() {
       console.log(`Clicking element: ${selector}`);
       await page.click(selector);
       await takeScreenshot();
-
     } else if (action === 'type') {
       const selector = args[1];
       const text = args[2];
@@ -61,13 +59,11 @@ async function run() {
       console.log(`Typing "${text}" into: ${selector}`);
       await page.type(selector, text);
       await takeScreenshot();
-
     } else if (action === 'close') {
       if (browser) {
         await browser.close();
         console.log('Browser closed.');
       }
-
     } else {
       console.error('Unknown action. Supported: launch, click, type, close');
     }

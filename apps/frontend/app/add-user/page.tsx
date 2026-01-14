@@ -76,7 +76,12 @@ export default function AddUser() {
               />
             </div>
 
-            <Button type="submit" variant="default" disabled={submitting} className="w-full md:w-auto">
+            <Button
+              type="submit"
+              variant="default"
+              disabled={submitting}
+              className="w-full md:w-auto"
+            >
               {submitting ? 'ADDING...' : 'ADD USER'}
             </Button>
           </form>

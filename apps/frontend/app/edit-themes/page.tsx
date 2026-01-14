@@ -3,7 +3,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchThemes, fetchWhiskeysByTheme, updateTheme, updateWhiskeys, type Theme, type Whiskey } from '@/lib/api';
+import {
+  fetchThemes,
+  fetchWhiskeysByTheme,
+  updateTheme,
+  updateWhiskeys,
+  type Theme,
+  type Whiskey,
+} from '@/lib/api';
 import { deleteTheme } from '@/lib/api/themes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,7 +72,10 @@ export default function EditThemes() {
   const handleSaveTheme = async () => {
     if (!selectedTheme) return;
     try {
-      await updateTheme(selectedTheme.id!, { name: selectedTheme.name, notes: selectedTheme.notes });
+      await updateTheme(selectedTheme.id!, {
+        name: selectedTheme.name,
+        notes: selectedTheme.notes,
+      });
       showToast('Theme updated successfully!', 'success');
     } catch (error) {
       console.error('Failed to update theme:', error);
@@ -73,7 +83,11 @@ export default function EditThemes() {
     }
   };
 
-  const handleWhiskeyChange = (index: number, field: 'name' | 'proof', value: string | number | null) => {
+  const handleWhiskeyChange = (
+    index: number,
+    field: 'name' | 'proof',
+    value: string | number | null
+  ) => {
     const updatedWhiskeys = [...whiskeys];
     updatedWhiskeys[index] = { ...updatedWhiskeys[index], [field]: value };
     setWhiskeys(updatedWhiskeys);
@@ -82,7 +96,7 @@ export default function EditThemes() {
   const handleSaveWhiskeys = async () => {
     if (!selectedTheme) return;
     try {
-      const whiskeysData = whiskeys.map(w => ({ name: w.name, proof: w.proof }));
+      const whiskeysData = whiskeys.map((w) => ({ name: w.name, proof: w.proof }));
       await updateWhiskeys(selectedTheme.id!, whiskeysData);
       showToast('Whiskeys updated successfully!', 'success');
     } catch (error) {
@@ -108,7 +122,7 @@ export default function EditThemes() {
     return (
       <div className="min-h-screen bg-[#F0F0E8] flex justify-center items-center p-4 md:p-8">
         <div className="w-full max-w-7xl border border-black bg-[#F0F0E8] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] p-8 text-center">
-          <span className="font-mono text-sm uppercase tracking-wider">// LOADING...</span>
+          <span className="font-mono text-sm uppercase tracking-wider">{'// LOADING...'}</span>
         </div>
       </div>
     );
@@ -150,7 +164,9 @@ export default function EditThemes() {
                     {theme.name}
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">{theme.notes}</p>
-                  <p className="text-xs text-gray-400">{new Date(theme.created_at).toLocaleDateString()}</p>
+                  <p className="text-xs text-gray-400">
+                    {new Date(theme.created_at).toLocaleDateString()}
+                  </p>
                 </div>
               ))}
             </div>
@@ -180,14 +196,18 @@ export default function EditThemes() {
                     <Textarea
                       id="themeNotes"
                       value={selectedTheme.notes}
-                      onChange={(e) => setSelectedTheme({ ...selectedTheme, notes: e.target.value })}
+                      onChange={(e) =>
+                        setSelectedTheme({ ...selectedTheme, notes: e.target.value })
+                      }
                       rows={4}
                     />
                   </div>
 
                   <div className="flex gap-4">
                     <Button onClick={handleSaveTheme}>Save Changes</Button>
-                    <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)}>Delete Theme</Button>
+                    <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)}>
+                      Delete Theme
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -213,7 +233,13 @@ export default function EditThemes() {
                           <Input
                             type="number"
                             value={whiskey.proof || ''}
-                            onChange={(e) => handleWhiskeyChange(index, 'proof', parseFloat(e.target.value) || null)}
+                            onChange={(e) =>
+                              handleWhiskeyChange(
+                                index,
+                                'proof',
+                                parseFloat(e.target.value) || null
+                              )
+                            }
                           />
                         </div>
                       </div>
@@ -221,7 +247,9 @@ export default function EditThemes() {
                   ))}
                 </div>
 
-                <Button className="mt-4" onClick={handleSaveWhiskeys}>Save Whiskey Changes</Button>
+                <Button className="mt-4" onClick={handleSaveWhiskeys}>
+                  Save Whiskey Changes
+                </Button>
               </div>
             </div>
           )}

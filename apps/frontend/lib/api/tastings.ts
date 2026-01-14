@@ -31,12 +31,15 @@ export interface ThemeScoresResponse {
 
 export interface SubmitTastingRequest {
   user_name: string;
-  whiskey_scores: Record<number, {
-    aroma_score: number;
-    flavor_score: number;
-    finish_score: number;
-    personal_rank: number;
-  }>;
+  whiskey_scores: Record<
+    number,
+    {
+      aroma_score: number;
+      flavor_score: number;
+      finish_score: number;
+      personal_rank: number;
+    }
+  >;
 }
 
 export interface Whiskey {
@@ -105,19 +108,27 @@ export async function fetchWhiskeysByTheme(themeId: number): Promise<Whiskey[]> 
 export interface UserTastingsResponse {
   user_name: string;
   theme: ThemeResponse;
-  tastings: Record<number, {
-    aroma_score: number;
-    flavor_score: number;
-    finish_score: number;
-    personal_rank: number;
-  }>;
+  tastings: Record<
+    number,
+    {
+      aroma_score: number;
+      flavor_score: number;
+      finish_score: number;
+      personal_rank: number;
+    }
+  >;
 }
 
 /**
  * Fetch user's tastings for a theme
  */
-export async function fetchUserTastingsForTheme(userName: string, themeId: number): Promise<UserTastingsResponse> {
-  const response = await apiFetch(`/tastings/users/${encodeURIComponent(userName)}/themes/${themeId}`);
+export async function fetchUserTastingsForTheme(
+  userName: string,
+  themeId: number
+): Promise<UserTastingsResponse> {
+  const response = await apiFetch(
+    `/tastings/users/${encodeURIComponent(userName)}/themes/${themeId}`
+  );
   if (!response.ok) {
     throw new Error(`Failed to fetch user tastings: ${response.statusText}`);
   }
