@@ -79,7 +79,7 @@ export default function DataView() {
               </Button>
             </Link>
           </div>
-          <div className="mt-8 flex gap-4">
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Button
               onClick={() => setViewType('all')}
               variant={viewType === 'all' ? 'default' : 'outline'}
