@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const SwissGrid = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -32,7 +33,13 @@ export const SwissGrid = ({ children }: { children: React.ReactNode }) => {
         {/* Footer */}
         <div className="p-4 bg-[#F0F0E8] flex justify-between items-center font-mono text-xs text-blue-700 border-t border-black">
           <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="Whiskey Tasting" className="w-5 h-5" />
+            <Image
+              src="/logo.svg"
+              alt="Whiskey Tasting"
+              width={20}
+              height={20}
+              className="w-5 h-5"
+            />
             <span className="uppercase font-bold">Whiskey Tasting</span>
           </div>
           <div className="flex items-center gap-4">

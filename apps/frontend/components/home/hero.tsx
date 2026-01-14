@@ -30,12 +30,7 @@ export default function Hero() {
           >
             GitHub
           </a>
-          <a
-            href="/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={buttonClass}
-          >
+          <a href="/docs" target="_blank" rel="noopener noreferrer" className={buttonClass}>
             API Docs
           </a>
           <Link href="/dashboard" className={buttonClass}>
