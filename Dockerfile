@@ -17,6 +17,9 @@ RUN npm ci
 # Copy frontend source
 COPY apps/frontend/ ./
 
+# Skip Puppeteer browser download to save space
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
 # Set environment variable for production build
 ARG NEXT_PUBLIC_API_URL=http://localhost:8010
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
@@ -92,6 +95,9 @@ COPY --from=frontend-builder /app/frontend/.next ./.next
 COPY --from=frontend-builder /app/frontend/public ./public
 COPY --from=frontend-builder /app/frontend/package*.json ./
 COPY --from=frontend-builder /app/frontend/next.config.ts ./
+
+# Skip Puppeteer browser download to save space
+ENV PUPPETEER_SKIP_DOWNLOAD=true
 
 # Install production dependencies only
 RUN npm ci --omit=dev
