@@ -6,21 +6,13 @@ The application is designed to be simple and accessible, including for elderly u
 
 I developed this project on NixOS to learn more about the operating system and its capabilities for software development.
 
-## Screenshots
+## Table of Contents
 
-Here are some screenshots of the application in action:
-
-![Home Page](assets/Screenshot_20260113_101727.png)
-![Theme Selection](assets/Screenshot_20260113_101742.png)
-![Whiskey List](assets/Screenshot_20260113_101748.png)
-![Tasting Form](assets/Screenshot_20260113_101756.png)
-![Rating Interface](assets/Screenshot_20260113_101803.png)
-![Results View](assets/Screenshot_20260113_101811.png)
-![Dashboard](assets/Screenshot_20260113_101820.png)
-![User Management](assets/Screenshot_20260113_101825.png)
-![Theme Editor](assets/Screenshot_20260113_101842.png)
-![Data View](assets/Screenshot_20260113_101853.png)
-![Administration](assets/Screenshot_20260113_101901.png)
+- [Setup](#setup)
+- [Deployment](#deployment)
+- [CI/CD Pipeline](#ci-cd-pipeline)
+- [For Contributors](#for-contributors)
+- [Screenshots](#screenshots)
 
 ## Setup
 
@@ -155,3 +147,19 @@ Images are built and pushed to Docker Hub (`reasel/whiskey-tasting`) with approp
 ## For Contributors
 
 If you're contributing to the code, read [AGENTS.md](AGENTS.md) for guidance on build commands, testing, code style, and project patterns. It contains rules for working with the codebase.
+
+## Screenshots
+
+Here are some screenshots of the application in action:
+
+![Home Page](assets/Screenshot_20260113_101727.png)
+![Theme Selection](assets/Screenshot_20260113_101742.png)
+![Whiskey List](assets/Screenshot_20260113_101748.png)
+![Tasting Form](assets/Screenshot_20260113_101756.png)
+![Rating Interface](assets/Screenshot_20260113_101803.png)
+![Results View](assets/Screenshot_20260113_101811.png)
+![Dashboard](assets/Screenshot_20260113_101820.png)
+![User Management](assets/Screenshot_20260113_101825.png)
+![Theme Editor](assets/Screenshot_20260113_101842.png)
+![Data View](assets/Screenshot_20260113_101853.png)
+![Administration](assets/Screenshot_20260113_101901.png)
