@@ -55,6 +55,8 @@ GitHub releases are automatically created for each versioned deployment, providi
          # - http://192.168.1.100:3010 (remote access to specific IP)
          # - Leave empty for localhost-only development
          - CORS_ORIGINS_STR_ADDITIONAL=
+         # Administration password (defaults to 'admin' if not set)
+         - ADMIN_PASSWORD=admin
          # Next.js server configuration (required for container deployment)
          - PORT=3010
          - HOSTNAME=0.0.0.0
@@ -88,9 +90,10 @@ GitHub releases are automatically created for each versioned deployment, providi
 
 #### Configuration Options
 
-- **Local Development**: Use default settings (NEXT_PUBLIC_API_URL defaults to localhost)
+- **Local Development**: Use default settings (NEXT_PUBLIC_API_URL defaults to localhost, ADMIN_PASSWORD defaults to 'admin')
 - **Remote Access**: Set `NEXT_PUBLIC_API_URL=http://YOUR_HOST_IP:8010`
 - **Reverse Proxy**: Set `NEXT_PUBLIC_API_URL=relative` and configure your reverse proxy to route `/api/v1/*` to `localhost:8010/api/v1/*`
+- **Administration Password**: Set `ADMIN_PASSWORD` to customize the password for accessing the administration panel (defaults to 'admin' if not set)
 
 #### Reverse Proxy Example (Caddy)
 

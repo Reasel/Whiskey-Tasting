@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/toast';
 
-const PASSWORD = 'admin';
+const PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin';
 
 export default function Administration() {
   const { showToast } = useToast();
