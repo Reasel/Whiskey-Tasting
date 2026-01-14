@@ -127,6 +127,31 @@ yourdomain.com {
 
 **Note**: Caddy automatically handles HTTPS certificates via Let's Encrypt when using a real domain. For local development, you can use `localhost` or set `tls internal` for self-signed certificates.
 
+## CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment. The CI/CD pipeline automates testing, building, and deploying the application.
+
+### Automated Testing and Building
+
+- **Triggers**: Runs on pushes to `master` branch, pull requests to `master`, and version tags (`v*`)
+- **Tests**: Backend tests with pytest, frontend linting and building
+- **Dependencies**: Node.js 22 for frontend, Python 3.13 for backend
+
+### Deployment Environments
+
+- **Staging**: Automatically deployed on every push to `master` branch
+  - Docker image: `reasel/whiskey-tasting:staging`
+  - Environment: `staging`
+
+- **Production**: Automatically deployed on version tags (`v*`)
+  - Docker image: `reasel/whiskey-tasting:latest` and `reasel/whiskey-tasting:vX.Y.Z`
+  - Environment: `production`
+  - Creates GitHub release with deployment notes
+
+### Docker Hub Integration
+
+Images are built and pushed to Docker Hub (`reasel/whiskey-tasting`) with appropriate tags for each environment.
+
 ## For Contributors
 
 If you're contributing to the code, read [AGENTS.md](AGENTS.md) for guidance on build commands, testing, code style, and project patterns. It contains rules for working with the codebase.
