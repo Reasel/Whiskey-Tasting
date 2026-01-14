@@ -10,7 +10,6 @@ import {
   DialogFooter,
 } from './dialog';
 import { Button } from './button';
-import { cn } from '@/lib/utils';
 
 /**
  * Swiss International Style Confirm Dialog Component

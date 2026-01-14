@@ -216,7 +216,6 @@ rm -rf data/             # Reset all data
 ### Testing
 ```bash
 cd apps/backend
-uv run pytest tests/test_seed_data.py  # Seed database with sample data
 uv run pytest tests/                   # Run all tests
 ```
 

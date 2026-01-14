@@ -52,8 +52,11 @@ export function ToastProvider({ children }: ToastProviderProps) {
           <div
             key={toast.id}
             className={`max-w-sm p-4 rounded shadow-lg border border-black bg-white font-mono text-sm ${
-              toast.type === 'success' ? 'text-green-700' :
-              toast.type === 'error' ? 'text-red-700' : 'text-black'
+              toast.type === 'success'
+                ? 'text-green-700'
+                : toast.type === 'error'
+                  ? 'text-red-700'
+                  : 'text-black'
             }`}
           >
             {toast.message}

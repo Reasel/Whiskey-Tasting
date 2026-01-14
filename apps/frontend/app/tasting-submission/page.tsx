@@ -2,7 +2,18 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { fetchUsers, fetchThemes, fetchActiveTheme, fetchWhiskeysByTheme, submitTasting, fetchUserTastingsForTheme, type Theme, type Whiskey, type SubmitTastingRequest, type User } from '@/lib/api';
+import {
+  fetchUsers,
+  fetchThemes,
+  fetchActiveTheme,
+  fetchWhiskeysByTheme,
+  submitTasting,
+  fetchUserTastingsForTheme,
+  type Theme,
+  type Whiskey,
+  type SubmitTastingRequest,
+  type User,
+} from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +28,12 @@ export default function TastingSubmission() {
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [selectedThemeId, setSelectedThemeId] = useState<number | null>(null);
   const [newUserName, setNewUserName] = useState('');
-  const [scores, setScores] = useState<Record<number, { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }>>({});
+  const [scores, setScores] = useState<
+    Record<
+      number,
+      { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }
+    >
+  >({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -100,20 +116,25 @@ export default function TastingSubmission() {
 
     try {
       const tastingsData = await fetchUserTastingsForTheme(selectedUser, selectedThemeId);
-      const initialScores: Record<number, { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }> = {};
+      const initialScores: Record<
+        number,
+        { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }
+      > = {};
       whiskeys.forEach((whiskey, index) => {
         const existing = tastingsData.tastings[whiskey.id!];
-        initialScores[whiskey.id!] = existing ? {
-          aroma_score: existing.aroma_score,
-          flavor_score: existing.flavor_score,
-          finish_score: existing.finish_score,
-          personal_rank: existing.personal_rank,
-        } : {
-          aroma_score: 3,
-          flavor_score: 3,
-          finish_score: 3,
-          personal_rank: index + 1,
-        };
+        initialScores[whiskey.id!] = existing
+          ? {
+              aroma_score: existing.aroma_score,
+              flavor_score: existing.flavor_score,
+              finish_score: existing.finish_score,
+              personal_rank: existing.personal_rank,
+            }
+          : {
+              aroma_score: 3,
+              flavor_score: 3,
+              finish_score: 3,
+              personal_rank: index + 1,
+            };
       });
       setScores(initialScores);
     } catch (error) {
@@ -147,26 +168,58 @@ export default function TastingSubmission() {
     const userName = selectedUser === 'new' ? newUserName.trim() : selectedUser;
     if (!userName || !selectedThemeId) return;
 
-    if (!silent) setSubmitting(true);
-    try {
-      const request: SubmitTastingRequest = {
-        user_name: userName,
-        whiskey_scores: scores,
-      };
-      await submitTasting(request);
-      if (!silent) {
-        showToast('Tasting submitted successfully!', 'success');
-        // Reset form but keep user selected
-        setNewUserName('');
-        resetScores();
+      if (!silent) setSubmitting(true);
+      try {
+        const request: SubmitTastingRequest = {
+          user_name: userName,
+          whiskey_scores: scores,
+        };
+        await submitTasting(request);
+        if (!silent) {
+          showToast('Tasting submitted successfully!', 'success');
+          // Reset form but keep user selected
+          setNewUserName('');
+          resetScores();
+        }
+      } catch (error) {
+        if (!silent) {
+          console.error('Failed to submit tasting:', error);
+          showToast('Failed to submit tasting. Please try again.', 'error');
+        }
+      } finally {
+        if (!silent) setSubmitting(false);
       }
-    } catch (error) {
-      if (!silent) {
-        console.error('Failed to submit tasting:', error);
-        showToast('Failed to submit tasting. Please try again.', 'error');
+    },
+    [selectedUser, newUserName, selectedThemeId, scores, showToast, resetScores]
+  );
+
+  // Auto-save every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (selectedUser && selectedThemeId && Object.keys(scores).length > 0) {
+        handleSubmitTasting(undefined, true);
       }
-    } finally {
-      if (!silent) setSubmitting(false);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [selectedUser, selectedThemeId, scores, handleSubmitTasting]);
+
+  // Save on page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (selectedUser && selectedThemeId && Object.keys(scores).length > 0) {
+        handleSubmitTasting(undefined, true);
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [selectedUser, selectedThemeId, scores, handleSubmitTasting]);
+
+  useEffect(() => {
+    if (selectedUser && selectedThemeId && selectedUser !== 'new') {
+      loadExistingTastings();
+    } else {
+      // Reset scores for new user or no selection
+      resetScores();
     }
   }, [selectedUser, newUserName, selectedThemeId, scores, showToast, resetScores]);
 
@@ -184,7 +237,7 @@ export default function TastingSubmission() {
     return (
       <div className="min-h-screen bg-[#F0F0E8] flex justify-center items-center p-4 md:p-8">
         <div className="w-full max-w-7xl border border-black bg-[#F0F0E8] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] p-8 text-center">
-          <span className="font-mono text-sm uppercase tracking-wider">// LOADING...</span>
+          <span className="font-mono text-sm uppercase tracking-wider">{'// LOADING...'}</span>
         </div>
       </div>
     );
@@ -277,27 +330,33 @@ export default function TastingSubmission() {
                   </h2>
                 </div>
                 <p className="text-sm text-gray-600 mb-6">
-                  Rate each whiskey on a scale of 1-5 (1 being worst, 5 being best) for Aroma, Flavor, and Finish. 
-                  Then rank them from 1 to N (1 being your favorite of the night, N being the least favorite).
+                  Rate each whiskey on a scale of 1-5 (1 being worst, 5 being best) for Aroma,
+                  Flavor, and Finish. Then rank them from 1 to N (1 being your favorite of the
+                  night, N being the least favorite).
                 </p>
 
                 <div className="space-y-4">
                   {whiskeys.map((whiskey, index) => (
-                    <div key={whiskey.id} className="border border-black bg-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]">
+                    <div
+                      key={whiskey.id}
+                      className="border border-black bg-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]"
+                    >
                       <h4 className="font-mono text-sm font-bold uppercase tracking-wider text-black mb-4">
                         {index + 1}. {whiskey.name} {whiskey.proof ? `(${whiskey.proof}%)` : ''}
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="space-y-2">
-                           <Label htmlFor={`aroma-${whiskey.id}`}>Aroma (1-5)</Label>
-                           <Input
+                          <Label htmlFor={`aroma-${whiskey.id}`}>Aroma (1-5)</Label>
+                          <Input
                             id={`aroma-${whiskey.id}`}
                             type="number"
                             min="1"
                             max="5"
                             step="0.1"
                             value={scores[whiskey.id!]?.aroma_score || 3}
-                            onChange={(e) => updateScore(whiskey.id!, 'aroma_score', parseFloat(e.target.value))}
+                            onChange={(e) =>
+                              updateScore(whiskey.id!, 'aroma_score', parseFloat(e.target.value))
+                            }
                           />
                         </div>
                         <div className="space-y-2">
@@ -309,7 +368,9 @@ export default function TastingSubmission() {
                             max="5"
                             step="0.1"
                             value={scores[whiskey.id!]?.flavor_score || 3}
-                            onChange={(e) => updateScore(whiskey.id!, 'flavor_score', parseFloat(e.target.value))}
+                            onChange={(e) =>
+                              updateScore(whiskey.id!, 'flavor_score', parseFloat(e.target.value))
+                            }
                           />
                         </div>
                         <div className="space-y-2">
@@ -321,18 +382,24 @@ export default function TastingSubmission() {
                             max="5"
                             step="0.1"
                             value={scores[whiskey.id!]?.finish_score || 3}
-                            onChange={(e) => updateScore(whiskey.id!, 'finish_score', parseFloat(e.target.value))}
+                            onChange={(e) =>
+                              updateScore(whiskey.id!, 'finish_score', parseFloat(e.target.value))
+                            }
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor={`rank-${whiskey.id}`}>Personal Rank (1-{whiskeys.length})</Label>
+                          <Label htmlFor={`rank-${whiskey.id}`}>
+                            Personal Rank (1-{whiskeys.length})
+                          </Label>
                           <Input
                             id={`rank-${whiskey.id}`}
                             type="number"
                             min="1"
                             max={whiskeys.length}
                             value={scores[whiskey.id!]?.personal_rank || index + 1}
-                            onChange={(e) => updateScore(whiskey.id!, 'personal_rank', parseInt(e.target.value))}
+                            onChange={(e) =>
+                              updateScore(whiskey.id!, 'personal_rank', parseInt(e.target.value))
+                            }
                           />
                         </div>
                       </div>
@@ -342,7 +409,12 @@ export default function TastingSubmission() {
               </div>
             )}
 
-            <Button type="submit" variant="default" disabled={submitting || !selectedUser || !selectedThemeId} className="w-full md:w-auto">
+            <Button
+              type="submit"
+              variant="default"
+              disabled={submitting || !selectedUser || !selectedThemeId}
+              className="w-full md:w-auto"
+            >
               {submitting ? 'SUBMITTING...' : 'SUBMIT TASTING'}
             </Button>
           </form>

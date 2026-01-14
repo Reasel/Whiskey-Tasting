@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchUsers, deleteUser, User } from '@/lib/api/users';
@@ -18,16 +18,7 @@ export default function DeleteUser() {
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  useEffect(() => {
-    const auth = localStorage.getItem('adminAuthenticated');
-    if (auth !== 'true') {
-      router.push('/administration');
-      return;
-    }
-    loadUsers();
-  }, [router]);
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       const response = await fetchUsers();
       setUsers(response.users);
@@ -37,7 +28,16 @@ export default function DeleteUser() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
+
+  useEffect(() => {
+    const auth = localStorage.getItem('adminAuthenticated');
+    if (auth !== 'true') {
+      router.push('/administration');
+      return;
+    }
+    loadUsers();
+  }, [router, loadUsers]);
 
   const handleDelete = async () => {
     if (!selectedUser) return;
@@ -101,7 +101,7 @@ export default function DeleteUser() {
                   value={selectedUser?.id || ''}
                   onChange={(e) => {
                     const userId = parseInt(e.target.value);
-                    const user = users.find(u => u.id === userId) || null;
+                    const user = users.find((u) => u.id === userId) || null;
                     setSelectedUser(user);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -126,7 +126,8 @@ export default function DeleteUser() {
               </Button>
 
               <p className="text-sm text-red-600 font-bold">
-                ⚠️ WARNING: This will permanently delete the user and all their tasting data. This action cannot be undone.
+                ⚠️ WARNING: This will permanently delete the user and all their tasting data. This
+                action cannot be undone.
               </p>
             </div>
           )}
