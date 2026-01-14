@@ -88,9 +88,10 @@ GitHub releases are automatically created for each versioned deployment, providi
 
 #### Configuration Options
 
-- **Local Development**: Use default settings (NEXT_PUBLIC_API_URL defaults to localhost)
+- **Local Development**: Use default settings (NEXT_PUBLIC_API_URL defaults to localhost, ADMIN_PASSWORD defaults to 'admin')
 - **Remote Access**: Set `NEXT_PUBLIC_API_URL=http://YOUR_HOST_IP:8010`
 - **Reverse Proxy**: Set `NEXT_PUBLIC_API_URL=relative` and configure your reverse proxy to route `/api/v1/*` to `localhost:8010/api/v1/*`
+- **Administration Password**: Set `ADMIN_PASSWORD` to customize the password for accessing the administration panel (defaults to 'admin' if not set)
 
 #### Reverse Proxy Example (Caddy)
 
