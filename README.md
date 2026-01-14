@@ -55,6 +55,8 @@ GitHub releases are automatically created for each versioned deployment, providi
          # - http://192.168.1.100:3010 (remote access to specific IP)
          # - Leave empty for localhost-only development
          - CORS_ORIGINS_STR_ADDITIONAL=
+         # Administration password (defaults to 'admin' if not set)
+         - ADMIN_PASSWORD=admin
          # Next.js server configuration (required for container deployment)
          - PORT=3010
          - HOSTNAME=0.0.0.0
