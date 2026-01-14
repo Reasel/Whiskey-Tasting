@@ -45,7 +45,7 @@ htmlcov/
 instance/
 .env # Backend specific environment variables
 
-# Config file with API keys - NEVER COMMIT
+# Config file with API keys - NEVER COMMIT THESE
 **/config.json
 apps/backend/data/config.json
 
