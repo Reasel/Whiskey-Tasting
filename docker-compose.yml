@@ -1,6 +1,9 @@
 services:
   whiskey-tasting:
-    build: .
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_API_URL: http://${HOST}:8010
     container_name: whiskey-tasting
     ports:
       - 3010:3010
@@ -10,9 +13,9 @@ services:
     environment:
       - NODE_ENV=production
       - HOSTNAME=0.0.0.0
-      - HOST=<YourHostnameHere>
+      - HOST=192.168.1.2
       - PORT=3010
-      - NEXT_PUBLIC_API_URL=${HOST}:8010
+      - NEXT_PUBLIC_API_URL=http://${HOST}:8010
       - CORS_ORIGINS_STR_ADDITIONAL=${HOST}:${PORT}
     restart: unless-stopped
     healthcheck:

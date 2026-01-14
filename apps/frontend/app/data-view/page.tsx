@@ -7,23 +7,23 @@ import { Button } from '@/components/ui/button';
 
 type ViewType = 'all' | 'theme' | 'person';
 
-interface WhiskeyScore {
+type Score = {
+  user_name: string;
   aroma_score: number;
   flavor_score: number;
   finish_score: number;
-  personal_rank: number;
-  user_name: string;
   average_score: number;
-}
+  personal_rank: number;
+};
 
-interface WhiskeyData {
+type WhiskeyWithScores = {
   whiskey_id: number;
   whiskey_name: string;
   proof: number | null;
+  scores: Score[];
   average_score: number;
   rank_by_average: number;
-  scores: WhiskeyScore[];
-}
+};
 
 export default function DataView() {
   const [themesScores, setThemesScores] = useState<ThemeScoresResponse[]>([]);
@@ -120,7 +120,7 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Helper function to calculate averages for a whiskey
-  const calculateAverages = (scores: WhiskeyScore[]) => {
+  const calculateAverages = (scores: Score[]) => {
     if (scores.length === 0) return { avgAroma: 0, avgFlavor: 0, avgFinish: 0 };
     const totalAroma = scores.reduce((sum, score) => sum + score.aroma_score, 0);
     const totalFlavor = scores.reduce((sum, score) => sum + score.flavor_score, 0);
@@ -134,9 +134,9 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
 
   // Collect all whiskeys with their scores, only from themes that have submissions
   const allWhiskeys: {
-    whiskey: WhiskeyData;
+    whiskey: WhiskeyWithScores;
     theme: string;
-    scores: WhiskeyScore[];
+    scores: Score[];
     averages: { avgAroma: number; avgFlavor: number; avgFinish: number };
   }[] = [];
 
@@ -170,7 +170,7 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
   };
 
   const sortedWhiskeys = [...allWhiskeys].sort((a, b) => {
-    let aVal: string | number | null, bVal: string | number | null;
+    let aVal: string | number, bVal: string | number;
     switch (sortBy) {
       case 'whiskey':
         aVal = a.whiskey.whiskey_name.toLowerCase();
@@ -181,8 +181,8 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
         bVal = b.theme.toLowerCase();
         break;
       case 'proof':
-        aVal = a.whiskey.proof;
-        bVal = b.whiskey.proof;
+        aVal = a.whiskey.proof || 0;
+        bVal = b.whiskey.proof || 0;
         break;
       case 'aroma':
         aVal = a.averages.avgAroma;
@@ -316,7 +316,7 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Helper function to calculate averages for a whiskey
-  const calculateAverages = (scores: WhiskeyScore[]) => {
+  const calculateAverages = (scores: Score[]) => {
     if (scores.length === 0) return { avgAroma: 0, avgFlavor: 0, avgFinish: 0 };
     const totalAroma = scores.reduce((sum, score) => sum + score.aroma_score, 0);
     const totalFlavor = scores.reduce((sum, score) => sum + score.flavor_score, 0);
@@ -420,10 +420,8 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
           if (aVal == null && bVal == null) return 0;
           if (aVal == null) return sortDirection === 'asc' ? -1 : 1;
           if (bVal == null) return sortDirection === 'asc' ? 1 : -1;
-          if ((aVal as string | number) < (bVal as string | number))
-            return sortDirection === 'asc' ? -1 : 1;
-          if ((aVal as string | number) > (bVal as string | number))
-            return sortDirection === 'asc' ? 1 : -1;
+          if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+          if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
           return 0;
         });
 
@@ -553,7 +551,7 @@ function PersonView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
     string,
     {
       theme: string;
-      whiskeys: Record<string, { scores: WhiskeyScore[]; average: number; proof: number | null }>;
+      whiskeys: Record<string, { scores: Score[]; average: number; proof: number | null }>;
     }
   > = {};
 

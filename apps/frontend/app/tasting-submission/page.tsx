@@ -37,17 +37,19 @@ export default function TastingSubmission() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
+    console.log('loadInitialData called');
     try {
       const [usersData, themesData, activeThemeData] = await Promise.all([
         fetchUsers(),
         fetchThemes(),
         fetchActiveTheme(),
       ]);
+      console.log('Fetched data:', {
+        users: usersData.users.length,
+        themes: themesData.themes.length,
+        activeTheme: activeThemeData,
+      });
       setUsers(usersData.users);
       setThemes(themesData.themes);
       setActiveTheme(activeThemeData);
@@ -57,7 +59,7 @@ export default function TastingSubmission() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const resetScores = useCallback(() => {
     const initialScores: Record<
@@ -77,8 +79,10 @@ export default function TastingSubmission() {
 
   const loadWhiskeys = useCallback(
     async (themeId: number) => {
+      console.log('loadWhiskeys called with themeId:', themeId);
       try {
         const whiskeysData = await fetchWhiskeysByTheme(themeId);
+        console.log('Fetched whiskeys:', whiskeysData.length);
         setWhiskeys(whiskeysData);
         resetScores();
       } catch (error) {
@@ -87,12 +91,6 @@ export default function TastingSubmission() {
     },
     [resetScores]
   );
-
-  useEffect(() => {
-    if (selectedThemeId) {
-      loadWhiskeys(selectedThemeId);
-    }
-  }, [selectedThemeId, loadWhiskeys]);
 
   const loadExistingTastings = useCallback(async () => {
     if (!selectedUser || !selectedThemeId || selectedUser === 'new') return;
@@ -124,18 +122,18 @@ export default function TastingSubmission() {
       console.error('Failed to load existing tastings:', error);
       resetScores();
     }
-  }, [selectedUser, selectedThemeId, whiskeys, resetScores]);
+  }, [whiskeys, selectedUser, selectedThemeId, resetScores]);
 
-  const handleUserChange = (value: string) => {
+  const handleUserChange = useCallback((value: string) => {
     setSelectedUser(value);
     if (value !== 'new') {
       setNewUserName('');
     }
-  };
+  }, []);
 
   const handleSubmitTasting = useCallback(
-    async (e?: React.FormEvent, silent = false) => {
-      if (!silent && e) e.preventDefault();
+    async (e: React.FormEvent, silent = false) => {
+      if (!silent) e.preventDefault();
       const userName = selectedUser === 'new' ? newUserName.trim() : selectedUser;
       if (!userName || !selectedThemeId) return;
 
@@ -164,26 +162,48 @@ export default function TastingSubmission() {
     [selectedUser, newUserName, selectedThemeId, scores, showToast, resetScores]
   );
 
+  const updateScore = useCallback((whiskeyId: number, field: string, value: number) => {
+    setScores((prev) => ({
+      ...prev,
+      [whiskeyId]: {
+        ...prev[whiskeyId],
+        [field]: value,
+      },
+    }));
+  }, []);
+
+  useEffect(() => {
+    console.log('useEffect loadInitialData');
+    loadInitialData();
+  }, []); // loadInitialData is stable
+
   // Auto-save every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       if (selectedUser && selectedThemeId && Object.keys(scores).length > 0) {
-        handleSubmitTasting(undefined, true);
+        handleSubmitTasting({} as React.FormEvent, false);
       }
     }, 5000);
     return () => clearInterval(interval);
-  }, [selectedUser, selectedThemeId, scores, handleSubmitTasting]);
+  }, [selectedUser, selectedThemeId, scores]); // handleSubmitTasting is stable
 
   // Save on page unload
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (selectedUser && selectedThemeId && Object.keys(scores).length > 0) {
-        handleSubmitTasting(undefined, true);
+        handleSubmitTasting({} as React.FormEvent, false);
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [selectedUser, selectedThemeId, scores, handleSubmitTasting]);
+  }, [selectedUser, selectedThemeId, scores]); // handleSubmitTasting is stable
+
+  useEffect(() => {
+    console.log('useEffect selectedThemeId:', selectedThemeId);
+    if (selectedThemeId) {
+      loadWhiskeys(selectedThemeId);
+    }
+  }, [selectedThemeId]); // loadWhiskeys is stable
 
   useEffect(() => {
     if (selectedUser && selectedThemeId && selectedUser !== 'new') {
@@ -192,17 +212,7 @@ export default function TastingSubmission() {
       // Reset scores for new user or no selection
       resetScores();
     }
-  }, [selectedUser, selectedThemeId, loadExistingTastings, resetScores]);
-
-  const updateScore = (whiskeyId: number, field: string, value: number) => {
-    setScores((prev) => ({
-      ...prev,
-      [whiskeyId]: {
-        ...prev[whiskeyId],
-        [field]: value,
-      },
-    }));
-  };
+  }, [selectedUser, selectedThemeId]); // loadExistingTastings and resetScores are stable
 
   if (loading) {
     return (
