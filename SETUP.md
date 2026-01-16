@@ -105,6 +105,7 @@ services:
       - PORT=3010
       - NEXT_PUBLIC_API_URL=${HOST}:8010
       - CORS_ORIGINS_STR_ADDITIONAL=${HOST}:${PORT}
+      - ADMIN_PASSWORD=your-secure-password # Administration password (defaults to 'admin' if not set)
     restart: unless-stopped
     healthcheck:
       test:

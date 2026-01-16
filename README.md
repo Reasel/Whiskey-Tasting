@@ -6,21 +6,13 @@ The application is designed to be simple and accessible, including for elderly u
 
 I developed this project on NixOS to learn more about the operating system and its capabilities for software development.
 
-## Screenshots
+## Table of Contents
 
-Here are some screenshots of the application in action:
-
-![Home Page](assets/Screenshot_20260113_101727.png)
-![Theme Selection](assets/Screenshot_20260113_101742.png)
-![Whiskey List](assets/Screenshot_20260113_101748.png)
-![Tasting Form](assets/Screenshot_20260113_101756.png)
-![Rating Interface](assets/Screenshot_20260113_101803.png)
-![Results View](assets/Screenshot_20260113_101811.png)
-![Dashboard](assets/Screenshot_20260113_101820.png)
-![User Management](assets/Screenshot_20260113_101825.png)
-![Theme Editor](assets/Screenshot_20260113_101842.png)
-![Data View](assets/Screenshot_20260113_101853.png)
-![Administration](assets/Screenshot_20260113_101901.png)
+- [Setup](#setup)
+- [Deployment](#deployment)
+- [CI/CD Pipeline](#ci-cd-pipeline)
+- [For Contributors](#for-contributors)
+- [Screenshots](#screenshots)
 
 ## Setup
 
@@ -63,6 +55,8 @@ GitHub releases are automatically created for each versioned deployment, providi
          # - http://192.168.1.100:3010 (remote access to specific IP)
          # - Leave empty for localhost-only development
          - CORS_ORIGINS_STR_ADDITIONAL=
+         # Administration password (defaults to 'admin' if not set)
+         - ADMIN_PASSWORD=admin
          # Next.js server configuration (required for container deployment)
          - PORT=3010
          - HOSTNAME=0.0.0.0
@@ -96,9 +90,10 @@ GitHub releases are automatically created for each versioned deployment, providi
 
 #### Configuration Options
 
-- **Local Development**: Use default settings (NEXT_PUBLIC_API_URL defaults to localhost)
+- **Local Development**: Use default settings (NEXT_PUBLIC_API_URL defaults to localhost, ADMIN_PASSWORD defaults to 'admin')
 - **Remote Access**: Set `NEXT_PUBLIC_API_URL=http://YOUR_HOST_IP:8010`
 - **Reverse Proxy**: Set `NEXT_PUBLIC_API_URL=relative` and configure your reverse proxy to route `/api/v1/*` to `localhost:8010/api/v1/*`
+- **Administration Password**: Set `ADMIN_PASSWORD` to customize the password for accessing the administration panel (defaults to 'admin' if not set)
 
 #### Reverse Proxy Example (Caddy)
 
@@ -155,3 +150,19 @@ Images are built and pushed to Docker Hub (`reasel/whiskey-tasting`) with approp
 ## For Contributors
 
 If you're contributing to the code, read [AGENTS.md](AGENTS.md) for guidance on build commands, testing, code style, and project patterns. It contains rules for working with the codebase.
+
+## Screenshots
+
+Here are some screenshots of the application in action:
+
+![Home Page](assets/Screenshot_20260113_101727.png)
+![Theme Selection](assets/Screenshot_20260113_101742.png)
+![Whiskey List](assets/Screenshot_20260113_101748.png)
+![Tasting Form](assets/Screenshot_20260113_101756.png)
+![Rating Interface](assets/Screenshot_20260113_101803.png)
+![Results View](assets/Screenshot_20260113_101811.png)
+![Dashboard](assets/Screenshot_20260113_101820.png)
+![User Management](assets/Screenshot_20260113_101825.png)
+![Theme Editor](assets/Screenshot_20260113_101842.png)
+![Data View](assets/Screenshot_20260113_101853.png)
+![Administration](assets/Screenshot_20260113_101901.png)
