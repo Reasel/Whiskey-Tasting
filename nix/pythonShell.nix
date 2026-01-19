@@ -7,6 +7,7 @@ pkgs.mkShell {
       ps.pydantic
       ps.pydantic-settings
       ps.tinydb
+      ps.requests
       ps.pytest
       ps.pytest-asyncio
       ps.pytest-cov
