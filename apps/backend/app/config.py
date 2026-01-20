@@ -49,28 +49,30 @@ class Settings(BaseSettings):
     data_dir: Path = Path(__file__).parent.parent / "data"
 
     @property
-    @property
-    def config_path(self) -> Path:
-        """Path to configuration file."""
-        return self.data_dir / "config.json"
-
-    def db_path(self) -> Path:
+def db_path(self) -> Path:
         """Path to TinyDB database file."""
         return self.data_dir / "database.json"
 
     # ntfy Configuration
     ntfy_url: str = "https://ntfy.sh"
     ntfy_topic: str = ""
+    ntfy_default_topic: str = ""
     ntfy_auth_user: str = ""
     ntfy_auth_pass: str = ""
+
+    @property
+    def ntfy_topic_final(self) -> str:
+        """Final topic to use for notifications, preferring explicit topic then default."""
+        return self.ntfy_topic or self.ntfy_default_topic
 
 
 def send_delete_notification(message: str, settings: Settings) -> None:
     """Send a delete notification via ntfy if configured."""
-    if not settings.ntfy_url or not settings.ntfy_topic:
+    topic = settings.ntfy_topic or settings.ntfy_default_topic
+    if not settings.ntfy_url or not topic:
         return
 
-    url = f"{settings.ntfy_url}/{settings.ntfy_topic}"
+    url = f"{settings.ntfy_url}/{topic}"
 
     headers = {"Content-Type": "text/plain"}
 
