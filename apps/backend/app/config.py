@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 
 import requests
+from pydantic import field_validator, model_validator
 from requests.auth import HTTPBasicAuth
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -49,16 +50,27 @@ class Settings(BaseSettings):
     data_dir: Path = Path(__file__).parent.parent / "data"
 
     @property
-def db_path(self) -> Path:
+    def db_path(self) -> Path:
         """Path to TinyDB database file."""
         return self.data_dir / "database.json"
 
     # ntfy Configuration
-    ntfy_url: str = "https://ntfy.sh"
+    ntfy_url: str = ""
     ntfy_topic: str = ""
     ntfy_default_topic: str = ""
     ntfy_auth_user: str = ""
     ntfy_auth_pass: str = ""
+
+    @model_validator(mode='after')
+    def validate_ntfy_config(self) -> 'Settings':
+        """Validate ntfy configuration consistency."""
+        if self.ntfy_url and not self.ntfy_topic:
+            raise ValueError("NTFY_TOPIC must be set if NTFY_URL is provided")
+        if self.ntfy_topic and not self.ntfy_url:
+            raise ValueError("NTFY_URL must be set if NTFY_TOPIC is provided")
+        if (self.ntfy_auth_user and not self.ntfy_auth_pass) or (self.ntfy_auth_pass and not self.ntfy_auth_user):
+            raise ValueError("Both NTFY_AUTH_USER and NTFY_AUTH_PASS must be set together")
+        return self
 
     @property
     def ntfy_topic_final(self) -> str:

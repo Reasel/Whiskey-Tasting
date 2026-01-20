@@ -17,7 +17,7 @@ class Database:
     """TinyDB wrapper for whiskey tasting data."""
 
     def __init__(self, db_path: Path | None = None):
-        self.db_path = db_path or settings.db_path()
+        self.db_path = db_path or settings.db_path
         logger.info(f"Initializing database at path: {self.db_path}")
         logger.info(f"Database directory exists: {self.db_path.parent.exists()}")
         self.db_path.parent.mkdir(parents=True, exist_ok=True)

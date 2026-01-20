@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 def send_notification(message: str, title: Optional[str] = None, priority: Optional[str] = None) -> None:
     """Send a notification via ntfy."""
+    logger.info(f"NTFY Debug - URL: '{settings.ntfy_url}', Topic: '{settings.ntfy_topic}'")
     if not settings.ntfy_url or not settings.ntfy_topic:
         logger.info("Ntfy not configured, skipping notification")
         return

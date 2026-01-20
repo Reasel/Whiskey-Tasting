@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.database import db
+from app.notifications import send_notification
 from app.schemas.models import UserListResponse, ApiResponse
 
 router = APIRouter()
@@ -44,6 +45,13 @@ async def delete_user(user_id: int) -> ApiResponse:
         success = db.delete_user(user_id)
         if not success:
             raise HTTPException(status_code=500, detail="Failed to delete user")
+
+        # Send notification about user deletion
+        send_notification(
+            f"User '{user['name']}' (ID: {user_id}) has been deleted",
+            title="User Deleted",
+            priority="default"
+        )
 
         return ApiResponse(message="User deleted successfully")
     except HTTPException:
