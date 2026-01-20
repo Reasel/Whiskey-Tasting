@@ -6,6 +6,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 
 from app.database import db
+from app.notifications import send_notification
 from app.schemas.models import (
     ApiResponse,
     CreateThemeRequest,
@@ -103,9 +104,22 @@ async def update_theme(theme_id: str, request: ThemeUpdateRequest) -> ThemeRespo
 async def delete_theme(theme_id: str) -> ApiResponse:
     """Delete a theme."""
     try:
+        # Get theme info before deletion for notification
+        theme = db.get_theme(int(theme_id))
+        if not theme:
+            raise HTTPException(status_code=404, detail="Theme not found")
+
         success = db.delete_theme(int(theme_id))
         if not success:
-            raise HTTPException(status_code=404, detail="Theme not found")
+            raise HTTPException(status_code=500, detail="Failed to delete theme")
+
+        # Send notification about theme deletion
+        send_notification(
+            f"Theme '{theme['name']}' (ID: {theme_id}) has been deleted",
+            title="Theme Deleted",
+            priority="default"
+        )
+
         return ApiResponse(message="Theme deleted successfully")
     except HTTPException:
         raise

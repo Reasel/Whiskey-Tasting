@@ -18,6 +18,11 @@ services:
       - NEXT_PUBLIC_API_URL=http://${HOST}:8010
       - CORS_ORIGINS_STR_ADDITIONAL=${HOST}:${PORT}
       - NEXT_PUBLIC_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      # Or set like the AUTH to utilize .env variables.
+      - NTFY_URL=https://ntfy.sh
+      - NTFY_TOPIC=my-whiskey-tastings
+      #- NTFY_AUTH_USER=${NTFY_AUTH_USER}
+      #- NTFY_AUTH_PASS=${NTFY_AUTH_PASS}
     restart: unless-stopped
     healthcheck:
       test:
