@@ -59,7 +59,7 @@ class Settings(BaseSettings):
         return self.data_dir / "database.json"
 
     # ntfy Configuration
-    ntfy_url: str = ""
+    ntfy_url: str = "https://ntfy.sh"
     ntfy_topic: str = ""
     ntfy_auth_user: str = ""
     ntfy_auth_pass: str = ""
