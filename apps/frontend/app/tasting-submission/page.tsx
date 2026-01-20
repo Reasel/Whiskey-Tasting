@@ -369,9 +369,7 @@ export default function TastingSubmission() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor={`rank-${whiskey.id}`}>
-                            Rank (1-{whiskeys.length})
-                          </Label>
+                          <Label htmlFor={`rank-${whiskey.id}`}>Rank (1-{whiskeys.length})</Label>
                           <Input
                             id={`rank-${whiskey.id}`}
                             type="number"
