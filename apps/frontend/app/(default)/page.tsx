@@ -19,19 +19,19 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Button
             onClick={() => router.push('/data-view')}
-            className="h-24 font-mono text-lg uppercase tracking-wider bg-black text-white hover:bg-gray-800"
+            className="h-24 font-mono text-lg uppercase tracking-wider"
           >
             Data View
           </Button>
           <Button
             onClick={() => router.push('/tasting-submission')}
-            className="h-24 font-mono text-lg uppercase tracking-wider bg-black text-white hover:bg-gray-800"
+            className="h-24 font-mono text-lg uppercase tracking-wider"
           >
             Tasting Submission
           </Button>
           <Button
             onClick={() => router.push('/administration')}
-            className="h-24 font-mono text-lg uppercase tracking-wider bg-black text-white hover:bg-gray-800"
+            className="h-24 font-mono text-lg uppercase tracking-wider"
           >
             Administration
           </Button>

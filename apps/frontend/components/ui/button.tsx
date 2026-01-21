@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
    * Visual variant determining color and purpose:
-   * - `default`: Hyper Blue (#1D4ED8) - Primary actions (save, submit, create)
+   * - `default`: Whiskey Amber (#F59E0B) - Primary actions (save, submit, create)
    * - `destructive`: Alert Red (#DC2626) - Destructive actions (delete, remove)
    * - `success`: Signal Green (#15803D) - Positive actions (download, confirm, complete)
    * - `warning`: Alert Orange (#F97316) - Caution actions (reset, clear, undo)
@@ -54,7 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       // Transitions
       'transition-all duration-150 ease-out',
       // Focus state - sharp blue ring (not soft glow)
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2',
       // Disabled state
       'disabled:pointer-events-none disabled:opacity-50',
       // SVG icon sizing
@@ -65,13 +65,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Variant styles - each has distinct purpose and color
     const variants = {
-      // PRIMARY - Hyper Blue (#1D4ED8 / blue-700)
+      // PRIMARY - Whiskey Amber (#F59E0B / amber-500)
       // Use for: Save, Submit, Create, Primary CTA
       default: cn(
-        'bg-blue-700 text-white',
+        'bg-amber-500 text-white',
         'border border-black',
         'shadow-[2px_2px_0px_0px_#000000]',
-        'hover:bg-blue-800',
+        'hover:bg-amber-600',
         'hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none',
         'active:translate-y-[2px] active:translate-x-[2px]'
       ),
