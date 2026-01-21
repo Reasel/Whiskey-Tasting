@@ -54,7 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       // Transitions
       'transition-all duration-150 ease-out',
       // Focus state - sharp blue ring (not soft glow)
-       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2',
       // Disabled state
       'disabled:pointer-events-none disabled:opacity-50',
       // SVG icon sizing
@@ -63,18 +63,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'rounded-none'
     );
 
-  // Variant styles - each has distinct purpose and color
-     const variants = {
-       // PRIMARY - Whiskey Amber (#F59E0B / amber-500)
-       // Use for: Save, Submit, Create, Primary CTA
-       default: cn(
-         'bg-amber-500 text-white',
-         'border border-black',
-         'shadow-[2px_2px_0px_0px_#000000]',
-         'hover:bg-amber-600',
-         'hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none',
-         'active:translate-y-[2px] active:translate-x-[2px]'
-       ),
+    // Variant styles - each has distinct purpose and color
+    const variants = {
+      // PRIMARY - Whiskey Amber (#F59E0B / amber-500)
+      // Use for: Save, Submit, Create, Primary CTA
+      default: cn(
+        'bg-amber-500 text-white',
+        'border border-black',
+        'shadow-[2px_2px_0px_0px_#000000]',
+        'hover:bg-amber-600',
+        'hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none',
+        'active:translate-y-[2px] active:translate-x-[2px]'
+      ),
 
       // DESTRUCTIVE - Alert Red (#DC2626 / red-600)
       // Use for: Delete, Remove, Destroy, Dangerous actions
