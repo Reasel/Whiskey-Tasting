@@ -145,8 +145,8 @@ function AllWhiskeysView({ themesScores }: { themesScores: ThemeScoresResponse[]
     const hasSubmissions = themeScore.whiskeys.some((whiskey) => whiskey.scores.length > 0);
     if (hasSubmissions) {
       themeScore.whiskeys.forEach((whiskey) => {
-        // Only include whiskeys with proof set and > 0
-        if (whiskey.proof && whiskey.proof > 0) {
+        // Filter to only whiskeys that do not match "Whiskey #" pattern (have been updated)
+        if (!/^Whiskey \d+$/.test(whiskey.whiskey_name)) {
           allWhiskeys.push({
             whiskey,
             theme: themeScore.theme.name,
