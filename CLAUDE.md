@@ -175,13 +175,71 @@ node browser-test.js close
 
 **Python**: Follow FastAPI and Pydantic patterns. All database operations use TinyDB Query API.
 
-## NixOS Considerations
+## Critical Project-Specific Rules
 
-When modifying Python dependencies in `apps/backend/pyproject.toml` or `apps/backend/requirements.txt`, also update `nix/pythonShell.nix` to maintain consistency across environments.
+### Database & Backend Patterns
 
-All `uv` commands require `--python python3` flag on NixOS.
+1. **Database operations are synchronous** (TinyDB), so **no `await` needed** in FastAPI handlers
+   - Even though FastAPI endpoints are async, TinyDB calls are synchronous
+   - Use `Query()` from tinydb for database searches and updates
 
-Windows-specific asyncio fix is included in `main.py` for Playwright compatibility.
+2. **Setting a theme as active**: Update its `created_at` timestamp to current time
+   - This makes it the most recent theme, thus the "active" one
+   - No explicit active flag or status field exists
+
+3. **Router modules**: Not all routers in `app/routers/` are mounted in `main.py`
+   - Check `app/routers/__init__.py` for available routers
+   - Some test seed data may use endpoints that aren't implemented (e.g., `PUT /themes/{theme_id}/whiskeys`)
+
+4. **Database storage**: Files stored in `apps/backend/data/`
+   - Check file permissions if encountering database issues
+   - TinyDB uses JSON files, not a traditional RDBMS
+
+### Frontend Patterns
+
+1. **API client centralization**: Use `lib/api/client.ts` for all API calls
+   - Auto-configures based on environment (localhost vs production)
+   - Supports relative URLs for reverse proxy setups
+
+## NixOS Development Guidelines
+
+### Critical NixOS Rules
+
+This project was developed on NixOS. When working on NixOS systems, follow these guidelines:
+
+1. **Always wrap Python/pytest commands in nix-shell**:
+   ```bash
+   nix-shell ./nix/pythonShell.nix --run "cd apps/backend && python3 -m pytest"
+   ```
+   - This ensures consistent dependencies and environment for testing
+   - Required for all backend tests and Python commands
+
+2. **Use `--python python3` flag** with all `uv` commands:
+   ```bash
+   uv run --python python3 pytest
+   uv sync --python python3
+   ```
+
+3. **Browser testing on NixOS**: Built-in browser tools fail due to incompatible Chromium binaries
+   - Use the custom Puppeteer script: `node browser-test.js launch http://localhost:3010`
+   - See "Browser Testing (NixOS)" section above for full commands
+
+4. **Dependency synchronization**: When modifying Python dependencies in:
+   - `apps/backend/pyproject.toml`
+   - `apps/backend/requirements.txt`
+
+   **MUST also update** `nix/pythonShell.nix` to maintain consistency across environments
+
+### NixOS Shell Configuration
+
+The `nix/pythonShell.nix` provides a development shell with:
+- Python 3 with all backend dependencies (FastAPI, pytest, Playwright, etc.)
+- uv package manager
+- Auto-activation of `.venv` if it exists
+
+### Windows Compatibility
+
+Windows-specific asyncio fix is included in `main.py` for Playwright compatibility (SelectorEventLoopPolicy).
 
 ## CI/CD Pipeline
 
