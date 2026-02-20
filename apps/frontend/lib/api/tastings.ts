@@ -1,8 +1,8 @@
 /**
  * Tasting API operations
  */
-
 import { apiFetch, apiPost } from './client';
+import { mockThemeScores } from './mock-data';
 
 // Types based on backend models
 export interface ThemeScoresResponse {
@@ -61,6 +61,13 @@ export interface ThemeResponse {
  * Fetch all themes with their scores
  */
 export async function fetchAllThemesScores(): Promise<ThemeScoresResponse[]> {
+  // Use mock data in development when running on localhost
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return new Promise((resolve) => {
+      resolve(mockThemeScores);
+    });
+  }
+
   const response = await apiFetch('/tastings/themes/scores');
   if (!response.ok) {
     throw new Error(`Failed to fetch themes scores: ${response.statusText}`);

@@ -439,7 +439,9 @@ function ThemeView({ themesScores }: { themesScores: ThemeScoresResponse[] }) {
                 <div>Avg Overall: {themeAverages.avgOverall.toFixed(1)}</div>
               </div>
             </div>
-            <p className="font-sans text-sm text-[#6B7280] mb-6">{themeScore.theme.notes}</p>
+            <p className="font-sans text-sm text-[#6B7280] mb-6 whitespace-pre-wrap">
+              {themeScore.theme.notes}
+            </p>
 
             <div className="overflow-x-auto">
               <table className="w-full font-mono text-sm border-collapse">

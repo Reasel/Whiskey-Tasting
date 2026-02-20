@@ -1,8 +1,8 @@
 /**
  * Theme management API functions
  */
-
-import { apiFetch, apiPost, apiPut, apiDelete } from './client';
+import { apiFetch, apiPost, apiPut, apiDelete, API_URL } from './client';
+import { mockThemeScores } from './mock-data';
 
 // Types
 export interface Theme {
@@ -29,6 +29,13 @@ export interface ThemeCreateResponse {
 
 // API Functions
 export const fetchThemes = async (): Promise<ThemeListResponse> => {
+  // Use mock data in development when running on localhost
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return new Promise((resolve) => {
+      resolve({ themes: mockThemeScores.map((ts) => ts.theme) });
+    });
+  }
+
   const response = await apiFetch('/themes');
   if (!response.ok) {
     throw new Error(`Failed to fetch themes: ${response.statusText}`);
