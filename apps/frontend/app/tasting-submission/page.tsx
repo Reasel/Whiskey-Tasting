@@ -31,7 +31,12 @@ export default function TastingSubmission() {
   const [scores, setScores] = useState<
     Record<
       number,
-      { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }
+      {
+        aroma_score: number | '';
+        flavor_score: number | '';
+        finish_score: number | '';
+        personal_rank: number | '';
+      }
     >
   >({});
   const [loading, setLoading] = useState(true);
@@ -64,14 +69,19 @@ export default function TastingSubmission() {
   const resetScores = useCallback(() => {
     const initialScores: Record<
       number,
-      { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }
+      {
+        aroma_score: number | '';
+        flavor_score: number | '';
+        finish_score: number | '';
+        personal_rank: number | '';
+      }
     > = {};
     whiskeys.forEach((whiskey, index) => {
       initialScores[whiskey.id!] = {
-        aroma_score: 3,
-        flavor_score: 3,
-        finish_score: 3,
-        personal_rank: index + 1,
+        aroma_score: '',
+        flavor_score: '',
+        finish_score: '',
+        personal_rank: '',
       };
     });
     setScores(initialScores);
@@ -99,7 +109,12 @@ export default function TastingSubmission() {
       const tastingsData = await fetchUserTastingsForTheme(selectedUser, selectedThemeId);
       const initialScores: Record<
         number,
-        { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }
+        {
+          aroma_score: number | '';
+          flavor_score: number | '';
+          finish_score: number | '';
+          personal_rank: number | '';
+        }
       > = {};
       whiskeys.forEach((whiskey, index) => {
         const existing = tastingsData.tastings[whiskey.id!];
@@ -111,10 +126,10 @@ export default function TastingSubmission() {
               personal_rank: existing.personal_rank,
             }
           : {
-              aroma_score: 3,
-              flavor_score: 3,
-              finish_score: 3,
-              personal_rank: index + 1,
+              aroma_score: '',
+              flavor_score: '',
+              finish_score: '',
+              personal_rank: '',
             };
       });
       setScores(initialScores);
@@ -139,9 +154,48 @@ export default function TastingSubmission() {
 
       if (!silent) setSubmitting(true);
       try {
+        // Convert scores to the format expected by the API, filtering out incomplete entries
+        const validScores: Record<
+          number,
+          {
+            aroma_score: number;
+            flavor_score: number;
+            finish_score: number;
+            personal_rank: number;
+          }
+        > = {};
+
+        let hasIncompleteScores = false;
+
+        Object.entries(scores).forEach(([whiskeyId, score]) => {
+          if (
+            score.aroma_score !== '' &&
+            score.flavor_score !== '' &&
+            score.finish_score !== '' &&
+            score.personal_rank !== ''
+          ) {
+            validScores[parseInt(whiskeyId)] = {
+              aroma_score: score.aroma_score as number,
+              flavor_score: score.flavor_score as number,
+              finish_score: score.finish_score as number,
+              personal_rank: score.personal_rank as number,
+            };
+          } else {
+            hasIncompleteScores = true;
+          }
+        });
+
+        // Require all whiskeys to have complete scores
+        if (hasIncompleteScores || Object.keys(validScores).length === 0) {
+          if (!silent) {
+            showToast('Please complete all whiskey ratings before submitting.', 'error');
+          }
+          return;
+        }
+
         const request: SubmitTastingRequest = {
           user_name: userName,
-          whiskey_scores: scores,
+          whiskey_scores: validScores,
         };
         await submitTasting(request);
         if (!silent) {
@@ -162,7 +216,7 @@ export default function TastingSubmission() {
     [selectedUser, newUserName, selectedThemeId, scores, showToast, resetScores]
   );
 
-  const updateScore = useCallback((whiskeyId: number, field: string, value: number) => {
+  const updateScore = useCallback((whiskeyId: number, field: string, value: number | '') => {
     setScores((prev) => ({
       ...prev,
       [whiskeyId]: {
@@ -334,9 +388,13 @@ export default function TastingSubmission() {
                             min="1"
                             max="5"
                             step="0.1"
-                            value={scores[whiskey.id!]?.aroma_score || 3}
+                            value={scores[whiskey.id!]?.aroma_score ?? ''}
                             onChange={(e) =>
-                              updateScore(whiskey.id!, 'aroma_score', parseFloat(e.target.value))
+                              updateScore(
+                                whiskey.id!,
+                                'aroma_score',
+                                e.target.value === '' ? '' : parseFloat(e.target.value)
+                              )
                             }
                           />
                         </div>
@@ -348,9 +406,13 @@ export default function TastingSubmission() {
                             min="1"
                             max="5"
                             step="0.1"
-                            value={scores[whiskey.id!]?.flavor_score || 3}
+                            value={scores[whiskey.id!]?.flavor_score ?? ''}
                             onChange={(e) =>
-                              updateScore(whiskey.id!, 'flavor_score', parseFloat(e.target.value))
+                              updateScore(
+                                whiskey.id!,
+                                'flavor_score',
+                                e.target.value === '' ? '' : parseFloat(e.target.value)
+                              )
                             }
                           />
                         </div>
@@ -362,9 +424,13 @@ export default function TastingSubmission() {
                             min="1"
                             max="5"
                             step="0.1"
-                            value={scores[whiskey.id!]?.finish_score || 3}
+                            value={scores[whiskey.id!]?.finish_score ?? ''}
                             onChange={(e) =>
-                              updateScore(whiskey.id!, 'finish_score', parseFloat(e.target.value))
+                              updateScore(
+                                whiskey.id!,
+                                'finish_score',
+                                e.target.value === '' ? '' : parseFloat(e.target.value)
+                              )
                             }
                           />
                         </div>
@@ -375,9 +441,13 @@ export default function TastingSubmission() {
                             type="number"
                             min="1"
                             max={whiskeys.length}
-                            value={scores[whiskey.id!]?.personal_rank || index + 1}
+                            value={scores[whiskey.id!]?.personal_rank ?? ''}
                             onChange={(e) =>
-                              updateScore(whiskey.id!, 'personal_rank', parseInt(e.target.value))
+                              updateScore(
+                                whiskey.id!,
+                                'personal_rank',
+                                e.target.value === '' ? '' : parseInt(e.target.value)
+                              )
                             }
                           />
                         </div>

@@ -53,6 +53,9 @@ apps/backend/data/config.json
 .cursor/
 .cursorrules
 
+# claude related files
+.claude/
+
 # roo related files
 .roo/mcp.json
 

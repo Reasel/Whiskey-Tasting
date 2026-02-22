@@ -11,6 +11,7 @@ pkgs.mkShell {
       ps.pytest
       ps.pytest-asyncio
       ps.pytest-cov
+      ps.coverage
       ps.playwright
       ps.httpx
     ]))
