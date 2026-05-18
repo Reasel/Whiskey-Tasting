@@ -41,15 +41,6 @@ export default function AdminIndexScreen() {
               onPress={() => router.push('/admin/data')}
             />
           </View>
-          <View style={styles.tile}>
-            <Button
-              title="DELETE USER"
-              size="xl"
-              variant="destructive"
-              block
-              onPress={() => router.push('/admin/users')}
-            />
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
