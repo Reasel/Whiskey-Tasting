@@ -83,19 +83,23 @@ export default function SettingsScreen() {
           />
 
           <View style={styles.buttonRow}>
-            <Button
-              title="TEST CONNECTION"
-              variant="secondary"
-              onPress={testConnection}
-              loading={testing}
-              style={styles.flex1}
-            />
-            <Button
-              title="SAVE"
-              onPress={saveUrl}
-              disabled={!hasChanges}
-              style={styles.flex1}
-            />
+            <View style={styles.flex1}>
+              <Button
+                title="TEST CONNECTION"
+                variant="secondary"
+                onPress={testConnection}
+                loading={testing}
+                block
+              />
+            </View>
+            <View style={styles.flex1}>
+              <Button
+                title="SAVE"
+                onPress={saveUrl}
+                disabled={!hasChanges}
+                block
+              />
+            </View>
           </View>
 
           {connectionStatus !== 'unknown' && (
