@@ -167,6 +167,7 @@ export default function TastingScreen() {
 
   const handleSelectUser = useCallback(
     async (name: string) => {
+      if (loadingWhiskeys) return;
       setUserName(name);
       setUserSelected(true);
       await setLastUsername(name);
@@ -174,15 +175,15 @@ export default function TastingScreen() {
         await loadExistingScores(name, selectedThemeId);
       }
     },
-    [selectedThemeId, loadExistingScores],
+    [selectedThemeId, loadExistingScores, loadingWhiskeys],
   );
 
   const handleContinueAsNew = useCallback(async () => {
-    if (!userName.trim()) return;
+    if (!userName.trim() || loadingWhiskeys) return;
     setUserSelected(true);
     await setLastUsername(userName.trim());
     initScores(whiskeys);
-  }, [userName, whiskeys, initScores]);
+  }, [userName, whiskeys, initScores, loadingWhiskeys]);
 
   const handleSubmit = useCallback(async () => {
     if (!userName.trim() || selectedThemeId == null) return;
@@ -274,7 +275,7 @@ export default function TastingScreen() {
           {users.map((u) => (
             <Card
               key={u.id}
-              onPress={() => handleSelectUser(u.name)}
+              onPress={loadingWhiskeys ? undefined : () => handleSelectUser(u.name)}
               style={[
                 styles.userCard,
                 userName === u.name && styles.userCardActive,
@@ -302,7 +303,7 @@ export default function TastingScreen() {
           <Button
             title="Continue"
             onPress={handleContinueAsNew}
-            disabled={!userName.trim()}
+            disabled={!userName.trim() || loadingWhiskeys}
             style={{ marginTop: spacing.md }}
           />
         </ScrollView>
