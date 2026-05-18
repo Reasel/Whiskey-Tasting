@@ -183,13 +183,10 @@ export default function ThemesScreen() {
             <Text style={styles.emptyText}>No themes yet. Create one!</Text>
           </View>
         ) : (
-          themes.map((theme, index) => (
+          themes.map((theme) => (
             <Card key={theme.id} style={styles.themeCard}>
               <View style={styles.themeHeader}>
                 <View style={styles.themeInfo}>
-                  {index === 0 && (
-                    <Text style={styles.activeBadge}>ACTIVE</Text>
-                  )}
                   <Text style={styles.themeName}>{theme.name}</Text>
                   {theme.notes ? (
                     <Text style={styles.themeNotes}>{theme.notes}</Text>
@@ -257,13 +254,6 @@ const styles = StyleSheet.create({
   themeInfo: {
     flex: 1,
     marginRight: spacing.md,
-  },
-  activeBadge: {
-    color: colors.primary,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 2,
-    marginBottom: spacing.xs,
   },
   themeName: {
     color: colors.text,
