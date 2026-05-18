@@ -25,11 +25,16 @@ export function RatingSlider({
   // Keep the field in sync when the value changes from outside (e.g. slider,
   // loading another user's saved scores).
   useEffect(() => {
-    setText(String(value));
+    setText(format(value));
   }, [value]);
 
   const clamp = (n: number) =>
     Math.min(maximumValue, Math.max(minimumValue, n));
+
+  // Display formatting: strip IEEE float noise from slider drag (e.g.
+  // 3.2000000000000002) while preserving real user-typed precision.
+  const format = (n: number) =>
+    integer ? String(n) : String(Math.round(n * 1e6) / 1e6);
 
   const commitText = () => {
     const parsed = integer ? parseInt(text, 10) : parseFloat(text);
@@ -39,7 +44,7 @@ export function RatingSlider({
     }
     const next = clamp(parsed);
     onValueChange(next);
-    setText(String(next));
+    setText(format(next));
   };
 
   return (
