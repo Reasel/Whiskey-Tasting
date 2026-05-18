@@ -429,14 +429,15 @@ const styles = StyleSheet.create({
   },
   colName: {
     flex: 1,
+    flexShrink: 1,
     marginRight: spacing.sm,
   },
   colScore: {
-    width: 32,
+    width: 28,
     marginRight: spacing.xs,
   },
   colAvg: {
-    width: 36,
+    width: 32,
   },
   detailColPerson: {
     flex: 1,
