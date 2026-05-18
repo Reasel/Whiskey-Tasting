@@ -1,7 +1,16 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../lib/theme';
+
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+function tabIcon(active: IoniconName, inactive: IoniconName) {
+  return ({ focused, color, size }: { focused: boolean; color: string; size: number }) => (
+    <Ionicons name={focused ? active : inactive} size={size} color={color} />
+  );
+}
 
 export default function RootLayout() {
   return (
@@ -41,6 +50,7 @@ export default function RootLayout() {
             title: 'Home',
             tabBarLabel: 'Home',
             headerTitle: 'Whiskey Tasting',
+            tabBarIcon: tabIcon('home', 'home-outline'),
           }}
         />
         <Tabs.Screen
@@ -50,6 +60,7 @@ export default function RootLayout() {
             tabBarLabel: 'Taste',
             headerTitle: 'Tasting',
             headerShown: false,
+            tabBarIcon: tabIcon('wine', 'wine-outline'),
           }}
         />
         <Tabs.Screen
@@ -58,6 +69,7 @@ export default function RootLayout() {
             title: 'Results',
             tabBarLabel: 'Results',
             headerTitle: 'Results',
+            tabBarIcon: tabIcon('stats-chart', 'stats-chart-outline'),
           }}
         />
         <Tabs.Screen
@@ -66,6 +78,7 @@ export default function RootLayout() {
             title: 'Admin',
             tabBarLabel: 'Admin',
             headerShown: false,
+            tabBarIcon: tabIcon('shield', 'shield-outline'),
           }}
         />
         <Tabs.Screen
@@ -74,6 +87,7 @@ export default function RootLayout() {
             title: 'Settings',
             tabBarLabel: 'Settings',
             headerTitle: 'Settings',
+            tabBarIcon: tabIcon('settings', 'settings-outline'),
           }}
         />
       </Tabs>
