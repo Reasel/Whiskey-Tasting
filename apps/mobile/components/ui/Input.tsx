@@ -1,13 +1,13 @@
 import React from 'react';
 import {
   View,
-  Text,
   TextInput,
   StyleSheet,
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
-import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
+import { AppText } from './AppText';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -23,45 +23,45 @@ export function Input({
   ...props
 }: InputProps) {
   return (
-    <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+    <View style={[styles.wrap, containerStyle]}>
+      {label ? (
+        <AppText variant="fieldLabel" style={styles.label}>
+          {label}
+        </AppText>
+      ) : null}
       <TextInput
-        style={[styles.input, error && styles.inputError, style]}
-        placeholderTextColor={colors.textMuted}
+        style={[styles.input, error ? styles.inputError : null, style]}
+        placeholderTextColor={colors.mutedText}
         {...props}
       />
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error ? (
+        <AppText variant="fieldLabel" style={styles.errorText}>
+          {error}
+        </AppText>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: spacing.md,
-  },
-  label: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
-    marginBottom: spacing.xs,
-    fontWeight: '500',
-  },
+  wrap: { gap: spacing.xs, marginBottom: spacing.md },
+  label: {},
   input: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.cardWhite,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: borderRadius.md,
+    borderColor: colors.inkBlack,
+    borderRadius: 0,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    color: colors.text,
-    fontSize: fontSize.md,
+    paddingVertical: spacing.smd,
+    fontFamily: 'Inter_400Regular',
+    fontSize: 16,
+    color: colors.inkBlack,
     minHeight: 48,
   },
   inputError: {
-    borderColor: colors.error,
+    borderColor: colors.alertRed,
   },
-  error: {
-    color: colors.error,
-    fontSize: fontSize.sm,
-    marginTop: spacing.xs,
+  errorText: {
+    color: colors.alertRed,
   },
 });
