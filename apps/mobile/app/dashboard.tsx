@@ -112,6 +112,13 @@ export default function DashboardScreen() {
     try {
       const data = await fetchAllThemesScores();
       setThemesScores(data);
+      // If the selected theme was deleted elsewhere, fall back to All
+      // Themes so the screen doesn't render a silent blank.
+      setThemeFilter((prev) =>
+        prev === 'all' || data.some((t) => t.theme.id === prev)
+          ? prev
+          : 'all',
+      );
     } catch {
       // silently fail, user can pull to refresh
     } finally {
@@ -259,7 +266,7 @@ export default function DashboardScreen() {
                           ? ` · ${r.tasterCount} taster${
                               r.tasterCount === 1 ? '' : 's'
                             }`
-                          : ` · rank #${r.rank}`}
+                          : ''}
                       </Text>
                     </View>
                     <View style={styles.avgBox}>
