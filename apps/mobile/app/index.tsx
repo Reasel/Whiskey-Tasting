@@ -93,7 +93,7 @@ export default function HomeScreen() {
                 <AppText variant="sectionTitle" style={styles.statValue}>
                   {status.database_stats.total_themes}
                 </AppText>
-                <AppText variant="fieldLabel" style={styles.statLabel}>Themes</AppText>
+                <AppText variant="fieldLabel" style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Themes</AppText>
               </Card>
             </View>
             <View style={styles.statCell}>
@@ -101,7 +101,7 @@ export default function HomeScreen() {
                 <AppText variant="sectionTitle" style={styles.statValue}>
                   {status.database_stats.total_whiskeys}
                 </AppText>
-                <AppText variant="fieldLabel" style={styles.statLabel}>Whiskeys</AppText>
+                <AppText variant="fieldLabel" style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Whiskeys</AppText>
               </Card>
             </View>
             <View style={styles.statCell}>
@@ -109,7 +109,7 @@ export default function HomeScreen() {
                 <AppText variant="sectionTitle" style={styles.statValue}>
                   {status.database_stats.total_tastings}
                 </AppText>
-                <AppText variant="fieldLabel" style={styles.statLabel}>Tastings</AppText>
+                <AppText variant="fieldLabel" style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Tastings</AppText>
               </Card>
             </View>
             <View style={styles.statCell}>
@@ -117,7 +117,7 @@ export default function HomeScreen() {
                 <AppText variant="sectionTitle" style={styles.statValue}>
                   {status.database_stats.total_users}
                 </AppText>
-                <AppText variant="fieldLabel" style={styles.statLabel}>Users</AppText>
+                <AppText variant="fieldLabel" style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Users</AppText>
               </Card>
             </View>
           </View>
