@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   RefreshControl,
@@ -10,13 +9,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { colors, spacing, fontSize } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import { Dropdown } from '../../components/ui/Dropdown';
 import { WhiskeyCard } from '../../components/tasting/WhiskeyCard';
 import { Toast } from '../../components/ui/Toast';
+import { AppText } from '../../components/ui/AppText';
+import { Eyebrow } from '../../components/ui/Eyebrow';
+import { Panel } from '../../components/ui/Panel';
 import {
   fetchThemes,
   fetchWhiskeysByTheme,
@@ -284,7 +286,7 @@ export default function TastingScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
         </View>
       </SafeAreaView>
     );
@@ -294,10 +296,12 @@ export default function TastingScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <Text style={styles.emptyTitle}>No Themes</Text>
-          <Text style={styles.emptyText}>
+          <AppText variant="sectionTitle" style={styles.emptyTitle}>
+            No Themes
+          </AppText>
+          <AppText variant="body" style={styles.emptyText}>
             Create a theme in the admin panel to start tasting.
-          </Text>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -310,17 +314,24 @@ export default function TastingScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
+          <AppText variant="pageTitle" style={styles.pageTitle}>
+            TASTING SUBMISSION
+          </AppText>
+          <Eyebrow style={styles.eyebrow}>SUBMIT OR EDIT TASTING SCORES</Eyebrow>
+
           <Dropdown
-            label="Theme"
+            label="THEME"
             value={selectedThemeId}
             options={themeOptions}
             onChange={handleThemeChange}
           />
 
-          <Text style={styles.sectionTitle}>Who are you?</Text>
-          <Text style={styles.sectionSubtitle}>
-            Select a name or enter a new one. You can submit for others too.
-          </Text>
+          <View style={styles.sectionHeader}>
+            <AppText variant="fieldLabel">WHO ARE YOU?</AppText>
+          </View>
+          <AppText variant="body" style={styles.sectionSubtitle}>
+            Select your name or enter a new one. You can submit for others too.
+          </AppText>
 
           {users.map((u) => (
             <Card
@@ -331,19 +342,22 @@ export default function TastingScreen() {
                 userName === u.name && styles.userCardActive,
               ]}
             >
-              <Text
+              <AppText
+                variant="body"
                 style={[
                   styles.userName,
                   userName === u.name && styles.userNameActive,
                 ]}
               >
                 {u.name}
-              </Text>
+              </AppText>
             </Card>
           ))}
 
           <View style={styles.divider} />
-          <Text style={styles.orText}>Or enter a new name:</Text>
+          <AppText variant="fieldLabel" style={styles.orLabel}>
+            OR ENTER A NEW NAME
+          </AppText>
           <Input
             value={userName}
             onChangeText={setUserName}
@@ -351,7 +365,7 @@ export default function TastingScreen() {
             autoCapitalize="words"
           />
           <Button
-            title="Continue"
+            title="CONTINUE"
             onPress={handleContinueAsNew}
             disabled={!userName.trim() || loadingWhiskeys}
             style={{ marginTop: spacing.md }}
@@ -380,50 +394,55 @@ export default function TastingScreen() {
               setRefreshing(true);
               loadData();
             }}
-            tintColor={colors.primary}
+            tintColor={colors.whiskeyAmber}
           />
         }
       >
         <View style={styles.themeHeader}>
-          <Text style={styles.themeName}>{selectedTheme?.name ?? ''}</Text>
-          <Text style={styles.userLabel}>Tasting as: {userName}</Text>
+          <AppText variant="sectionTitle">{selectedTheme?.name ?? ''}</AppText>
+          <AppText variant="tableCell" style={styles.userLabel}>
+            Tasting as: {userName}
+          </AppText>
           <Button
-            title="Change Theme / User"
-            variant="ghost"
+            title="CHANGE USER"
+            variant="outline"
             size="sm"
             onPress={() => setUserSelected(false)}
+            style={styles.changeUserButton}
           />
         </View>
 
         {loadingWhiskeys ? (
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
         ) : (
-          whiskeys.map((whiskey, index) =>
-            whiskey.id != null ? (
-              <WhiskeyCard
-                key={whiskey.id}
-                index={index}
-                name={whiskey.name}
-                proof={whiskey.proof}
-                scores={
-                  scores[whiskey.id] || {
-                    aroma_score: 3,
-                    flavor_score: 3,
-                    finish_score: 3,
-                    personal_rank: index + 1,
+          <Panel title="Scores">
+            {whiskeys.map((whiskey, index) =>
+              whiskey.id != null ? (
+                <WhiskeyCard
+                  key={whiskey.id}
+                  index={index}
+                  name={whiskey.name}
+                  proof={whiskey.proof}
+                  scores={
+                    scores[whiskey.id] || {
+                      aroma_score: 3,
+                      flavor_score: 3,
+                      finish_score: 3,
+                      personal_rank: index + 1,
+                    }
                   }
-                }
-                totalWhiskeys={whiskeys.length}
-                onScoreChange={(field, value) =>
-                  updateScore(whiskey.id!, field, value)
-                }
-              />
-            ) : null,
-          )
+                  totalWhiskeys={whiskeys.length}
+                  onScoreChange={(field, value) =>
+                    updateScore(whiskey.id!, field, value)
+                  }
+                />
+              ) : null,
+            )}
+          </Panel>
         )}
 
         <Button
-          title={submitting ? 'Submitting...' : 'Submit Tasting'}
+          title="SUBMIT TASTING"
           size="lg"
           onPress={handleSubmit}
           loading={submitting}
@@ -445,7 +464,7 @@ export default function TastingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.canvasCream,
   },
   centered: {
     flex: 1,
@@ -458,65 +477,58 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   emptyTitle: {
-    color: colors.text,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
     marginBottom: spacing.sm,
-  },
-  emptyText: {
-    color: colors.textSecondary,
-    fontSize: fontSize.md,
     textAlign: 'center',
   },
-  sectionTitle: {
-    color: colors.text,
-    fontSize: fontSize.xxl,
-    fontWeight: '800',
+  emptyText: {
+    color: colors.steelGrey,
+    textAlign: 'center',
+  },
+  pageTitle: {
+    marginBottom: spacing.xs,
+  },
+  eyebrow: {
+    marginBottom: spacing.lg,
+  },
+  sectionHeader: {
+    marginTop: spacing.lg,
     marginBottom: spacing.xs,
   },
   sectionSubtitle: {
-    color: colors.textSecondary,
-    fontSize: fontSize.md,
+    color: colors.steelGrey,
     marginBottom: spacing.lg,
   },
   userCard: {
     marginBottom: spacing.sm,
   },
   userCardActive: {
-    borderColor: colors.primary,
+    borderColor: colors.whiskeyAmber,
     borderWidth: 2,
   },
   userName: {
-    color: colors.text,
-    fontSize: fontSize.lg,
-    fontWeight: '500',
+    color: colors.inkBlack,
   },
   userNameActive: {
-    color: colors.primary,
+    color: colors.whiskeyAmber,
   },
   divider: {
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: colors.inkBlack,
     marginVertical: spacing.lg,
   },
-  orText: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
+  orLabel: {
     marginBottom: spacing.md,
   },
   themeHeader: {
     marginBottom: spacing.lg,
   },
-  themeName: {
-    color: colors.text,
-    fontSize: fontSize.xxl,
-    fontWeight: '800',
-  },
   userLabel: {
-    color: colors.primary,
-    fontSize: fontSize.sm,
+    color: colors.steelGrey,
     marginTop: spacing.xs,
-    fontWeight: '500',
+    marginBottom: spacing.sm,
+  },
+  changeUserButton: {
+    alignSelf: 'flex-start',
   },
   submitButton: {
     marginTop: spacing.lg,

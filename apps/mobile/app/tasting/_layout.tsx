@@ -5,10 +5,10 @@ export default function TastingLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerTintColor: colors.text,
+        headerStyle: { backgroundColor: colors.canvasCream },
+        headerTintColor: colors.inkBlack,
         headerTitleStyle: { fontWeight: '600' },
-        contentStyle: { backgroundColor: colors.background },
+        contentStyle: { backgroundColor: colors.canvasCream },
         headerShadowVisible: false,
       }}
     >
