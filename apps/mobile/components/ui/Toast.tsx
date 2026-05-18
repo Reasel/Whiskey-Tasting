@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Text, StyleSheet } from 'react-native';
-import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
+import { Animated, View, StyleSheet } from 'react-native';
+import { colors, spacing } from '../../lib/theme';
+import { AppText } from './AppText';
+import { HardShadow } from './HardShadow';
 
 interface ToastProps {
   message: string;
@@ -39,36 +41,35 @@ export function Toast({
 
   if (!visible) return null;
 
-  const bgColor =
-    type === 'success'
-      ? colors.success
-      : type === 'error'
-        ? colors.error
-        : colors.primary;
+  // type is kept in the interface for API compatibility but visual style is
+  // now uniform (white box, black border) per design system.
+  void type;
 
   return (
-    <Animated.View
-      style={[styles.container, { opacity, backgroundColor: bgColor }]}
-    >
-      <Text style={styles.text}>{message}</Text>
+    <Animated.View style={[styles.positioner, { opacity }]}>
+      <HardShadow offset="card">
+        <View style={styles.container}>
+          <AppText variant="tableCell" style={{ color: colors.inkBlack }}>
+            {message}
+          </AppText>
+        </View>
+      </HardShadow>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  positioner: {
     position: 'absolute',
-    bottom: 100,
-    left: spacing.lg,
-    right: spacing.lg,
-    padding: spacing.md,
-    borderRadius: borderRadius.md,
-    alignItems: 'center',
+    left: spacing.md,
+    bottom: spacing.xl,
     zIndex: 1000,
   },
-  text: {
-    color: colors.white,
-    fontSize: fontSize.md,
-    fontWeight: '500',
+  container: {
+    backgroundColor: colors.cardWhite,
+    borderWidth: 1,
+    borderColor: colors.inkBlack,
+    borderRadius: 0,
+    padding: spacing.md,
   },
 });
