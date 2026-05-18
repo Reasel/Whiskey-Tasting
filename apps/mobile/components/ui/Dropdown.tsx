@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   Modal,
@@ -9,7 +8,9 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
+import { AppText } from './AppText';
+import { HardShadow } from './HardShadow';
 
 export interface DropdownOption {
   label: string;
@@ -39,17 +40,19 @@ export function Dropdown({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <TouchableOpacity
-        style={styles.control}
-        activeOpacity={0.7}
-        onPress={() => setOpen(true)}
-      >
-        <Text style={selected ? styles.valueText : styles.placeholderText}>
-          {selected ? selected.label : placeholder}
-        </Text>
-        <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
-      </TouchableOpacity>
+      {label && <AppText variant="fieldLabel" style={styles.label}>{label}</AppText>}
+      <HardShadow offset="card">
+        <TouchableOpacity
+          style={styles.control}
+          activeOpacity={0.7}
+          onPress={() => setOpen(true)}
+        >
+          <AppText variant="body" style={selected ? styles.valueText : styles.placeholderText}>
+            {selected ? selected.label : placeholder}
+          </AppText>
+          <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
+        </TouchableOpacity>
+      </HardShadow>
 
       <Modal
         visible={open}
@@ -66,7 +69,7 @@ export function Dropdown({
             <ScrollView>
               {options.length === 0 ? (
                 <View style={styles.empty}>
-                  <Text style={styles.emptyText}>No options</Text>
+                  <AppText variant="body" style={styles.emptyText}>No options</AppText>
                 </View>
               ) : (
                 options.map((opt, index) => {
@@ -86,19 +89,20 @@ export function Dropdown({
                         setOpen(false);
                       }}
                     >
-                      <Text
+                      <AppText
+                        variant="body"
                         style={[
                           styles.optionText,
                           isActive && styles.optionTextActive,
                         ]}
                       >
                         {opt.label}
-                      </Text>
+                      </AppText>
                       {isActive && (
                         <Ionicons
                           name="checkmark"
                           size={18}
-                          color={colors.primary}
+                          color={colors.cardWhite}
                         />
                       )}
                     </TouchableOpacity>
@@ -118,42 +122,37 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   label: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
     marginBottom: spacing.xs,
-    fontWeight: '500',
   },
   control: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.cardWhite,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: borderRadius.md,
+    borderColor: colors.inkBlack,
+    borderRadius: 0,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     minHeight: 48,
   },
   valueText: {
-    color: colors.text,
-    fontSize: fontSize.md,
+    color: colors.inkBlack,
   },
   placeholderText: {
-    color: colors.textMuted,
-    fontSize: fontSize.md,
+    color: colors.mutedText,
   },
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     padding: spacing.xl,
   },
   sheet: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
+    backgroundColor: colors.cardWhite,
+    borderRadius: 0,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.inkBlack,
     maxHeight: '70%',
     overflow: 'hidden',
   },
@@ -164,20 +163,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: colors.lightGrey,
+    backgroundColor: colors.cardWhite,
   },
   optionLast: {
     borderBottomWidth: 0,
   },
   optionActive: {
-    backgroundColor: colors.surfaceLight,
+    backgroundColor: colors.whiskeyAmber,
   },
   optionText: {
-    color: colors.text,
-    fontSize: fontSize.md,
+    color: colors.inkBlack,
   },
   optionTextActive: {
-    color: colors.primary,
+    color: colors.cardWhite,
     fontWeight: '700',
   },
   empty: {
@@ -186,7 +185,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: colors.textMuted,
-    fontSize: fontSize.md,
+    color: colors.mutedText,
   },
 });
