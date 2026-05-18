@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, fontSize } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
@@ -124,6 +125,37 @@ export default function TastingScreen() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Refresh the theme/user lists whenever the tab regains focus so themes
+  // created in Admin show up here. The first focus is the initial mount,
+  // already covered by loadData() above, so skip it. Selection, the
+  // in-progress user, and entered scores are intentionally left untouched.
+  const didInitialLoad = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (!didInitialLoad.current) {
+        didInitialLoad.current = true;
+        return;
+      }
+      let active = true;
+      (async () => {
+        try {
+          const [themesResp, usersData] = await Promise.all([
+            fetchThemes(),
+            fetchUsers(),
+          ]);
+          if (!active) return;
+          setThemes(themesResp.themes);
+          setUsers(usersData.users);
+        } catch {
+          // keep current state on a transient failure
+        }
+      })();
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
 
   const handleThemeChange = useCallback(
     (value: number | string) => {
