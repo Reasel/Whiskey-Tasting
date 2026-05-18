@@ -416,28 +416,30 @@ export default function TastingScreen() {
           <ActivityIndicator size="large" color={colors.whiskeyAmber} />
         ) : (
           <Panel title="Scores">
-            {whiskeys.map((whiskey, index) =>
-              whiskey.id != null ? (
-                <WhiskeyCard
-                  key={whiskey.id}
-                  index={index}
-                  name={whiskey.name}
-                  proof={whiskey.proof}
-                  scores={
-                    scores[whiskey.id] || {
-                      aroma_score: 3,
-                      flavor_score: 3,
-                      finish_score: 3,
-                      personal_rank: index + 1,
+            <View style={styles.scoreList}>
+              {whiskeys.map((whiskey, index) =>
+                whiskey.id != null ? (
+                  <WhiskeyCard
+                    key={whiskey.id}
+                    index={index}
+                    name={whiskey.name}
+                    proof={whiskey.proof}
+                    scores={
+                      scores[whiskey.id] || {
+                        aroma_score: 3,
+                        flavor_score: 3,
+                        finish_score: 3,
+                        personal_rank: index + 1,
+                      }
                     }
-                  }
-                  totalWhiskeys={whiskeys.length}
-                  onScoreChange={(field, value) =>
-                    updateScore(whiskey.id!, field, value)
-                  }
-                />
-              ) : null,
-            )}
+                    totalWhiskeys={whiskeys.length}
+                    onScoreChange={(field, value) =>
+                      updateScore(whiskey.id!, field, value)
+                    }
+                  />
+                ) : null,
+              )}
+            </View>
           </Panel>
         )}
 
@@ -533,5 +535,8 @@ const styles = StyleSheet.create({
   submitButton: {
     marginTop: spacing.lg,
     width: '100%',
+  },
+  scoreList: {
+    gap: spacing.md,
   },
 });

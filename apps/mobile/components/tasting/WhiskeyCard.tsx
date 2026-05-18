@@ -30,7 +30,7 @@ export function WhiskeyCard({
   onScoreChange,
 }: WhiskeyCardProps) {
   return (
-    <Card style={styles.cardInner}>
+    <Card>
       <View style={styles.header}>
         <AppText variant="eyebrow" style={styles.number}>{index + 1}</AppText>
         <View style={styles.titleContainer}>
@@ -69,9 +69,6 @@ export function WhiskeyCard({
 }
 
 const styles = StyleSheet.create({
-  cardInner: {
-    marginBottom: spacing.md,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
