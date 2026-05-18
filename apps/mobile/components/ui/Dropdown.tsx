@@ -34,7 +34,8 @@ export function Dropdown({
   containerStyle,
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
-  const selected = options.find((o) => o.value === value);
+  const valueKey = value == null ? null : String(value);
+  const selected = options.find((o) => String(o.value) === valueKey);
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -63,36 +64,47 @@ export function Dropdown({
         >
           <View style={styles.sheet}>
             <ScrollView>
-              {options.map((opt) => {
-                const isActive = opt.value === value;
-                return (
-                  <TouchableOpacity
-                    key={String(opt.value)}
-                    style={[styles.option, isActive && styles.optionActive]}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                      onChange(opt.value);
-                      setOpen(false);
-                    }}
-                  >
-                    <Text
+              {options.length === 0 ? (
+                <View style={styles.empty}>
+                  <Text style={styles.emptyText}>No options</Text>
+                </View>
+              ) : (
+                options.map((opt, index) => {
+                  const isActive = String(opt.value) === valueKey;
+                  const isLast = index === options.length - 1;
+                  return (
+                    <TouchableOpacity
+                      key={String(opt.value)}
                       style={[
-                        styles.optionText,
-                        isActive && styles.optionTextActive,
+                        styles.option,
+                        isLast && styles.optionLast,
+                        isActive && styles.optionActive,
                       ]}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        onChange(opt.value);
+                        setOpen(false);
+                      }}
                     >
-                      {opt.label}
-                    </Text>
-                    {isActive && (
-                      <Ionicons
-                        name="checkmark"
-                        size={18}
-                        color={colors.primary}
-                      />
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
+                      <Text
+                        style={[
+                          styles.optionText,
+                          isActive && styles.optionTextActive,
+                        ]}
+                      >
+                        {opt.label}
+                      </Text>
+                      {isActive && (
+                        <Ionicons
+                          name="checkmark"
+                          size={18}
+                          color={colors.primary}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })
+              )}
             </ScrollView>
           </View>
         </TouchableOpacity>
@@ -154,6 +166,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  optionLast: {
+    borderBottomWidth: 0,
+  },
   optionActive: {
     backgroundColor: colors.surfaceLight,
   },
@@ -164,5 +179,14 @@ const styles = StyleSheet.create({
   optionTextActive: {
     color: colors.primary,
     fontWeight: '700',
+  },
+  empty: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: colors.textMuted,
+    fontSize: fontSize.md,
   },
 });
