@@ -61,6 +61,8 @@ export default function HomeScreen() {
       <GridBackground />
       <ScrollView
         contentContainerStyle={styles.content}
+        bounces={false}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -155,11 +157,11 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.lg,
-    paddingBottom: spacing.xxl,
+    paddingBottom: spacing.lg,
+    flexGrow: 1,
   },
   hero: {
-    marginBottom: spacing.xl,
-    paddingVertical: spacing.xl,
+    marginBottom: spacing.lg,
   },
   eyebrow: {
     marginTop: spacing.sm,

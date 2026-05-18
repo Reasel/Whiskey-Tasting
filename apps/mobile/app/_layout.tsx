@@ -19,21 +19,23 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function tabLabel(label: string) {
   return ({ color }: { focused: boolean; color: string }) => (
-    <AppText
-      numberOfLines={1}
-      adjustsFontSizeToFit
-      minimumFontScale={0.6}
-      style={{
-        color,
-        fontFamily: 'JetBrainsMono_700Bold',
-        fontSize: 11,
-        letterSpacing: 0.6,
-        textTransform: 'uppercase',
-        textAlign: 'center',
-      }}
-    >
-      {label}
-    </AppText>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <AppText
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.6}
+        style={{
+          color,
+          fontFamily: 'JetBrainsMono_700Bold',
+          fontSize: 11,
+          letterSpacing: 0.6,
+          textTransform: 'uppercase',
+          textAlign: 'center',
+        }}
+      >
+        {label}
+      </AppText>
+    </View>
   );
 }
 
@@ -70,9 +72,9 @@ export default function RootLayout() {
             backgroundColor: colors.canvasCream,
             borderTopColor: colors.inkBlack,
             borderTopWidth: 1,
-            height: 64 + insets.bottom,
+            height: 52 + insets.bottom,
           },
-          tabBarItemStyle: { borderRadius: 0 },
+          tabBarItemStyle: { borderRadius: 0, justifyContent: 'center' },
         }}
       >
         <Tabs.Screen
