@@ -13,31 +13,8 @@ import {
 import { Inter_400Regular } from '@expo-google-fonts/inter';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../lib/theme';
-import { AppText } from '../components/ui/AppText';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
-
-function tabLabel(label: string) {
-  return ({ color }: { focused: boolean; color: string }) => (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <AppText
-        numberOfLines={1}
-        adjustsFontSizeToFit
-        minimumFontScale={0.6}
-        style={{
-          color,
-          fontFamily: 'JetBrainsMono_700Bold',
-          fontSize: 11,
-          letterSpacing: 0.6,
-          textTransform: 'uppercase',
-          textAlign: 'center',
-        }}
-      >
-        {label}
-      </AppText>
-    </View>
-  );
-}
 
 export default function RootLayout() {
   const insets = useSafeAreaInsets();
@@ -65,6 +42,13 @@ export default function RootLayout() {
         screenOptions={{
           headerShown: false,
           tabBarIcon: () => null,
+          tabBarIconStyle: { display: 'none' },
+          tabBarLabelStyle: {
+            fontFamily: 'JetBrainsMono_700Bold',
+            fontSize: 10,
+            letterSpacing: 0.3,
+            textTransform: 'uppercase',
+          },
           tabBarActiveBackgroundColor: colors.whiskeyAmber,
           tabBarActiveTintColor: colors.cardWhite,
           tabBarInactiveTintColor: colors.steelGrey,
@@ -72,30 +56,30 @@ export default function RootLayout() {
             backgroundColor: colors.canvasCream,
             borderTopColor: colors.inkBlack,
             borderTopWidth: 1,
-            height: 52 + insets.bottom,
+            height: 56 + insets.bottom,
           },
           tabBarItemStyle: { borderRadius: 0, justifyContent: 'center' },
         }}
       >
         <Tabs.Screen
           name="index"
-          options={{ tabBarLabel: tabLabel('HOME') }}
+          options={{ tabBarLabel: 'HOME' }}
         />
         <Tabs.Screen
           name="tasting"
-          options={{ tabBarLabel: tabLabel('TASTE') }}
+          options={{ tabBarLabel: 'TASTE' }}
         />
         <Tabs.Screen
           name="dashboard"
-          options={{ tabBarLabel: tabLabel('RESULTS') }}
+          options={{ tabBarLabel: 'RESULTS' }}
         />
         <Tabs.Screen
           name="admin"
-          options={{ tabBarLabel: tabLabel('ADMIN') }}
+          options={{ tabBarLabel: 'ADMIN' }}
         />
         <Tabs.Screen
           name="settings"
-          options={{ tabBarLabel: tabLabel('SETTINGS') }}
+          options={{ tabBarLabel: 'SETTINGS' }}
         />
       </Tabs>
     </View>
