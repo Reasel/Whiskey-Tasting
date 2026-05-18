@@ -125,8 +125,7 @@ export function Button({
             { translateY: pressed && !flat ? 2 : 0 },
           ],
         },
-        block && styles.block,
-        style,
+        block && styles.fill,
       ]}
     >
       {loading ? (
@@ -145,15 +144,17 @@ export function Button({
     </Pressable>
   );
 
+  const outerStyle = [block && styles.block, style];
+
   if (flat) {
-    return block ? <View style={styles.block}>{body}</View> : body;
+    return <View style={outerStyle}>{body}</View>;
   }
 
   return (
     <HardShadow
       offset="card"
       collapsed={pressed || isDisabled}
-      style={block ? styles.block : undefined}
+      style={outerStyle}
     >
       {body}
     </HardShadow>
@@ -167,5 +168,6 @@ const styles = StyleSheet.create({
     borderRadius: 0,
   },
   block: { alignSelf: 'stretch', width: '100%' },
+  fill: { width: '100%' },
   linkLabel: { textDecorationLine: 'underline' },
 });
