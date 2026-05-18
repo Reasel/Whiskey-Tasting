@@ -88,30 +88,38 @@ export default function HomeScreen() {
 
         {status && (
           <View style={styles.stats}>
-            <Card style={styles.statCard}>
-              <AppText variant="sectionTitle" style={styles.statValue}>
-                {status.database_stats.total_themes}
-              </AppText>
-              <AppText variant="fieldLabel" style={styles.statLabel}>Themes</AppText>
-            </Card>
-            <Card style={styles.statCard}>
-              <AppText variant="sectionTitle" style={styles.statValue}>
-                {status.database_stats.total_whiskeys}
-              </AppText>
-              <AppText variant="fieldLabel" style={styles.statLabel}>Whiskeys</AppText>
-            </Card>
-            <Card style={styles.statCard}>
-              <AppText variant="sectionTitle" style={styles.statValue}>
-                {status.database_stats.total_tastings}
-              </AppText>
-              <AppText variant="fieldLabel" style={styles.statLabel}>Tastings</AppText>
-            </Card>
-            <Card style={styles.statCard}>
-              <AppText variant="sectionTitle" style={styles.statValue}>
-                {status.database_stats.total_users}
-              </AppText>
-              <AppText variant="fieldLabel" style={styles.statLabel}>Users</AppText>
-            </Card>
+            <View style={styles.statCell}>
+              <Card style={styles.statCard}>
+                <AppText variant="sectionTitle" style={styles.statValue}>
+                  {status.database_stats.total_themes}
+                </AppText>
+                <AppText variant="fieldLabel" style={styles.statLabel}>Themes</AppText>
+              </Card>
+            </View>
+            <View style={styles.statCell}>
+              <Card style={styles.statCard}>
+                <AppText variant="sectionTitle" style={styles.statValue}>
+                  {status.database_stats.total_whiskeys}
+                </AppText>
+                <AppText variant="fieldLabel" style={styles.statLabel}>Whiskeys</AppText>
+              </Card>
+            </View>
+            <View style={styles.statCell}>
+              <Card style={styles.statCard}>
+                <AppText variant="sectionTitle" style={styles.statValue}>
+                  {status.database_stats.total_tastings}
+                </AppText>
+                <AppText variant="fieldLabel" style={styles.statLabel}>Tastings</AppText>
+              </Card>
+            </View>
+            <View style={styles.statCell}>
+              <Card style={styles.statCard}>
+                <AppText variant="sectionTitle" style={styles.statValue}>
+                  {status.database_stats.total_users}
+                </AppText>
+                <AppText variant="fieldLabel" style={styles.statLabel}>Users</AppText>
+              </Card>
+            </View>
           </View>
         )}
 
@@ -169,6 +177,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.xl,
     gap: spacing.sm,
+  },
+  statCell: {
+    flex: 1,
   },
   statCard: {
     flex: 1,
