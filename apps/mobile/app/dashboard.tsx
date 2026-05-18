@@ -253,60 +253,60 @@ export default function DashboardScreen() {
                     {/* Column header row */}
                     <View style={[styles.tableRow, styles.tableHeaderRow]}>
                       <View style={styles.colRank}>
-                        <AppText variant="fieldLabel">#</AppText>
+                        <AppText variant="fieldLabel" numberOfLines={1} adjustsFontSizeToFit>#</AppText>
                       </View>
                       <View style={styles.colName}>
-                        <AppText variant="fieldLabel">WHISKEY</AppText>
+                        <AppText variant="fieldLabel" numberOfLines={1} adjustsFontSizeToFit>WHISKEY</AppText>
                       </View>
                       <View style={styles.colScore}>
-                        <AppText variant="fieldLabel" style={styles.right}>A</AppText>
+                        <AppText variant="fieldLabel" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>A</AppText>
                       </View>
                       <View style={styles.colScore}>
-                        <AppText variant="fieldLabel" style={styles.right}>F</AppText>
+                        <AppText variant="fieldLabel" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>F</AppText>
                       </View>
                       <View style={styles.colScore}>
-                        <AppText variant="fieldLabel" style={styles.right}>Fi</AppText>
+                        <AppText variant="fieldLabel" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>Fi</AppText>
                       </View>
                       <View style={styles.colAvg}>
-                        <AppText variant="fieldLabel" style={styles.right}>AVG</AppText>
+                        <AppText variant="fieldLabel" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>AVG</AppText>
                       </View>
                     </View>
 
                     {rows.map((r) => (
                       <View key={r.whiskeyId} style={styles.tableRow}>
                         <View style={styles.colRank}>
-                          <AppText variant="tableCell">{r.rank}</AppText>
+                          <AppText variant="tableCell" numberOfLines={1} adjustsFontSizeToFit>{r.rank}</AppText>
                         </View>
                         <View style={styles.colName}>
-                          <AppText variant="tableCell">{r.name}</AppText>
+                          <AppText variant="tableCell" numberOfLines={1} adjustsFontSizeToFit>{r.name}</AppText>
                           {r.proof != null && (
-                            <AppText variant="tableCell" style={styles.proofText}>
+                            <AppText variant="tableCell" style={styles.proofText} numberOfLines={1} adjustsFontSizeToFit>
                               {r.proof}% ABV
                             </AppText>
                           )}
                           {personFilter === 'all' && (
-                            <AppText variant="tableCell" style={styles.tasterText}>
+                            <AppText variant="tableCell" style={styles.tasterText} numberOfLines={1} adjustsFontSizeToFit>
                               {r.tasterCount} taster{r.tasterCount === 1 ? '' : 's'}
                             </AppText>
                           )}
                         </View>
                         <View style={styles.colScore}>
-                          <AppText variant="tableCell" style={styles.right}>
+                          <AppText variant="tableCell" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>
                             {r.aroma.toFixed(1)}
                           </AppText>
                         </View>
                         <View style={styles.colScore}>
-                          <AppText variant="tableCell" style={styles.right}>
+                          <AppText variant="tableCell" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>
                             {r.flavor.toFixed(1)}
                           </AppText>
                         </View>
                         <View style={styles.colScore}>
-                          <AppText variant="tableCell" style={styles.right}>
+                          <AppText variant="tableCell" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>
                             {r.finish.toFixed(1)}
                           </AppText>
                         </View>
                         <View style={styles.colAvg}>
-                          <AppText variant="tableCell" style={[styles.right, styles.avgValue]}>
+                          <AppText variant="tableCell" style={[styles.right, styles.avgValue]} numberOfLines={1} adjustsFontSizeToFit>
                             {r.avg.toFixed(1)}
                           </AppText>
                         </View>
@@ -322,22 +322,22 @@ export default function DashboardScreen() {
                     {/* Column header row */}
                     <View style={[styles.tableRow, styles.tableHeaderRow]}>
                       <View style={styles.detailColPerson}>
-                        <AppText variant="fieldLabel">PERSON</AppText>
+                        <AppText variant="fieldLabel" numberOfLines={1} adjustsFontSizeToFit>PERSON</AppText>
                       </View>
                       <View style={styles.detailColWhiskey}>
-                        <AppText variant="fieldLabel">WHISKEY</AppText>
+                        <AppText variant="fieldLabel" numberOfLines={1} adjustsFontSizeToFit>WHISKEY</AppText>
                       </View>
                       <View style={styles.colScore}>
-                        <AppText variant="fieldLabel" style={styles.right}>A</AppText>
+                        <AppText variant="fieldLabel" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>A</AppText>
                       </View>
                       <View style={styles.colScore}>
-                        <AppText variant="fieldLabel" style={styles.right}>F</AppText>
+                        <AppText variant="fieldLabel" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>F</AppText>
                       </View>
                       <View style={styles.colScore}>
-                        <AppText variant="fieldLabel" style={styles.right}>Fi</AppText>
+                        <AppText variant="fieldLabel" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>Fi</AppText>
                       </View>
                       <View style={styles.colAvg}>
-                        <AppText variant="fieldLabel" style={styles.right}>AVG</AppText>
+                        <AppText variant="fieldLabel" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>AVG</AppText>
                       </View>
                     </View>
 
@@ -348,28 +348,28 @@ export default function DashboardScreen() {
                           style={styles.tableRow}
                         >
                           <View style={styles.detailColPerson}>
-                            <AppText variant="tableCell">{score.user_name}</AppText>
+                            <AppText variant="tableCell" numberOfLines={1} adjustsFontSizeToFit>{score.user_name}</AppText>
                           </View>
                           <View style={styles.detailColWhiskey}>
-                            <AppText variant="tableCell">{whiskey.whiskey_name}</AppText>
+                            <AppText variant="tableCell" numberOfLines={1} adjustsFontSizeToFit>{whiskey.whiskey_name}</AppText>
                           </View>
                           <View style={styles.colScore}>
-                            <AppText variant="tableCell" style={styles.right}>
+                            <AppText variant="tableCell" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>
                               {score.aroma_score.toFixed(1)}
                             </AppText>
                           </View>
                           <View style={styles.colScore}>
-                            <AppText variant="tableCell" style={styles.right}>
+                            <AppText variant="tableCell" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>
                               {score.flavor_score.toFixed(1)}
                             </AppText>
                           </View>
                           <View style={styles.colScore}>
-                            <AppText variant="tableCell" style={styles.right}>
+                            <AppText variant="tableCell" style={styles.right} numberOfLines={1} adjustsFontSizeToFit>
                               {score.finish_score.toFixed(1)}
                             </AppText>
                           </View>
                           <View style={styles.colAvg}>
-                            <AppText variant="tableCell" style={[styles.right, styles.avgValue]}>
+                            <AppText variant="tableCell" style={[styles.right, styles.avgValue]} numberOfLines={1} adjustsFontSizeToFit>
                               {score.average_score.toFixed(1)}
                             </AppText>
                           </View>

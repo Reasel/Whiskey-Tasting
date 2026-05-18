@@ -80,19 +80,19 @@ export default function DataScreen() {
 
         {data.map((themeData) => (
           <Card key={themeData.theme.id} style={styles.themeCard}>
-            <AppText variant="sectionTitle" style={styles.themeName}>{themeData.theme.name}</AppText>
+            <AppText variant="sectionTitle" style={styles.themeName} numberOfLines={1} adjustsFontSizeToFit>{themeData.theme.name}</AppText>
 
             {/* Table header */}
             <View style={styles.tableHeader}>
-              <AppText variant="tableCell" style={[styles.headerCell, styles.cellWide]}>
+              <AppText variant="tableCell" style={[styles.headerCell, styles.cellWide]} numberOfLines={1} adjustsFontSizeToFit>
                 Whiskey
               </AppText>
-              <AppText variant="tableCell" style={styles.headerCell}>User</AppText>
-              <AppText variant="tableCell" style={styles.headerCell}>Aroma</AppText>
-              <AppText variant="tableCell" style={styles.headerCell}>Flavor</AppText>
-              <AppText variant="tableCell" style={styles.headerCell}>Finish</AppText>
-              <AppText variant="tableCell" style={styles.headerCell}>Avg</AppText>
-              <AppText variant="tableCell" style={styles.headerCell}>Rank</AppText>
+              <AppText variant="tableCell" style={styles.headerCell} numberOfLines={1} adjustsFontSizeToFit>User</AppText>
+              <AppText variant="tableCell" style={styles.headerCell} numberOfLines={1} adjustsFontSizeToFit>Aroma</AppText>
+              <AppText variant="tableCell" style={styles.headerCell} numberOfLines={1} adjustsFontSizeToFit>Flavor</AppText>
+              <AppText variant="tableCell" style={styles.headerCell} numberOfLines={1} adjustsFontSizeToFit>Finish</AppText>
+              <AppText variant="tableCell" style={styles.headerCell} numberOfLines={1} adjustsFontSizeToFit>Avg</AppText>
+              <AppText variant="tableCell" style={styles.headerCell} numberOfLines={1} adjustsFontSizeToFit>Rank</AppText>
             </View>
 
             {/* Table rows */}
@@ -106,25 +106,26 @@ export default function DataScreen() {
                     variant="tableCell"
                     style={[styles.cell, styles.cellWide]}
                     numberOfLines={1}
+                    adjustsFontSizeToFit
                   >
                     {whiskey.whiskey_name}
                   </AppText>
-                  <AppText variant="tableCell" style={styles.cell} numberOfLines={1}>
+                  <AppText variant="tableCell" style={styles.cell} numberOfLines={1} adjustsFontSizeToFit>
                     {score.user_name}
                   </AppText>
-                  <AppText variant="tableCell" style={styles.cell}>
+                  <AppText variant="tableCell" style={styles.cell} numberOfLines={1} adjustsFontSizeToFit>
                     {score.aroma_score.toFixed(1)}
                   </AppText>
-                  <AppText variant="tableCell" style={styles.cell}>
+                  <AppText variant="tableCell" style={styles.cell} numberOfLines={1} adjustsFontSizeToFit>
                     {score.flavor_score.toFixed(1)}
                   </AppText>
-                  <AppText variant="tableCell" style={styles.cell}>
+                  <AppText variant="tableCell" style={styles.cell} numberOfLines={1} adjustsFontSizeToFit>
                     {score.finish_score.toFixed(1)}
                   </AppText>
-                  <AppText variant="tableCell" style={[styles.cell, styles.cellHighlight]}>
+                  <AppText variant="tableCell" style={[styles.cell, styles.cellHighlight]} numberOfLines={1} adjustsFontSizeToFit>
                     {score.average_score.toFixed(1)}
                   </AppText>
-                  <AppText variant="tableCell" style={styles.cell}>{score.personal_rank}</AppText>
+                  <AppText variant="tableCell" style={styles.cell} numberOfLines={1} adjustsFontSizeToFit>{score.personal_rank}</AppText>
                 </View>
               )),
             )}
