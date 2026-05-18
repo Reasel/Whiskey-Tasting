@@ -126,10 +126,18 @@ export default function TastingScreen() {
     loadData();
   }, [loadData]);
 
+  // Track the current selection so the focus effect can react to a deleted
+  // theme without re-subscribing on every selection change.
+  const selectedThemeIdRef = useRef<number | null>(null);
+  useEffect(() => {
+    selectedThemeIdRef.current = selectedThemeId;
+  }, [selectedThemeId]);
+
   // Refresh the theme/user lists whenever the tab regains focus so themes
   // created in Admin show up here. The first focus is the initial mount,
-  // already covered by loadData() above, so skip it. Selection, the
-  // in-progress user, and entered scores are intentionally left untouched.
+  // already covered by loadData() above, so skip it. The in-progress user
+  // and entered scores are left untouched while the selected theme still
+  // exists; if it was deleted, fall back to the first theme.
   const didInitialLoad = useRef(false);
   useFocusEffect(
     useCallback(() => {
@@ -147,6 +155,16 @@ export default function TastingScreen() {
           if (!active) return;
           setThemes(themesResp.themes);
           setUsers(usersData.users);
+
+          const cur = selectedThemeIdRef.current;
+          if (cur != null && !themesResp.themes.some((t) => t.id === cur)) {
+            // The selected theme was deleted elsewhere — fall back to the
+            // first theme and return to the selection screen.
+            const first = themesResp.themes[0] ?? null;
+            setSelectedThemeId(first ? first.id : null);
+            setUserSelected(false);
+            if (first) loadWhiskeys(first.id);
+          }
         } catch {
           // keep current state on a transient failure
         }
@@ -154,7 +172,7 @@ export default function TastingScreen() {
       return () => {
         active = false;
       };
-    }, []),
+    }, [loadWhiskeys]),
   );
 
   const handleThemeChange = useCallback(
