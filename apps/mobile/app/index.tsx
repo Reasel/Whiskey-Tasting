@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   RefreshControl,
@@ -9,9 +8,12 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fontSize, borderRadius } from '../lib/theme';
+import { colors, spacing } from '../lib/theme';
+import { AppText } from '../components/ui/AppText';
+import { Eyebrow } from '../components/ui/Eyebrow';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { GridBackground } from '../components/ui/GridBackground';
 import { fetchSystemStatus, type SystemStatus } from '../lib/api';
 
 export default function HomeScreen() {
@@ -46,8 +48,9 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
+        <GridBackground />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
         </View>
       </SafeAreaView>
     );
@@ -55,24 +58,25 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
+      <GridBackground />
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.primary}
+            tintColor={colors.whiskeyAmber}
           />
         }
       >
         <View style={styles.hero}>
-          <Text style={styles.title}>WHISKEY{'\n'}TASTING</Text>
-          <Text style={styles.subtitle}>// Have a drink!</Text>
+          <AppText variant="pageTitle">WHISKEY TASTING</AppText>
+          <Eyebrow style={styles.eyebrow}>HAVE A DRINK!</Eyebrow>
         </View>
 
         {error && (
           <Card style={styles.errorCard}>
-            <Text style={styles.errorText}>{error}</Text>
+            <AppText variant="body" style={styles.errorText}>{error}</AppText>
             <Button
               title="Open Settings"
               variant="ghost"
@@ -84,46 +88,45 @@ export default function HomeScreen() {
 
         {status && (
           <View style={styles.stats}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>
+            <Card style={styles.statCard}>
+              <AppText variant="sectionTitle" style={styles.statValue}>
                 {status.database_stats.total_themes}
-              </Text>
-              <Text style={styles.statLabel}>Themes</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>
+              </AppText>
+              <AppText variant="fieldLabel" style={styles.statLabel}>Themes</AppText>
+            </Card>
+            <Card style={styles.statCard}>
+              <AppText variant="sectionTitle" style={styles.statValue}>
                 {status.database_stats.total_whiskeys}
-              </Text>
-              <Text style={styles.statLabel}>Whiskeys</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>
+              </AppText>
+              <AppText variant="fieldLabel" style={styles.statLabel}>Whiskeys</AppText>
+            </Card>
+            <Card style={styles.statCard}>
+              <AppText variant="sectionTitle" style={styles.statValue}>
                 {status.database_stats.total_tastings}
-              </Text>
-              <Text style={styles.statLabel}>Tastings</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>
+              </AppText>
+              <AppText variant="fieldLabel" style={styles.statLabel}>Tastings</AppText>
+            </Card>
+            <Card style={styles.statCard}>
+              <AppText variant="sectionTitle" style={styles.statValue}>
                 {status.database_stats.total_users}
-              </Text>
-              <Text style={styles.statLabel}>Users</Text>
-            </View>
+              </AppText>
+              <AppText variant="fieldLabel" style={styles.statLabel}>Users</AppText>
+            </Card>
           </View>
         )}
 
         <View style={styles.actions}>
           <Button
-            title="Start Tasting"
-            size="lg"
+            title="START TASTING"
+            size="xl"
+            block
             onPress={() => router.push('/tasting/')}
-            style={styles.actionButton}
           />
           <Button
-            title="View Results"
-            variant="secondary"
-            size="lg"
+            title="VIEW RESULTS"
+            size="xl"
+            block
             onPress={() => router.push('/dashboard')}
-            style={styles.actionButton}
           />
         </View>
       </ScrollView>
@@ -134,7 +137,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.canvasCream,
+    position: 'relative',
   },
   centered: {
     flex: 1,
@@ -149,58 +153,38 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
     paddingVertical: spacing.xl,
   },
-  title: {
-    color: colors.text,
-    fontSize: fontSize.hero,
-    fontWeight: '800',
-    letterSpacing: -1,
-    lineHeight: fontSize.hero * 1.1,
-  },
-  subtitle: {
-    color: colors.textMuted,
-    fontSize: fontSize.sm,
+  eyebrow: {
     marginTop: spacing.sm,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
   },
   errorCard: {
     marginBottom: spacing.lg,
-    borderColor: colors.error,
+    borderColor: colors.alertRed,
   },
   errorText: {
-    color: colors.error,
-    fontSize: fontSize.sm,
+    color: colors.alertRed,
     marginBottom: spacing.sm,
   },
   stats: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: spacing.xl,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
+    gap: spacing.sm,
   },
-  statItem: {
+  statCard: {
+    flex: 1,
     alignItems: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xs,
   },
   statValue: {
-    color: colors.text,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
+    textAlign: 'center',
   },
   statLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-    marginTop: 2,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+    color: colors.mutedText,
   },
   actions: {
     gap: spacing.md,
-  },
-  actionButton: {
-    width: '100%',
   },
 });
