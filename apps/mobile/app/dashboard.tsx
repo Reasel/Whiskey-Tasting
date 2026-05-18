@@ -27,16 +27,20 @@ export default function DashboardScreen() {
     try {
       const data = await fetchAllThemesScores();
       setThemesScores(data);
-      if (data.length > 0 && expandedTheme === null) {
-        setExpandedTheme(data[0].theme.id);
-      }
+      // Auto-expand the first theme only on the initial load. Using a
+      // functional update keeps loadData stable (no expandedTheme dep), so
+      // toggling a theme no longer recreates loadData and refetches, which
+      // previously made the section snap straight back to expanded.
+      setExpandedTheme((prev) =>
+        prev === null && data.length > 0 ? data[0].theme.id : prev,
+      );
     } catch {
       // silently fail, user can pull to refresh
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [expandedTheme]);
+  }, []);
 
   useEffect(() => {
     loadData();
