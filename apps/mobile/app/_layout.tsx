@@ -11,11 +11,14 @@ import {
   JetBrainsMono_700Bold,
 } from '@expo-google-fonts/jetbrains-mono';
 import { Inter_400Regular } from '@expo-google-fonts/inter';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../lib/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
+  const insets = useSafeAreaInsets();
+
   const [fontsLoaded, fontError] = useFonts({
     Merriweather_700Bold,
     JetBrainsMono_400Regular,
@@ -45,7 +48,7 @@ export default function RootLayout() {
             backgroundColor: colors.canvasCream,
             borderTopColor: colors.inkBlack,
             borderTopWidth: 1,
-            height: 64,
+            height: 64 + insets.bottom,
           },
           tabBarItemStyle: { borderRadius: 0 },
           tabBarLabelStyle: {
