@@ -156,6 +156,39 @@ No automated test harness exists for the mobile app (its `lint` script is
 - `apps/mobile/components/tasting/WhiskeyCard.tsx` — integer rank field (#3)
 - `apps/mobile/components/ui/Dropdown.tsx` — new reusable dropdown (#1)
 
+## Addendum (2026-05-18, post-review feedback)
+
+### Taste tab — stale theme list (bug)
+The Taste screen fetched themes once on mount; expo-router keeps tabs mounted,
+so a theme created in Admin never appeared. Fix: fetch themes/users via
+`useFocusEffect` so each focus refreshes the list. The selected theme, the
+in-progress user selection, and entered scores are preserved if the selected
+theme still exists; if it was deleted, fall back to the first theme.
+
+### Results tab — theme/person filters + sort (revamp)
+Replace the collapsible all-themes list in `app/dashboard.tsx` with three
+`Dropdown`s (reusing `components/ui/Dropdown.tsx`):
+
+- **Theme:** `All Themes` (default) or one theme.
+- **Person:** `All People` (default) or one person (distinct submitters derived
+  from the scores data).
+- **Sort by:** `Rank` (default), `Average`, `Aroma`, `Flavor`, `Finish`.
+  Rank sorts ascending (#1 first); the score metrics sort descending.
+
+Display rules:
+- **All People:** per whiskey shows the mean across tasters (aroma/flavor/
+  finish/average) and taster count; "rank" is rank-by-average within the
+  theme; an Individual Scores breakdown card is shown.
+- **One person:** per whiskey shows that person's aroma/flavor/finish, their
+  average, and their personal rank; no breakdown card.
+- **All Themes:** one section per theme; **one theme:** just that section.
+- A theme/person combination with no data shows a "No tastings yet" message.
+
+All data comes from `fetchAllThemesScores()` (already returns every theme,
+including newly created ones; per-whiskey `rank_by_average` is recomputed
+client-side since the all-themes endpoint returns 0). The screen refetches on
+focus; pull-to-refresh is retained.
+
 ## Out of Scope
 
 - Backend changes (none required; it already accepts float scores and the

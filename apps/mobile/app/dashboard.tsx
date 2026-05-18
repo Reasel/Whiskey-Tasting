@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,34 +6,112 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
-  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 import { colors, spacing, fontSize, borderRadius } from '../lib/theme';
 import { Card } from '../components/ui/Card';
-import { ScoreDisplay } from '../components/tasting/ScoreDisplay';
+import { Dropdown } from '../components/ui/Dropdown';
 import {
   fetchAllThemesScores,
   type ThemeScoresResponse,
 } from '../lib/api';
 
+type SortKey = 'rank' | 'avg' | 'aroma' | 'flavor' | 'finish';
+
+const SORT_OPTIONS: { label: string; value: SortKey }[] = [
+  { label: 'Rank', value: 'rank' },
+  { label: 'Average', value: 'avg' },
+  { label: 'Aroma', value: 'aroma' },
+  { label: 'Flavor', value: 'flavor' },
+  { label: 'Finish', value: 'finish' },
+];
+
+type Row = {
+  whiskeyId: number;
+  name: string;
+  proof: number | null;
+  aroma: number;
+  flavor: number;
+  finish: number;
+  avg: number;
+  rank: number;
+  tasterCount: number;
+};
+
+const mean = (xs: number[]) =>
+  xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+
+function buildRows(
+  theme: ThemeScoresResponse,
+  person: string | 'all',
+): Row[] {
+  const rows: Row[] = [];
+  for (const w of theme.whiskeys) {
+    if (person === 'all') {
+      const ss = w.scores;
+      if (ss.length === 0) continue;
+      rows.push({
+        whiskeyId: w.whiskey_id,
+        name: w.whiskey_name,
+        proof: w.proof,
+        aroma: mean(ss.map((s) => s.aroma_score)),
+        flavor: mean(ss.map((s) => s.flavor_score)),
+        finish: mean(ss.map((s) => s.finish_score)),
+        avg: mean(ss.map((s) => s.average_score)),
+        rank: 0,
+        tasterCount: ss.length,
+      });
+    } else {
+      const s = w.scores.find((x) => x.user_name === person);
+      if (!s) continue;
+      rows.push({
+        whiskeyId: w.whiskey_id,
+        name: w.whiskey_name,
+        proof: w.proof,
+        aroma: s.aroma_score,
+        flavor: s.flavor_score,
+        finish: s.finish_score,
+        avg: s.average_score,
+        rank: s.personal_rank,
+        tasterCount: 1,
+      });
+    }
+  }
+  if (person === 'all') {
+    // The all-themes endpoint returns rank_by_average = 0, so rank by the
+    // computed average within this theme (highest average = #1).
+    [...rows]
+      .sort((a, b) => b.avg - a.avg)
+      .forEach((r, i) => {
+        r.rank = i + 1;
+      });
+  }
+  return rows;
+}
+
+function sortRows(rows: Row[], sortBy: SortKey): Row[] {
+  const out = [...rows];
+  if (sortBy === 'rank') {
+    out.sort((a, b) => a.rank - b.rank);
+  } else {
+    out.sort((a, b) => b[sortBy] - a[sortBy]);
+  }
+  return out;
+}
+
 export default function DashboardScreen() {
   const [themesScores, setThemesScores] = useState<ThemeScoresResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [expandedTheme, setExpandedTheme] = useState<number | null>(null);
+  const [themeFilter, setThemeFilter] = useState<number | 'all'>('all');
+  const [personFilter, setPersonFilter] = useState<string | 'all'>('all');
+  const [sortBy, setSortBy] = useState<SortKey>('rank');
 
   const loadData = useCallback(async () => {
     try {
       const data = await fetchAllThemesScores();
       setThemesScores(data);
-      // Auto-expand the first theme only on the initial load. Using a
-      // functional update keeps loadData stable (no expandedTheme dep), so
-      // toggling a theme no longer recreates loadData and refetches, which
-      // previously made the section snap straight back to expanded.
-      setExpandedTheme((prev) =>
-        prev === null && data.length > 0 ? data[0].theme.id : prev,
-      );
     } catch {
       // silently fail, user can pull to refresh
     } finally {
@@ -42,14 +120,53 @@ export default function DashboardScreen() {
     }
   }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData]),
+  );
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     loadData();
   }, [loadData]);
+
+  const people = useMemo(() => {
+    const set = new Set<string>();
+    themesScores.forEach((t) =>
+      t.whiskeys.forEach((w) =>
+        w.scores.forEach((s) => set.add(s.user_name)),
+      ),
+    );
+    return Array.from(set).sort();
+  }, [themesScores]);
+
+  const themeOptions = useMemo(
+    () => [
+      { label: 'All Themes', value: 'all' as const },
+      ...themesScores.map((t) => ({
+        label: t.theme.name,
+        value: t.theme.id,
+      })),
+    ],
+    [themesScores],
+  );
+
+  const personOptions = useMemo(
+    () => [
+      { label: 'All People', value: 'all' as const },
+      ...people.map((p) => ({ label: p, value: p })),
+    ],
+    [people],
+  );
+
+  const shownThemes = useMemo(
+    () =>
+      themeFilter === 'all'
+        ? themesScores
+        : themesScores.filter((t) => t.theme.id === themeFilter),
+    [themesScores, themeFilter],
+  );
 
   if (loading) {
     return (
@@ -86,57 +203,77 @@ export default function DashboardScreen() {
           />
         }
       >
-        {themesScores.map((themeScore) => (
-          <View key={themeScore.theme.id} style={styles.themeSection}>
-            <TouchableOpacity
-              onPress={() =>
-                setExpandedTheme(
-                  expandedTheme === themeScore.theme.id
-                    ? null
-                    : themeScore.theme.id,
-                )
-              }
-              activeOpacity={0.7}
-            >
-              <Card style={styles.themeHeader}>
-                <View style={styles.themeHeaderRow}>
-                  <View style={styles.themeInfo}>
-                    <Text style={styles.themeName}>
-                      {themeScore.theme.name}
-                    </Text>
-                    {themeScore.theme.notes ? (
-                      <Text style={styles.themeNotes}>
-                        {themeScore.theme.notes}
-                      </Text>
-                    ) : null}
-                  </View>
-                  <Text style={styles.chevron}>
-                    {expandedTheme === themeScore.theme.id ? '\u25B2' : '\u25BC'}
+        <Dropdown
+          label="Theme"
+          value={themeFilter}
+          options={themeOptions}
+          onChange={(v) =>
+            setThemeFilter(v === 'all' ? 'all' : Number(v))
+          }
+        />
+        <Dropdown
+          label="Person"
+          value={personFilter}
+          options={personOptions}
+          onChange={(v) => setPersonFilter(String(v))}
+        />
+        <Dropdown
+          label="Sort by"
+          value={sortBy}
+          options={SORT_OPTIONS}
+          onChange={(v) => setSortBy(v as SortKey)}
+        />
+
+        {shownThemes.map((themeScore) => {
+          const rows = sortRows(
+            buildRows(themeScore, personFilter),
+            sortBy,
+          );
+          return (
+            <View key={themeScore.theme.id} style={styles.themeSection}>
+              <Text style={styles.themeName}>{themeScore.theme.name}</Text>
+
+              {rows.length === 0 ? (
+                <Card style={styles.emptyCard}>
+                  <Text style={styles.emptyText}>
+                    {personFilter === 'all'
+                      ? 'No tastings yet for this theme.'
+                      : `No scores from ${personFilter} for this theme.`}
                   </Text>
-                </View>
-                <Text style={styles.whiskeyCount}>
-                  {themeScore.whiskeys.length} whiskeys
-                </Text>
-              </Card>
-            </TouchableOpacity>
+                </Card>
+              ) : (
+                rows.map((r) => (
+                  <View key={r.whiskeyId} style={styles.row}>
+                    <View style={styles.rankBadge}>
+                      <Text style={styles.rankText}>#{r.rank}</Text>
+                    </View>
+                    <View style={styles.rowInfo}>
+                      <Text style={styles.whiskeyName}>{r.name}</Text>
+                      {r.proof != null && (
+                        <Text style={styles.proof}>{r.proof}% ABV</Text>
+                      )}
+                      <Text style={styles.metrics}>
+                        A {r.aroma.toFixed(1)} · F {r.flavor.toFixed(1)} · Fi{' '}
+                        {r.finish.toFixed(1)}
+                        {personFilter === 'all'
+                          ? ` · ${r.tasterCount} taster${
+                              r.tasterCount === 1 ? '' : 's'
+                            }`
+                          : ` · rank #${r.rank}`}
+                      </Text>
+                    </View>
+                    <View style={styles.avgBox}>
+                      <Text style={styles.avgValue}>
+                        {r.avg.toFixed(1)}
+                      </Text>
+                      <Text style={styles.avgLabel}>avg</Text>
+                    </View>
+                  </View>
+                ))
+              )}
 
-            {expandedTheme === themeScore.theme.id && (
-              <View style={styles.scoresList}>
-                {themeScore.whiskeys
-                  .sort((a, b) => a.rank_by_average - b.rank_by_average)
-                  .map((whiskey) => (
-                    <ScoreDisplay
-                      key={whiskey.whiskey_id}
-                      whiskeyName={whiskey.whiskey_name}
-                      proof={whiskey.proof}
-                      averageScore={whiskey.average_score}
-                      rank={whiskey.rank_by_average}
-                      tasterCount={whiskey.scores.length}
-                    />
-                  ))}
-
-                {/* Detailed scores table */}
-                {themeScore.whiskeys.some((w) => w.scores.length > 0) && (
+              {personFilter === 'all' &&
+                themeScore.whiskeys.some((w) => w.scores.length > 0) && (
                   <Card style={styles.detailCard}>
                     <Text style={styles.detailTitle}>Individual Scores</Text>
                     {themeScore.whiskeys.map((whiskey) =>
@@ -172,10 +309,9 @@ export default function DashboardScreen() {
                     )}
                   </Card>
                 )}
-              </View>
-            )}
-          </View>
-        ))}
+            </View>
+          );
+        })}
       </ScrollView>
     </SafeAreaView>
   );
@@ -207,44 +343,71 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     textAlign: 'center',
   },
+  emptyCard: {
+    marginBottom: spacing.md,
+  },
   themeSection: {
     marginBottom: spacing.lg,
-  },
-  themeHeader: {
-    marginBottom: 0,
-  },
-  themeHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  themeInfo: {
-    flex: 1,
   },
   themeName: {
     color: colors.text,
     fontSize: fontSize.lg,
+    fontWeight: '800',
+    marginBottom: spacing.sm,
+  },
+  row: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rankBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  rankText: {
+    color: colors.white,
+    fontSize: fontSize.sm,
     fontWeight: '700',
   },
-  themeNotes: {
+  rowInfo: {
+    flex: 1,
+  },
+  whiskeyName: {
+    color: colors.text,
+    fontSize: fontSize.md,
+    fontWeight: '600',
+  },
+  proof: {
     color: colors.textSecondary,
     fontSize: fontSize.sm,
-    marginTop: 2,
   },
-  chevron: {
-    color: colors.textMuted,
-    fontSize: fontSize.md,
-    marginLeft: spacing.md,
-  },
-  whiskeyCount: {
+  metrics: {
     color: colors.textMuted,
     fontSize: 12,
-    marginTop: spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    marginTop: 2,
   },
-  scoresList: {
-    marginTop: spacing.sm,
+  avgBox: {
+    alignItems: 'center',
+    marginLeft: spacing.md,
+  },
+  avgValue: {
+    color: colors.primary,
+    fontSize: fontSize.xl,
+    fontWeight: '700',
+  },
+  avgLabel: {
+    color: colors.textMuted,
+    fontSize: 11,
   },
   detailCard: {
     marginTop: spacing.sm,
