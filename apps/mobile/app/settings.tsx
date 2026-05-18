@@ -1,19 +1,19 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   Alert,
-  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fontSize, borderRadius } from '../lib/theme';
+import { colors, spacing } from '../lib/theme';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Card } from '../components/ui/Card';
+import { Panel } from '../components/ui/Panel';
+import { AppText } from '../components/ui/AppText';
+import { Eyebrow } from '../components/ui/Eyebrow';
 import { getServerUrl, setServerUrl } from '../lib/storage';
-import { clearApiCache, fetchSystemStatus } from '../lib/api';
+import { clearApiCache } from '../lib/api';
 import { APP_VERSION, APP_NAME } from '../lib/config';
 
 export default function SettingsScreen() {
@@ -63,73 +63,66 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.heading}>Server Connection</Text>
-        <Text style={styles.description}>
-          Enter the URL of your Whiskey Tasting server. This is usually the IP
-          address of the machine running the backend.
-        </Text>
+        <AppText variant="pageTitle" style={styles.pageTitle}>SETTINGS</AppText>
+        <Eyebrow style={styles.eyebrow}>CONFIGURE THE APP</Eyebrow>
 
-        <Input
-          label="Server URL"
-          value={url}
-          onChangeText={setUrl}
-          placeholder="http://192.168.1.100:8010"
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-        />
+        <Panel title="Server Connection" style={styles.panel}>
+          <AppText variant="body" style={styles.description}>
+            Enter the URL of your Whiskey Tasting server. This is usually the IP
+            address of the machine running the backend.
+          </AppText>
 
-        <View style={styles.buttonRow}>
-          <Button
-            title={testing ? 'Testing...' : 'Test Connection'}
-            variant="secondary"
-            onPress={testConnection}
-            loading={testing}
-            style={styles.flex1}
+          <Input
+            label="SERVER URL"
+            value={url}
+            onChangeText={setUrl}
+            placeholder="http://192.168.1.100:8010"
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
           />
-          <Button
-            title="Save"
-            onPress={saveUrl}
-            disabled={!hasChanges}
-            style={styles.flex1}
-          />
-        </View>
 
-        {connectionStatus !== 'unknown' && (
-          <Card
-            style={[
-              styles.statusCard,
-              connectionStatus === 'connected'
-                ? styles.statusConnected
-                : styles.statusFailed,
-            ]}
-          >
-            <Text
+          <View style={styles.buttonRow}>
+            <Button
+              title="TEST CONNECTION"
+              variant="secondary"
+              onPress={testConnection}
+              loading={testing}
+              style={styles.flex1}
+            />
+            <Button
+              title="SAVE"
+              onPress={saveUrl}
+              disabled={!hasChanges}
+              style={styles.flex1}
+            />
+          </View>
+
+          {connectionStatus !== 'unknown' && (
+            <AppText
+              variant="body"
               style={[
                 styles.statusText,
                 {
                   color:
                     connectionStatus === 'connected'
-                      ? colors.success
-                      : colors.error,
+                      ? colors.signalGreen
+                      : colors.alertRed,
                 },
               ]}
             >
               {connectionStatus === 'connected'
-                ? 'Connected successfully!'
+                ? 'Connected successfully.'
                 : 'Connection failed. Check the URL and make sure the server is running.'}
-            </Text>
-          </Card>
-        )}
+            </AppText>
+          )}
+        </Panel>
 
-        <View style={styles.divider} />
-
-        <Text style={styles.heading}>About</Text>
-        <Card>
-          <Text style={styles.aboutLabel}>{APP_NAME}</Text>
-          <Text style={styles.aboutValue}>Version {APP_VERSION}</Text>
-          <Text style={styles.aboutValue}>Built with Expo & React Native</Text>
-        </Card>
+        <Panel title="About" style={styles.panel}>
+          <AppText variant="sectionTitle" style={styles.aboutName}>{APP_NAME}</AppText>
+          <AppText variant="tableCell">Version {APP_VERSION}</AppText>
+          <AppText variant="tableCell">Built with Expo {'&'} React Native</AppText>
+        </Panel>
       </ScrollView>
     </SafeAreaView>
   );
@@ -138,23 +131,24 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.canvasCream,
   },
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  heading: {
-    color: colors.text,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-    marginBottom: spacing.sm,
+  pageTitle: {
+    marginBottom: spacing.xs,
+  },
+  eyebrow: {
+    marginBottom: spacing.xl,
+  },
+  panel: {
+    marginBottom: spacing.lg,
   },
   description: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
+    color: colors.mutedText,
     marginBottom: spacing.lg,
-    lineHeight: 20,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -164,32 +158,10 @@ const styles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
-  statusCard: {
+  statusText: {
     marginTop: spacing.md,
   },
-  statusConnected: {
-    borderColor: colors.success,
-  },
-  statusFailed: {
-    borderColor: colors.error,
-  },
-  statusText: {
-    fontSize: fontSize.sm,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: spacing.xl,
-  },
-  aboutLabel: {
-    color: colors.text,
-    fontSize: fontSize.lg,
-    fontWeight: '600',
+  aboutName: {
     marginBottom: spacing.xs,
-  },
-  aboutValue: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
-    marginTop: 2,
   },
 });
