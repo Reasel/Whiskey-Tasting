@@ -1,13 +1,14 @@
 import React from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
+import { AppText } from './AppText';
+import { HardShadow } from './HardShadow';
 
 interface CardProps {
   children: React.ReactNode;
@@ -17,36 +18,36 @@ interface CardProps {
 }
 
 export function Card({ children, title, onPress, style }: CardProps) {
-  const content = (
+  const inner = (
     <View style={[styles.card, style]}>
-      {title && <Text style={styles.title}>{title}</Text>}
+      {title ? (
+        <AppText variant="sectionTitle" style={styles.title}>
+          {title}
+        </AppText>
+      ) : null}
       {children}
     </View>
   );
 
+  const content = <HardShadow offset="cardSoft">{inner}</HardShadow>;
+
   if (onPress) {
     return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
         {content}
       </TouchableOpacity>
     );
   }
-
   return content;
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
+    backgroundColor: colors.cardWhite,
+    borderRadius: 0,
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.inkBlack,
   },
-  title: {
-    color: colors.text,
-    fontSize: fontSize.lg,
-    fontWeight: '600',
-    marginBottom: spacing.md,
-  },
+  title: { marginBottom: spacing.md },
 });
