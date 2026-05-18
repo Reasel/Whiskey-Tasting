@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { colors, spacing, fontSize } from '../../lib/theme';
+import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
 
 interface RatingSliderProps {
   label: string;
@@ -9,7 +9,7 @@ interface RatingSliderProps {
   onValueChange: (value: number) => void;
   minimumValue?: number;
   maximumValue?: number;
-  step?: number;
+  integer?: boolean;
 }
 
 export function RatingSlider({
@@ -18,21 +18,52 @@ export function RatingSlider({
   onValueChange,
   minimumValue = 1,
   maximumValue = 5,
-  step = 0.5,
+  integer = false,
 }: RatingSliderProps) {
+  const [text, setText] = useState(String(value));
+
+  // Keep the field in sync when the value changes from outside (e.g. slider,
+  // loading another user's saved scores).
+  useEffect(() => {
+    setText(String(value));
+  }, [value]);
+
+  const clamp = (n: number) =>
+    Math.min(maximumValue, Math.max(minimumValue, n));
+
+  const commitText = () => {
+    const parsed = integer ? parseInt(text, 10) : parseFloat(text);
+    if (Number.isNaN(parsed)) {
+      setText(String(value));
+      return;
+    }
+    const next = clamp(parsed);
+    onValueChange(next);
+    setText(String(next));
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.label}>{label}</Text>
-        <Text style={styles.value}>{value.toFixed(1)}</Text>
+        <TextInput
+          style={styles.valueInput}
+          value={text}
+          onChangeText={setText}
+          onBlur={commitText}
+          onSubmitEditing={commitText}
+          keyboardType={integer ? 'number-pad' : 'decimal-pad'}
+          selectTextOnFocus
+          returnKeyType="done"
+        />
       </View>
       <Slider
         style={styles.slider}
         minimumValue={minimumValue}
         maximumValue={maximumValue}
-        step={step}
+        step={integer ? 1 : 0.1}
         value={value}
-        onValueChange={onValueChange}
+        onValueChange={(v) => onValueChange(integer ? Math.round(v) : v)}
         minimumTrackTintColor={colors.primary}
         maximumTrackTintColor={colors.surfaceLight}
         thumbTintColor={colors.primary}
@@ -60,10 +91,16 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     fontWeight: '500',
   },
-  value: {
+  valueInput: {
     color: colors.primary,
     fontSize: fontSize.lg,
     fontWeight: '700',
+    backgroundColor: colors.surfaceLight,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    minWidth: 72,
+    textAlign: 'center',
   },
   slider: {
     width: '100%',
