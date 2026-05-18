@@ -1,7 +1,17 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from 'expo-font';
+import { Merriweather_700Bold } from '@expo-google-fonts/merriweather';
+import {
+  JetBrainsMono_400Regular,
+  JetBrainsMono_500Medium,
+  JetBrainsMono_700Bold,
+} from '@expo-google-fonts/jetbrains-mono';
+import { Inter_400Regular } from '@expo-google-fonts/inter';
 import { colors } from '../lib/theme';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -12,10 +22,28 @@ function tabIcon(active: IoniconName, inactive: IoniconName) {
   );
 }
 
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    Merriweather_700Bold,
+    JetBrainsMono_400Regular,
+    JetBrainsMono_500Medium,
+    JetBrainsMono_700Bold,
+    Inter_400Regular,
+  });
+
+  const onReady = useCallback(() => {
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
+  if (!fontsLoaded && !fontError) {
+    return <View style={{ flex: 1, backgroundColor: colors.canvasCream }} />;
+  }
+
   return (
-    <>
-      <StatusBar style="light" />
+    <View style={{ flex: 1 }} onLayout={onReady}>
+      <StatusBar style="dark" />
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: colors.primary,
@@ -91,6 +119,6 @@ export default function RootLayout() {
           }}
         />
       </Tabs>
-    </>
+    </View>
   );
 }
