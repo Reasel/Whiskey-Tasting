@@ -403,13 +403,14 @@ export default function TastingScreen() {
           <AppText variant="tableCell" style={styles.userLabel}>
             Tasting as: {userName}
           </AppText>
-          <Button
-            title="CHANGE USER"
-            variant="outline"
-            size="sm"
-            onPress={() => setUserSelected(false)}
-            style={styles.changeUserButton}
-          />
+          <View style={styles.changeUserWrap}>
+            <Button
+              title="CHANGE USER"
+              variant="outline"
+              size="sm"
+              onPress={() => setUserSelected(false)}
+            />
+          </View>
         </View>
 
         {loadingWhiskeys ? (
@@ -529,7 +530,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
     marginBottom: spacing.sm,
   },
-  changeUserButton: {
+  changeUserWrap: {
     alignSelf: 'flex-start',
   },
   submitButton: {
