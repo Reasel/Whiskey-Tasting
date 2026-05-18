@@ -22,7 +22,6 @@ interface WhiskeyCardProps {
 }
 
 export function WhiskeyCard({
-  index,
   name,
   proof,
   scores,
@@ -32,13 +31,12 @@ export function WhiskeyCard({
   return (
     <Card>
       <View style={styles.header}>
-        <AppText variant="eyebrow" style={styles.number}>{index + 1}</AppText>
-        <View style={styles.titleContainer}>
-          <AppText variant="sectionTitle">{name}</AppText>
-          {proof != null && (
-            <AppText variant="body" style={styles.proof}>{proof}% ABV</AppText>
-          )}
-        </View>
+        <AppText variant="sectionTitle" numberOfLines={2} adjustsFontSizeToFit>
+          {name}
+        </AppText>
+        {proof != null && (
+          <AppText variant="body" style={styles.proof}>{proof}% ABV</AppText>
+        )}
       </View>
 
       <RatingSlider
@@ -70,17 +68,7 @@ export function WhiskeyCard({
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: spacing.lg,
-  },
-  number: {
-    color: colors.whiskeyAmber,
-    marginRight: spacing.md,
-    width: 32,
-  },
-  titleContainer: {
-    flex: 1,
   },
   proof: {
     color: colors.steelGrey,
