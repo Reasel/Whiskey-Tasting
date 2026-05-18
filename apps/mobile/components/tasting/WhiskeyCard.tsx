@@ -57,10 +57,10 @@ export function WhiskeyCard({
       <RatingSlider
         label="Personal Rank"
         value={scores.personal_rank}
-        onValueChange={(v) => onScoreChange('personal_rank', Math.round(v))}
+        onValueChange={(v) => onScoreChange('personal_rank', v)}
         minimumValue={1}
         maximumValue={totalWhiskeys}
-        step={1}
+        integer
       />
     </View>
   );
