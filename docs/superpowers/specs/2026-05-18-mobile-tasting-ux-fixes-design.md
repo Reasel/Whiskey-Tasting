@@ -85,10 +85,11 @@ The Tasting screen has two phases after load: a **selection phase** and the
     allowed); on change, parse with `parseFloat`.
   - On blur (or submit) clamp to `[minimumValue, maximumValue]` and, if empty/
     invalid, revert to the last valid value.
-  - The slider keeps working; `step` is lowered to `0.1` for finer dragging.
-    The slider's `value` prop reflects the precise number (the thumb tracks it;
-    the slider only snaps on user drag, not on programmatic value).
-  - Precise typed values (e.g. `4.126`) are stored and submitted unchanged.
+  - The slider keeps working with `step` `0.5` (snaps 1, 1.5, 2, … 5 on
+    drag). The slider's `value` prop reflects the precise number (the thumb
+    tracks it; the slider only snaps on user drag, not on programmatic value).
+  - Precise typed values (e.g. `4.126`) are entered via the number field and
+    are stored and submitted unchanged — only the slider drag is stepped.
 - `RatingSlider` gains an optional `integer?: boolean` prop. When set, the
   field uses `keyboardType="number-pad"`, parses with `parseInt`, disallows
   decimals, and the slider `step` is `1`.

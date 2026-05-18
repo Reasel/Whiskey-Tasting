@@ -66,7 +66,7 @@ export function RatingSlider({
         style={styles.slider}
         minimumValue={minimumValue}
         maximumValue={maximumValue}
-        step={integer ? 1 : 0.1}
+        step={integer ? 1 : 0.5}
         value={value}
         onValueChange={(v) => onValueChange(integer ? Math.round(v) : v)}
         minimumTrackTintColor={colors.primary}
