@@ -51,7 +51,7 @@ export function RatingSlider({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <AppText variant="fieldLabel">{label}</AppText>
+        <AppText variant="fieldLabel" style={styles.label} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{label}</AppText>
         <TextInput
           style={styles.valueInput}
           value={text}
@@ -91,6 +91,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.xs,
+  },
+  label: {
+    flexShrink: 1,
+    marginRight: spacing.sm,
   },
   valueInput: {
     backgroundColor: colors.cardWhite,

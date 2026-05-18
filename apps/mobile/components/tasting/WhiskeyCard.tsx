@@ -42,22 +42,22 @@ export function WhiskeyCard({
       </View>
 
       <RatingSlider
-        label="AROMA (1-5)"
+        label="AROMA"
         value={scores.aroma_score}
         onValueChange={(v) => onScoreChange('aroma_score', v)}
       />
       <RatingSlider
-        label="FLAVOR (1-5)"
+        label="FLAVOR"
         value={scores.flavor_score}
         onValueChange={(v) => onScoreChange('flavor_score', v)}
       />
       <RatingSlider
-        label="FINISH (1-5)"
+        label="FINISH"
         value={scores.finish_score}
         onValueChange={(v) => onScoreChange('finish_score', v)}
       />
       <RatingSlider
-        label={`PERSONAL RANK (1-${totalWhiskeys})`}
+        label="PERSONAL RANK"
         value={scores.personal_rank}
         onValueChange={(v) => onScoreChange('personal_rank', v)}
         minimumValue={1}
