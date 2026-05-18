@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Keyboard } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
 
@@ -39,7 +39,7 @@ export function RatingSlider({
   const commitText = () => {
     const parsed = integer ? parseInt(text, 10) : parseFloat(text);
     if (Number.isNaN(parsed)) {
-      setText(String(value));
+      setText(format(value));
       return;
     }
     const next = clamp(parsed);
@@ -56,7 +56,7 @@ export function RatingSlider({
           value={text}
           onChangeText={setText}
           onBlur={commitText}
-          onSubmitEditing={commitText}
+          onSubmitEditing={() => Keyboard.dismiss()}
           keyboardType={integer ? 'number-pad' : 'decimal-pad'}
           selectTextOnFocus
           returnKeyType="done"
