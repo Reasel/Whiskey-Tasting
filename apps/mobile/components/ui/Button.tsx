@@ -47,7 +47,7 @@ const FILL: Record<Variant, string> = {
   destructive: colors.alertRed,
   success: colors.signalGreen,
   warning: colors.alertOrange,
-  outline: 'transparent',
+  outline: colors.canvasCream,
   secondary: colors.panelGrey,
   ghost: 'transparent',
   link: 'transparent',

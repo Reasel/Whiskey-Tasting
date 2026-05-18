@@ -63,19 +63,19 @@ export function RatingSlider({
           returnKeyType="done"
         />
       </View>
-      <Slider
-        style={styles.slider}
-        minimumValue={minimumValue}
-        maximumValue={maximumValue}
-        step={integer ? 1 : 0.5}
-        value={value}
-        onValueChange={(v) => onValueChange(integer ? Math.round(v) : v)}
-        minimumTrackTintColor={colors.whiskeyAmber}
-        maximumTrackTintColor={colors.lightGrey}
-        thumbTintColor={colors.whiskeyAmber}
-      />
-      <View style={styles.labels}>
+      <View style={styles.sliderRow}>
         <AppText variant="tableCell">{minimumValue}</AppText>
+        <Slider
+          style={styles.slider}
+          minimumValue={minimumValue}
+          maximumValue={maximumValue}
+          step={integer ? 1 : 0.5}
+          value={value}
+          onValueChange={(v) => onValueChange(integer ? Math.round(v) : v)}
+          minimumTrackTintColor={colors.whiskeyAmber}
+          maximumTrackTintColor={colors.lightGrey}
+          thumbTintColor={colors.whiskeyAmber}
+        />
         <AppText variant="tableCell">{maximumValue}</AppText>
       </View>
     </View>
@@ -110,12 +110,12 @@ const styles = StyleSheet.create({
     minWidth: 72,
   },
   slider: {
-    width: '100%',
+    flex: 1,
     height: 40,
   },
-  labels: {
+  sliderRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10, // align min/max with slider thumb-center endpoints
+    alignItems: 'center',
+    gap: spacing.sm,
   },
 });
