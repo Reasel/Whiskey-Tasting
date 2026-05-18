@@ -116,5 +116,6 @@ const styles = StyleSheet.create({
   labels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingHorizontal: 10, // align min/max with slider thumb-center endpoints
   },
 });
