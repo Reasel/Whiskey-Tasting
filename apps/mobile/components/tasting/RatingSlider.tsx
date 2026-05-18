@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Keyboard } from 'react-native';
+import { View, TextInput, StyleSheet, Keyboard } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
+import { AppText } from '../ui/AppText';
 
 interface RatingSliderProps {
   label: string;
@@ -50,7 +51,7 @@ export function RatingSlider({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.label}>{label}</Text>
+        <AppText variant="fieldLabel">{label}</AppText>
         <TextInput
           style={styles.valueInput}
           value={text}
@@ -69,13 +70,13 @@ export function RatingSlider({
         step={integer ? 1 : 0.5}
         value={value}
         onValueChange={(v) => onValueChange(integer ? Math.round(v) : v)}
-        minimumTrackTintColor={colors.primary}
-        maximumTrackTintColor={colors.surfaceLight}
-        thumbTintColor={colors.primary}
+        minimumTrackTintColor={colors.whiskeyAmber}
+        maximumTrackTintColor={colors.lightGrey}
+        thumbTintColor={colors.whiskeyAmber}
       />
       <View style={styles.labels}>
-        <Text style={styles.rangeLabel}>{minimumValue}</Text>
-        <Text style={styles.rangeLabel}>{maximumValue}</Text>
+        <AppText variant="tableCell">{minimumValue}</AppText>
+        <AppText variant="tableCell">{maximumValue}</AppText>
       </View>
     </View>
   );
@@ -91,21 +92,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.xs,
   },
-  label: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
-    fontWeight: '500',
-  },
   valueInput: {
-    color: colors.primary,
-    fontSize: fontSize.lg,
-    fontWeight: '700',
-    backgroundColor: colors.surfaceLight,
-    borderRadius: borderRadius.sm,
+    backgroundColor: colors.cardWhite,
+    borderWidth: 1,
+    borderColor: colors.inkBlack,
+    borderRadius: 0,
+    fontFamily: 'JetBrainsMono_700Bold',
+    fontSize: 18,
+    color: colors.inkBlack,
+    textAlign: 'center',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     minWidth: 72,
-    textAlign: 'center',
   },
   slider: {
     width: '100%',
@@ -114,9 +112,5 @@ const styles = StyleSheet.create({
   labels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  rangeLabel: {
-    color: colors.textMuted,
-    fontSize: 12,
   },
 });

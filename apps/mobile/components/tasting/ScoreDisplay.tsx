@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
+import { View, StyleSheet } from 'react-native';
+import { colors, spacing } from '../../lib/theme';
+import { AppText } from '../ui/AppText';
 
 interface ScoreDisplayProps {
   whiskeyName: string;
@@ -20,18 +21,18 @@ export function ScoreDisplay({
   return (
     <View style={styles.card}>
       <View style={styles.rankBadge}>
-        <Text style={styles.rankText}>#{rank}</Text>
+        <AppText variant="fieldLabel" style={styles.rankText}>#{rank}</AppText>
       </View>
       <View style={styles.info}>
-        <Text style={styles.name}>{whiskeyName}</Text>
+        <AppText variant="body" style={styles.name}>{whiskeyName}</AppText>
         {proof != null && (
-          <Text style={styles.proof}>{proof}% ABV</Text>
+          <AppText variant="tableCell" style={styles.proof}>{proof}% ABV</AppText>
         )}
-        <Text style={styles.tasters}>{tasterCount} tasters</Text>
+        <AppText variant="tableCell" style={styles.tasters}>{tasterCount} tasters</AppText>
       </View>
       <View style={styles.scoreContainer}>
-        <Text style={styles.score}>{averageScore.toFixed(1)}</Text>
-        <Text style={styles.scoreLabel}>avg</Text>
+        <AppText variant="tableCell" style={styles.score}>{averageScore.toFixed(1)}</AppText>
+        <AppText variant="fieldLabel" style={styles.scoreLabel}>avg</AppText>
       </View>
     </View>
   );
@@ -39,44 +40,38 @@ export function ScoreDisplay({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
+    backgroundColor: colors.cardWhite,
+    borderRadius: 0,
     padding: spacing.md,
     marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.inkBlack,
     flexDirection: 'row',
     alignItems: 'center',
   },
   rankBadge: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.primary,
+    borderRadius: 0,
+    backgroundColor: colors.whiskeyAmber,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
   },
   rankText: {
-    color: colors.white,
-    fontSize: fontSize.sm,
-    fontWeight: '700',
+    color: colors.inkBlack,
   },
   info: {
     flex: 1,
   },
   name: {
-    color: colors.text,
-    fontSize: fontSize.md,
-    fontWeight: '600',
+    color: colors.inkBlack,
   },
   proof: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
+    color: colors.steelGrey,
   },
   tasters: {
-    color: colors.textMuted,
-    fontSize: 12,
+    color: colors.mutedText,
     marginTop: 2,
   },
   scoreContainer: {
@@ -84,12 +79,10 @@ const styles = StyleSheet.create({
     marginLeft: spacing.md,
   },
   score: {
-    color: colors.primary,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
+    color: colors.inkBlack,
+    fontSize: 24,
   },
   scoreLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
+    color: colors.mutedText,
   },
 });

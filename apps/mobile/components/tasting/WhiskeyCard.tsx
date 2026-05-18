@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
+import { View, StyleSheet } from 'react-native';
+import { colors, spacing } from '../../lib/theme';
+import { AppText } from '../ui/AppText';
+import { Card } from '../ui/Card';
 import { RatingSlider } from './RatingSlider';
 
 interface WhiskeyScores {
@@ -28,52 +30,47 @@ export function WhiskeyCard({
   onScoreChange,
 }: WhiskeyCardProps) {
   return (
-    <View style={styles.card}>
+    <Card style={styles.cardInner}>
       <View style={styles.header}>
-        <Text style={styles.number}>{index + 1}</Text>
+        <AppText variant="eyebrow" style={styles.number}>{index + 1}</AppText>
         <View style={styles.titleContainer}>
-          <Text style={styles.name}>{name}</Text>
+          <AppText variant="sectionTitle">{name}</AppText>
           {proof != null && (
-            <Text style={styles.proof}>{proof}% ABV</Text>
+            <AppText variant="body" style={styles.proof}>{proof}% ABV</AppText>
           )}
         </View>
       </View>
 
       <RatingSlider
-        label="Aroma"
+        label="AROMA (1-5)"
         value={scores.aroma_score}
         onValueChange={(v) => onScoreChange('aroma_score', v)}
       />
       <RatingSlider
-        label="Flavor"
+        label="FLAVOR (1-5)"
         value={scores.flavor_score}
         onValueChange={(v) => onScoreChange('flavor_score', v)}
       />
       <RatingSlider
-        label="Finish"
+        label="FINISH (1-5)"
         value={scores.finish_score}
         onValueChange={(v) => onScoreChange('finish_score', v)}
       />
       <RatingSlider
-        label="Personal Rank"
+        label={`PERSONAL RANK (1-${totalWhiskeys})`}
         value={scores.personal_rank}
         onValueChange={(v) => onScoreChange('personal_rank', v)}
         minimumValue={1}
         maximumValue={totalWhiskeys}
         integer
       />
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
+  cardInner: {
     marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   header: {
     flexDirection: 'row',
@@ -81,23 +78,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   number: {
-    color: colors.primary,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
+    color: colors.whiskeyAmber,
     marginRight: spacing.md,
     width: 32,
   },
   titleContainer: {
     flex: 1,
   },
-  name: {
-    color: colors.text,
-    fontSize: fontSize.lg,
-    fontWeight: '600',
-  },
   proof: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
+    color: colors.steelGrey,
     marginTop: 2,
   },
 });
