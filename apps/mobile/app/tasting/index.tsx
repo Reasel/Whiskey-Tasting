@@ -6,18 +6,18 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { colors, spacing, fontSize, borderRadius } from '../../lib/theme';
+import { colors, spacing, fontSize } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
+import { Dropdown } from '../../components/ui/Dropdown';
 import { WhiskeyCard } from '../../components/tasting/WhiskeyCard';
 import { Toast } from '../../components/ui/Toast';
 import {
-  fetchActiveTheme,
+  fetchThemes,
   fetchWhiskeysByTheme,
   fetchUsers,
   fetchUserTastingsForTheme,
@@ -37,12 +37,14 @@ type WhiskeyScores = {
 };
 
 export default function TastingScreen() {
-  const [activeTheme, setActiveTheme] = useState<Theme | null>(null);
+  const [themes, setThemes] = useState<Theme[]>([]);
+  const [selectedThemeId, setSelectedThemeId] = useState<number | null>(null);
   const [whiskeys, setWhiskeys] = useState<Whiskey[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [userName, setUserName] = useState('');
   const [scores, setScores] = useState<Record<number, WhiskeyScores>>({});
   const [loading, setLoading] = useState(true);
+  const [loadingWhiskeys, setLoadingWhiskeys] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [userSelected, setUserSelected] = useState(false);
@@ -51,6 +53,9 @@ export default function TastingScreen() {
     type: 'success' | 'error' | 'info';
     visible: boolean;
   }>({ message: '', type: 'info', visible: false });
+
+  const selectedTheme =
+    themes.find((t) => t.id === selectedThemeId) ?? null;
 
   const initScores = useCallback((whiskeysData: Whiskey[]) => {
     const initial: Record<number, WhiskeyScores> = {};
@@ -67,21 +72,42 @@ export default function TastingScreen() {
     setScores(initial);
   }, []);
 
+  const loadWhiskeys = useCallback(
+    async (themeId: number) => {
+      setLoadingWhiskeys(true);
+      try {
+        const whiskeysData = await fetchWhiskeysByTheme(themeId);
+        setWhiskeys(whiskeysData);
+        initScores(whiskeysData);
+      } catch {
+        setWhiskeys([]);
+        setToast({
+          message: 'Could not load whiskeys for this theme.',
+          type: 'error',
+          visible: true,
+        });
+      } finally {
+        setLoadingWhiskeys(false);
+      }
+    },
+    [initScores],
+  );
+
   const loadData = useCallback(async () => {
     try {
-      const [themeData, usersData, savedName] = await Promise.all([
-        fetchActiveTheme(),
+      const [themesResp, usersData, savedName] = await Promise.all([
+        fetchThemes(),
         fetchUsers(),
         getLastUsername(),
       ]);
-      setActiveTheme(themeData);
+      setThemes(themesResp.themes);
       setUsers(usersData.users);
       if (savedName) setUserName(savedName);
 
-      if (themeData) {
-        const whiskeysData = await fetchWhiskeysByTheme(themeData.id);
-        setWhiskeys(whiskeysData);
-        initScores(whiskeysData);
+      const firstTheme = themesResp.themes[0];
+      if (firstTheme) {
+        setSelectedThemeId(firstTheme.id);
+        await loadWhiskeys(firstTheme.id);
       }
     } catch {
       setToast({
@@ -93,77 +119,62 @@ export default function TastingScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [initScores]);
+  }, [loadWhiskeys]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  const loadExistingTastings = useCallback(async () => {
-    if (!userName.trim() || !activeTheme) return;
-    try {
-      const data = await fetchUserTastingsForTheme(
-        userName.trim(),
-        activeTheme.id,
-      );
-      const loaded: Record<number, WhiskeyScores> = {};
-      whiskeys.forEach((w, i) => {
-        if (w.id == null) return;
-        const existing = data.tastings[w.id];
-        loaded[w.id] = existing
-          ? {
-              aroma_score: existing.aroma_score,
-              flavor_score: existing.flavor_score,
-              finish_score: existing.finish_score,
-              personal_rank: existing.personal_rank,
-            }
-          : {
-              aroma_score: 3,
-              flavor_score: 3,
-              finish_score: 3,
-              personal_rank: i + 1,
-            };
-      });
-      setScores(loaded);
-    } catch {
-      initScores(whiskeys);
-    }
-  }, [userName, activeTheme, whiskeys, initScores]);
+  const handleThemeChange = useCallback(
+    (value: number | string) => {
+      const themeId = Number(value);
+      setSelectedThemeId(themeId);
+      setUserSelected(false);
+      loadWhiskeys(themeId);
+    },
+    [loadWhiskeys],
+  );
+
+  const loadExistingScores = useCallback(
+    async (name: string, themeId: number) => {
+      try {
+        const data = await fetchUserTastingsForTheme(name, themeId);
+        const loaded: Record<number, WhiskeyScores> = {};
+        whiskeys.forEach((w, i) => {
+          if (w.id == null) return;
+          const existing = data.tastings[w.id];
+          loaded[w.id] = existing
+            ? {
+                aroma_score: existing.aroma_score,
+                flavor_score: existing.flavor_score,
+                finish_score: existing.finish_score,
+                personal_rank: existing.personal_rank,
+              }
+            : {
+                aroma_score: 3,
+                flavor_score: 3,
+                finish_score: 3,
+                personal_rank: i + 1,
+              };
+        });
+        setScores(loaded);
+      } catch {
+        initScores(whiskeys);
+      }
+    },
+    [whiskeys, initScores],
+  );
 
   const handleSelectUser = useCallback(
     async (name: string) => {
       setUserName(name);
       setUserSelected(true);
       await setLastUsername(name);
-      // Try loading existing tastings
-      if (activeTheme) {
-        try {
-          const data = await fetchUserTastingsForTheme(name, activeTheme.id);
-          const loaded: Record<number, WhiskeyScores> = {};
-          whiskeys.forEach((w, i) => {
-            if (w.id == null) return;
-            const existing = data.tastings[w.id];
-            loaded[w.id] = existing
-              ? {
-                  aroma_score: existing.aroma_score,
-                  flavor_score: existing.flavor_score,
-                  finish_score: existing.finish_score,
-                  personal_rank: existing.personal_rank,
-                }
-              : {
-                  aroma_score: 3,
-                  flavor_score: 3,
-                  finish_score: 3,
-                  personal_rank: i + 1,
-                };
-          });
-          setScores(loaded);
-        } catch {
-          initScores(whiskeys);
-        }
+      if (selectedThemeId != null) {
+        await loadExistingScores(name, selectedThemeId);
       }
     },
-    [activeTheme, whiskeys, initScores],
+    [selectedThemeId, loadExistingScores],
   );
 
   const handleContinueAsNew = useCallback(async () => {
@@ -174,7 +185,7 @@ export default function TastingScreen() {
   }, [userName, whiskeys, initScores]);
 
   const handleSubmit = useCallback(async () => {
-    if (!userName.trim() || !activeTheme) return;
+    if (!userName.trim() || selectedThemeId == null) return;
 
     setSubmitting(true);
     try {
@@ -185,10 +196,14 @@ export default function TastingScreen() {
       await submitTasting(request);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setToast({
-        message: 'Tasting submitted!',
+        message: 'Tasting submitted! Pick the next person.',
         type: 'success',
         visible: true,
       });
+      // Proxy flow: return to a fresh person picker, keep the theme.
+      setUserSelected(false);
+      setUserName('');
+      initScores(whiskeys);
     } catch {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setToast({
@@ -199,7 +214,7 @@ export default function TastingScreen() {
     } finally {
       setSubmitting(false);
     }
-  }, [userName, activeTheme, scores]);
+  }, [userName, selectedThemeId, scores, whiskeys, initScores]);
 
   const updateScore = useCallback(
     (whiskeyId: number, field: keyof WhiskeyScores, value: number) => {
@@ -224,11 +239,11 @@ export default function TastingScreen() {
     );
   }
 
-  if (!activeTheme) {
+  if (themes.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <Text style={styles.emptyTitle}>No Active Theme</Text>
+          <Text style={styles.emptyTitle}>No Themes</Text>
           <Text style={styles.emptyText}>
             Create a theme in the admin panel to start tasting.
           </Text>
@@ -237,14 +252,23 @@ export default function TastingScreen() {
     );
   }
 
-  // User selection phase
+  const themeOptions = themes.map((t) => ({ label: t.name, value: t.id }));
+
+  // Selection phase: choose theme + person.
   if (!userSelected) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
+          <Dropdown
+            label="Theme"
+            value={selectedThemeId}
+            options={themeOptions}
+            onChange={handleThemeChange}
+          />
+
           <Text style={styles.sectionTitle}>Who are you?</Text>
           <Text style={styles.sectionSubtitle}>
-            Select your name or enter a new one
+            Select a name or enter a new one. You can submit for others too.
           </Text>
 
           {users.map((u) => (
@@ -282,11 +306,18 @@ export default function TastingScreen() {
             style={{ marginTop: spacing.md }}
           />
         </ScrollView>
+
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          visible={toast.visible}
+          onHide={() => setToast((t) => ({ ...t, visible: false }))}
+        />
       </SafeAreaView>
     );
   }
 
-  // Tasting form
+  // Tasting form.
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
@@ -303,35 +334,41 @@ export default function TastingScreen() {
         }
       >
         <View style={styles.themeHeader}>
-          <Text style={styles.themeName}>{activeTheme.name}</Text>
+          <Text style={styles.themeName}>{selectedTheme?.name ?? ''}</Text>
           <Text style={styles.userLabel}>Tasting as: {userName}</Text>
           <Button
-            title="Change User"
+            title="Change Theme / User"
             variant="ghost"
             size="sm"
             onPress={() => setUserSelected(false)}
           />
         </View>
 
-        {whiskeys.map((whiskey, index) =>
-          whiskey.id != null ? (
-            <WhiskeyCard
-              key={whiskey.id}
-              index={index}
-              name={whiskey.name}
-              proof={whiskey.proof}
-              scores={scores[whiskey.id] || {
-                aroma_score: 3,
-                flavor_score: 3,
-                finish_score: 3,
-                personal_rank: index + 1,
-              }}
-              totalWhiskeys={whiskeys.length}
-              onScoreChange={(field, value) =>
-                updateScore(whiskey.id!, field, value)
-              }
-            />
-          ) : null,
+        {loadingWhiskeys ? (
+          <ActivityIndicator size="large" color={colors.primary} />
+        ) : (
+          whiskeys.map((whiskey, index) =>
+            whiskey.id != null ? (
+              <WhiskeyCard
+                key={whiskey.id}
+                index={index}
+                name={whiskey.name}
+                proof={whiskey.proof}
+                scores={
+                  scores[whiskey.id] || {
+                    aroma_score: 3,
+                    flavor_score: 3,
+                    finish_score: 3,
+                    personal_rank: index + 1,
+                  }
+                }
+                totalWhiskeys={whiskeys.length}
+                onScoreChange={(field, value) =>
+                  updateScore(whiskey.id!, field, value)
+                }
+              />
+            ) : null,
+          )
         )}
 
         <Button
@@ -339,7 +376,7 @@ export default function TastingScreen() {
           size="lg"
           onPress={handleSubmit}
           loading={submitting}
-          disabled={submitting}
+          disabled={submitting || loadingWhiskeys}
           style={styles.submitButton}
         />
       </ScrollView>
