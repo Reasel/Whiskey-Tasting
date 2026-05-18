@@ -1,63 +1,162 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
+  Pressable,
+  View,
   ActivityIndicator,
+  StyleSheet,
   type ViewStyle,
-  type TextStyle,
+  type StyleProp,
 } from 'react-native';
-import { colors, borderRadius, spacing, fontSize } from '../../lib/theme';
+import { colors } from '../../lib/theme';
+import { AppText } from './AppText';
+import { HardShadow } from './HardShadow';
+
+type Variant =
+  | 'default'
+  | 'destructive'
+  | 'success'
+  | 'warning'
+  | 'outline'
+  | 'secondary'
+  | 'ghost'
+  | 'link';
+type Size = 'sm' | 'default' | 'lg' | 'xl' | 'icon';
+
+type LegacyVariant = 'primary' | 'danger';
+type LegacySize = 'md';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: Variant | LegacyVariant;
+  size?: Size | LegacySize;
   disabled?: boolean;
   loading?: boolean;
-  style?: ViewStyle;
+  block?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
+
+const VARIANT_ALIAS: Record<LegacyVariant, Variant> = {
+  primary: 'default',
+  danger: 'destructive',
+};
+const SIZE_ALIAS: Record<LegacySize, Size> = { md: 'default' };
+
+const FILL: Record<Variant, string> = {
+  default: colors.whiskeyAmber,
+  destructive: colors.alertRed,
+  success: colors.signalGreen,
+  warning: colors.alertOrange,
+  outline: 'transparent',
+  secondary: colors.panelGrey,
+  ghost: 'transparent',
+  link: 'transparent',
+};
+const PRESSED_FILL: Partial<Record<Variant, string>> = {
+  default: colors.amberDark,
+};
+const LABEL_COLOR: Record<Variant, string> = {
+  default: colors.cardWhite,
+  destructive: colors.cardWhite,
+  success: colors.cardWhite,
+  warning: colors.cardWhite,
+  outline: colors.inkBlack,
+  secondary: colors.inkBlack,
+  ghost: colors.inkBlack,
+  link: colors.whiskeyAmber,
+};
+const HEIGHT: Record<Size, number> = {
+  sm: 32,
+  default: 40,
+  lg: 48,
+  xl: 96,
+  icon: 40,
+};
+const PAD_X: Record<Size, number> = {
+  sm: 12,
+  default: 16,
+  lg: 20,
+  xl: 24,
+  icon: 0,
+};
 
 export function Button({
   title,
   onPress,
-  variant = 'primary',
-  size = 'md',
+  variant = 'default',
+  size = 'default',
   disabled = false,
   loading = false,
+  block = false,
   style,
 }: ButtonProps) {
-  const buttonStyles: ViewStyle[] = [
-    styles.base,
-    styles[`variant_${variant}`],
-    styles[`size_${size}`],
-    (disabled || loading) && styles.disabled,
-    style as ViewStyle,
-  ].filter(Boolean) as ViewStyle[];
+  const [pressed, setPressed] = useState(false);
 
-  const textStyles: TextStyle[] = [
-    styles.text,
-    styles[`text_${variant}`],
-    styles[`textSize_${size}`],
-  ].filter(Boolean) as TextStyle[];
+  const v: Variant =
+    variant in VARIANT_ALIAS
+      ? VARIANT_ALIAS[variant as LegacyVariant]
+      : (variant as Variant);
+  const sz: Size =
+    size in SIZE_ALIAS ? SIZE_ALIAS[size as LegacySize] : (size as Size);
 
-  return (
-    <TouchableOpacity
-      style={buttonStyles}
+  const flat = v === 'ghost' || v === 'link';
+  const isDisabled = disabled || loading;
+  const fill =
+    pressed && PRESSED_FILL[v] ? (PRESSED_FILL[v] as string) : FILL[v];
+
+  const body = (
+    <Pressable
       onPress={onPress}
-      disabled={disabled || loading}
-      activeOpacity={0.7}
+      disabled={isDisabled}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      style={[
+        styles.base,
+        {
+          height: HEIGHT[sz],
+          paddingHorizontal: PAD_X[sz],
+          width: sz === 'icon' ? HEIGHT.icon : undefined,
+          backgroundColor: fill,
+          borderWidth: flat ? 0 : 1,
+          borderColor: colors.inkBlack,
+          opacity: isDisabled ? 0.5 : 1,
+          transform: [
+            { translateX: pressed && !flat ? 2 : 0 },
+            { translateY: pressed && !flat ? 2 : 0 },
+          ],
+        },
+        block && styles.block,
+        style,
+      ]}
     >
       {loading ? (
-        <ActivityIndicator
-          color={variant === 'ghost' ? colors.primary : colors.white}
-          size="small"
-        />
+        <ActivityIndicator color={LABEL_COLOR[v]} size="small" />
       ) : (
-        <Text style={textStyles}>{title}</Text>
+        <AppText
+          variant="buttonLabel"
+          style={[
+            { color: LABEL_COLOR[v] },
+            v === 'link' && styles.linkLabel,
+          ]}
+        >
+          {title}
+        </AppText>
       )}
-    </TouchableOpacity>
+    </Pressable>
+  );
+
+  if (flat) {
+    return block ? <View style={styles.block}>{body}</View> : body;
+  }
+
+  return (
+    <HardShadow
+      offset="card"
+      collapsed={pressed || isDisabled}
+      style={block ? styles.block : undefined}
+    >
+      {body}
+    </HardShadow>
   );
 }
 
@@ -65,63 +164,8 @@ const styles = StyleSheet.create({
   base: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: borderRadius.md,
-    minHeight: 48,
+    borderRadius: 0,
   },
-  variant_primary: {
-    backgroundColor: colors.primary,
-  },
-  variant_secondary: {
-    backgroundColor: colors.surfaceLight,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  variant_danger: {
-    backgroundColor: colors.error,
-  },
-  variant_ghost: {
-    backgroundColor: 'transparent',
-  },
-  size_sm: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    minHeight: 36,
-  },
-  size_md: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  size_lg: {
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
-    minHeight: 56,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  text: {
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  text_primary: {
-    color: colors.white,
-  },
-  text_secondary: {
-    color: colors.text,
-  },
-  text_danger: {
-    color: colors.white,
-  },
-  text_ghost: {
-    color: colors.primary,
-  },
-  textSize_sm: {
-    fontSize: fontSize.sm,
-  },
-  textSize_md: {
-    fontSize: fontSize.md,
-  },
-  textSize_lg: {
-    fontSize: fontSize.lg,
-  },
+  block: { alignSelf: 'stretch', width: '100%' },
+  linkLabel: { textDecorationLine: 'underline' },
 });
