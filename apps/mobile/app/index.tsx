@@ -12,11 +12,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, fontSize, borderRadius } from '../lib/theme';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { fetchActiveTheme, fetchSystemStatus, type Theme, type SystemStatus } from '../lib/api';
+import { fetchSystemStatus, type SystemStatus } from '../lib/api';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [activeTheme, setActiveTheme] = useState<Theme | null>(null);
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -25,11 +24,7 @@ export default function HomeScreen() {
   const loadData = useCallback(async () => {
     try {
       setError(null);
-      const [themeData, statusData] = await Promise.all([
-        fetchActiveTheme(),
-        fetchSystemStatus(),
-      ]);
-      setActiveTheme(themeData);
+      const statusData = await fetchSystemStatus();
       setStatus(statusData);
     } catch (e) {
       setError('Could not connect to server. Check your settings.');
@@ -84,16 +79,6 @@ export default function HomeScreen() {
               size="sm"
               onPress={() => router.push('/settings')}
             />
-          </Card>
-        )}
-
-        {activeTheme && (
-          <Card style={styles.themeCard}>
-            <Text style={styles.activeLabel}>ACTIVE THEME</Text>
-            <Text style={styles.themeName}>{activeTheme.name}</Text>
-            {activeTheme.notes ? (
-              <Text style={styles.themeNotes}>{activeTheme.notes}</Text>
-            ) : null}
           </Card>
         )}
 
@@ -186,28 +171,6 @@ const styles = StyleSheet.create({
     color: colors.error,
     fontSize: fontSize.sm,
     marginBottom: spacing.sm,
-  },
-  themeCard: {
-    marginBottom: spacing.lg,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary,
-  },
-  activeLabel: {
-    color: colors.primary,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 2,
-    marginBottom: spacing.xs,
-  },
-  themeName: {
-    color: colors.text,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-  },
-  themeNotes: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
-    marginTop: spacing.xs,
   },
   stats: {
     flexDirection: 'row',
