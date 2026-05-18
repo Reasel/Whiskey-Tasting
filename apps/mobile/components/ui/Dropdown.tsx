@@ -50,7 +50,7 @@ export function Dropdown({
           <AppText variant="body" style={selected ? styles.valueText : styles.placeholderText}>
             {selected ? selected.label : placeholder}
           </AppText>
-          <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
+          <Ionicons name="chevron-down" size={18} color={colors.steelGrey} />
         </TouchableOpacity>
       </HardShadow>
 

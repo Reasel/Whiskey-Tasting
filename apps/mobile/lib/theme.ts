@@ -14,20 +14,6 @@ export const colors = {
   alertOrange: '#F97316',
   alertRed: '#DC2626',
   hyperBlue: '#1D4ED8', // dialog info "?" icon ONLY
-  // legacy aliases (TEMPORARY — removed in the final cleanup task so
-  // unmigrated screens compile and render in-palette during migration):
-  background: '#F0F0E8',
-  surface: '#FFFFFF',
-  surfaceLight: '#E5E5E0',
-  primary: '#F59E0B',
-  primaryDark: '#D97706',
-  text: '#000000',
-  textSecondary: '#4B5563',
-  textMuted: '#6B7280',
-  border: '#000000',
-  error: '#DC2626',
-  success: '#15803D',
-  white: '#FFFFFF',
 };
 
 export const spacing = {
@@ -42,25 +28,6 @@ export const spacing = {
   huge: 96,
 };
 
-// Legacy size scale kept so existing screens compile during migration.
-// Superseded by AppText variants; do not use in new code.
-export const fontSize = {
-  sm: 14,
-  md: 16,
-  lg: 20,
-  xl: 24,
-  xxl: 32,
-  hero: 40,
-};
-
-// TEMPORARY back-compat shim: every value is 0 so existing
-// `borderRadius.*` references render square. Removed in the final task.
-export const borderRadius = {
-  sm: 0,
-  md: 0,
-  lg: 0,
-  full: 0,
-};
 
 export const fonts = {
   serif: 'Merriweather_700Bold',
