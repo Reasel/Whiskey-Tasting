@@ -20,7 +20,13 @@ export async function apiFetch(
 ): Promise<Response> {
   const base = await getApiBase();
   const url = endpoint.startsWith('http') ? endpoint : `${base}${endpoint}`;
-  return fetch(url, options);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export async function apiPost<T>(

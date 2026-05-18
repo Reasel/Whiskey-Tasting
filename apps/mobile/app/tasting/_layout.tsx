@@ -16,10 +16,6 @@ export default function TastingLayout() {
         name="index"
         options={{ title: 'Tasting', headerTitle: 'Tasting Submission' }}
       />
-      <Stack.Screen
-        name="[id]"
-        options={{ title: 'Tasting Details' }}
-      />
     </Stack>
   );
 }
