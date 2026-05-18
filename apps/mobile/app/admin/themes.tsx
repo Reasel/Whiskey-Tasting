@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   RefreshControl,
@@ -9,11 +8,13 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fontSize } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import { Toast } from '../../components/ui/Toast';
+import { AppText } from '../../components/ui/AppText';
+import { Eyebrow } from '../../components/ui/Eyebrow';
 import {
   fetchThemes,
   createTheme,
@@ -118,7 +119,7 @@ export default function ThemesScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
         </View>
       </SafeAreaView>
     );
@@ -135,13 +136,16 @@ export default function ThemesScreen() {
               setRefreshing(true);
               loadThemes();
             }}
-            tintColor={colors.primary}
+            tintColor={colors.whiskeyAmber}
           />
         }
       >
+        <AppText variant="pageTitle" style={styles.title}>THEMES</AppText>
+        <Eyebrow style={styles.eyebrow}>MANAGE TASTING THEMES</Eyebrow>
+
         <Button
-          title={showForm ? 'Cancel' : 'Create New Theme'}
-          variant={showForm ? 'ghost' : 'primary'}
+          title={showForm ? 'CANCEL' : 'CREATE NEW THEME'}
+          variant={showForm ? 'outline' : 'default'}
           onPress={() => setShowForm(!showForm)}
           style={styles.createButton}
         />
@@ -170,7 +174,7 @@ export default function ThemesScreen() {
               placeholder="3"
             />
             <Button
-              title={creating ? 'Creating...' : 'Create Theme'}
+              title={creating ? 'Creating...' : 'CREATE THEME'}
               onPress={handleCreate}
               loading={creating}
               disabled={!name.trim() || creating}
@@ -180,21 +184,21 @@ export default function ThemesScreen() {
 
         {themes.length === 0 ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyText}>No themes yet. Create one!</Text>
+            <AppText variant="body" style={styles.emptyText}>No themes yet. Create one!</AppText>
           </View>
         ) : (
           themes.map((theme) => (
             <Card key={theme.id} style={styles.themeCard}>
               <View style={styles.themeHeader}>
                 <View style={styles.themeInfo}>
-                  <Text style={styles.themeName}>{theme.name}</Text>
+                  <AppText variant="sectionTitle">{theme.name}</AppText>
                   {theme.notes ? (
-                    <Text style={styles.themeNotes}>{theme.notes}</Text>
+                    <AppText variant="body" style={styles.themeNotes}>{theme.notes}</AppText>
                   ) : null}
                 </View>
                 <Button
-                  title="Delete"
-                  variant="danger"
+                  title="DELETE"
+                  variant="destructive"
                   size="sm"
                   onPress={() => handleDelete(theme)}
                 />
@@ -217,7 +221,7 @@ export default function ThemesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.canvasCream,
   },
   centered: {
     flex: 1,
@@ -227,6 +231,12 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
+  },
+  title: {
+    marginBottom: spacing.xs,
+  },
+  eyebrow: {
+    marginBottom: spacing.lg,
   },
   createButton: {
     marginBottom: spacing.lg,
@@ -240,8 +250,7 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   emptyText: {
-    color: colors.textSecondary,
-    fontSize: fontSize.md,
+    color: colors.mutedText,
   },
   themeCard: {
     marginBottom: spacing.md,
@@ -255,14 +264,8 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: spacing.md,
   },
-  themeName: {
-    color: colors.text,
-    fontSize: fontSize.lg,
-    fontWeight: '600',
-  },
   themeNotes: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
+    color: colors.steelGrey,
     marginTop: 2,
   },
 });

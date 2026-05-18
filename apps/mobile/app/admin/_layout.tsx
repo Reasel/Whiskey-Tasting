@@ -1,15 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   Alert,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fontSize } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { Panel } from '../../components/ui/Panel';
+import { AppText } from '../../components/ui/AppText';
+import { Eyebrow } from '../../components/ui/Eyebrow';
 
 const ADMIN_PASSWORD = 'admin';
 
@@ -30,16 +32,19 @@ export default function AdminLayout() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loginContainer}>
-          <Text style={styles.title}>Administration</Text>
-          <Text style={styles.subtitle}>Enter admin password to continue</Text>
-          <Input
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Password"
-            secureTextEntry
-            containerStyle={styles.passwordInput}
-          />
-          <Button title="Enter" onPress={handleLogin} />
+          <Panel style={{ maxWidth: 420, alignSelf: 'center', width: '100%' }}>
+            <AppText variant="pageTitle" style={styles.title}>ADMINISTRATION</AppText>
+            <Eyebrow style={styles.subtitle}>ENTER ADMIN PASSWORD TO CONTINUE</Eyebrow>
+            <Input
+              label="PASSWORD"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Password"
+              secureTextEntry
+              containerStyle={styles.passwordInput}
+            />
+            <Button title="ENTER" onPress={handleLogin} />
+          </Panel>
         </View>
       </SafeAreaView>
     );
@@ -48,10 +53,10 @@ export default function AdminLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerTintColor: colors.text,
+        headerStyle: { backgroundColor: colors.canvasCream },
+        headerTintColor: colors.inkBlack,
         headerTitleStyle: { fontWeight: '600' },
-        contentStyle: { backgroundColor: colors.background },
+        contentStyle: { backgroundColor: colors.canvasCream },
       }}
     >
       <Stack.Screen
@@ -68,7 +73,7 @@ export default function AdminLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.canvasCream,
   },
   loginContainer: {
     flex: 1,
@@ -76,15 +81,10 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   title: {
-    color: colors.text,
-    fontSize: fontSize.xxl,
-    fontWeight: '800',
     marginBottom: spacing.xs,
     textAlign: 'center',
   },
   subtitle: {
-    color: colors.textSecondary,
-    fontSize: fontSize.md,
     marginBottom: spacing.xl,
     textAlign: 'center',
   },

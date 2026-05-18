@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fontSize, borderRadius } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
 import { Card } from '../../components/ui/Card';
+import { AppText } from '../../components/ui/AppText';
+import { Eyebrow } from '../../components/ui/Eyebrow';
 import {
   fetchAllThemesScores,
   type ThemeScoresResponse,
@@ -40,7 +41,7 @@ export default function DataScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
         </View>
       </SafeAreaView>
     );
@@ -50,10 +51,10 @@ export default function DataScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <Text style={styles.emptyTitle}>No Data</Text>
-          <Text style={styles.emptyText}>
+          <AppText variant="sectionTitle" style={styles.emptyTitle}>No Data</AppText>
+          <AppText variant="body" style={styles.emptyText}>
             No tasting data available yet.
-          </Text>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -70,25 +71,28 @@ export default function DataScreen() {
               setRefreshing(true);
               loadData();
             }}
-            tintColor={colors.primary}
+            tintColor={colors.whiskeyAmber}
           />
         }
       >
+        <AppText variant="pageTitle" style={styles.title}>DATA</AppText>
+        <Eyebrow style={styles.eyebrow}>SUBMITTED TASTING DATA</Eyebrow>
+
         {data.map((themeData) => (
           <Card key={themeData.theme.id} style={styles.themeCard}>
-            <Text style={styles.themeName}>{themeData.theme.name}</Text>
+            <AppText variant="sectionTitle" style={styles.themeName}>{themeData.theme.name}</AppText>
 
             {/* Table header */}
             <View style={styles.tableHeader}>
-              <Text style={[styles.headerCell, styles.cellWide]}>
+              <AppText variant="tableCell" style={[styles.headerCell, styles.cellWide]}>
                 Whiskey
-              </Text>
-              <Text style={styles.headerCell}>User</Text>
-              <Text style={styles.headerCell}>Aroma</Text>
-              <Text style={styles.headerCell}>Flavor</Text>
-              <Text style={styles.headerCell}>Finish</Text>
-              <Text style={styles.headerCell}>Avg</Text>
-              <Text style={styles.headerCell}>Rank</Text>
+              </AppText>
+              <AppText variant="tableCell" style={styles.headerCell}>User</AppText>
+              <AppText variant="tableCell" style={styles.headerCell}>Aroma</AppText>
+              <AppText variant="tableCell" style={styles.headerCell}>Flavor</AppText>
+              <AppText variant="tableCell" style={styles.headerCell}>Finish</AppText>
+              <AppText variant="tableCell" style={styles.headerCell}>Avg</AppText>
+              <AppText variant="tableCell" style={styles.headerCell}>Rank</AppText>
             </View>
 
             {/* Table rows */}
@@ -101,28 +105,29 @@ export default function DataScreen() {
                     idx % 2 === 0 && styles.tableRowAlt,
                   ]}
                 >
-                  <Text
+                  <AppText
+                    variant="tableCell"
                     style={[styles.cell, styles.cellWide]}
                     numberOfLines={1}
                   >
                     {whiskey.whiskey_name}
-                  </Text>
-                  <Text style={styles.cell} numberOfLines={1}>
+                  </AppText>
+                  <AppText variant="tableCell" style={styles.cell} numberOfLines={1}>
                     {score.user_name}
-                  </Text>
-                  <Text style={styles.cell}>
+                  </AppText>
+                  <AppText variant="tableCell" style={styles.cell}>
                     {score.aroma_score.toFixed(1)}
-                  </Text>
-                  <Text style={styles.cell}>
+                  </AppText>
+                  <AppText variant="tableCell" style={styles.cell}>
                     {score.flavor_score.toFixed(1)}
-                  </Text>
-                  <Text style={styles.cell}>
+                  </AppText>
+                  <AppText variant="tableCell" style={styles.cell}>
                     {score.finish_score.toFixed(1)}
-                  </Text>
-                  <Text style={[styles.cell, styles.cellHighlight]}>
+                  </AppText>
+                  <AppText variant="tableCell" style={[styles.cell, styles.cellHighlight]}>
                     {score.average_score.toFixed(1)}
-                  </Text>
-                  <Text style={styles.cell}>{score.personal_rank}</Text>
+                  </AppText>
+                  <AppText variant="tableCell" style={styles.cell}>{score.personal_rank}</AppText>
                 </View>
               )),
             )}
@@ -136,7 +141,7 @@ export default function DataScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.canvasCream,
   },
   centered: {
     flex: 1,
@@ -148,15 +153,17 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     paddingBottom: spacing.xxl,
   },
+  title: {
+    marginBottom: spacing.xs,
+  },
+  eyebrow: {
+    marginBottom: spacing.lg,
+  },
   emptyTitle: {
-    color: colors.text,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
     marginBottom: spacing.sm,
   },
   emptyText: {
-    color: colors.textSecondary,
-    fontSize: fontSize.md,
+    color: colors.mutedText,
     textAlign: 'center',
   },
   themeCard: {
@@ -164,22 +171,17 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   themeName: {
-    color: colors.text,
-    fontSize: fontSize.lg,
-    fontWeight: '700',
     marginBottom: spacing.md,
   },
   tableHeader: {
     flexDirection: 'row',
     borderBottomWidth: 2,
-    borderBottomColor: colors.primary,
+    borderBottomColor: colors.whiskeyAmber,
     paddingBottom: spacing.sm,
     marginBottom: spacing.xs,
   },
   headerCell: {
-    color: colors.primary,
-    fontSize: 10,
-    fontWeight: '700',
+    color: colors.whiskeyAmber,
     flex: 1,
     textAlign: 'center',
     textTransform: 'uppercase',
@@ -189,15 +191,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: colors.lightGrey,
   },
   tableRowAlt: {
-    backgroundColor: colors.surfaceLight,
-    borderRadius: 4,
+    backgroundColor: colors.panelGrey,
   },
   cell: {
-    color: colors.text,
-    fontSize: 11,
     flex: 1,
     textAlign: 'center',
   },
@@ -206,7 +205,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   cellHighlight: {
-    color: colors.primary,
-    fontWeight: '600',
+    color: colors.whiskeyAmber,
   },
 });

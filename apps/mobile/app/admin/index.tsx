@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fontSize } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
+import { AppText } from '../../components/ui/AppText';
+import { Eyebrow } from '../../components/ui/Eyebrow';
 
 export default function AdminIndexScreen() {
   const router = useRouter();
@@ -11,32 +13,43 @@ export default function AdminIndexScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Administration</Text>
-        <Text style={styles.subtitle}>
-          Manage themes, users, and view data
-        </Text>
+        <AppText variant="pageTitle" style={styles.title}>ADMINISTRATION</AppText>
+        <Eyebrow style={styles.subtitle}>MANAGE THEMES, USERS, AND SETTINGS</Eyebrow>
 
-        <View style={styles.actions}>
-          <Button
-            title="Manage Themes"
-            size="lg"
-            onPress={() => router.push('/admin/themes')}
-            style={styles.button}
-          />
-          <Button
-            title="Manage Users"
-            size="lg"
-            variant="secondary"
-            onPress={() => router.push('/admin/users')}
-            style={styles.button}
-          />
-          <Button
-            title="View Data"
-            size="lg"
-            variant="secondary"
-            onPress={() => router.push('/admin/data')}
-            style={styles.button}
-          />
+        <View style={styles.grid}>
+          <View style={styles.tile}>
+            <Button
+              title="MANAGE THEMES"
+              size="xl"
+              block
+              onPress={() => router.push('/admin/themes')}
+            />
+          </View>
+          <View style={styles.tile}>
+            <Button
+              title="MANAGE USERS"
+              size="xl"
+              block
+              onPress={() => router.push('/admin/users')}
+            />
+          </View>
+          <View style={styles.tile}>
+            <Button
+              title="VIEW DATA"
+              size="xl"
+              block
+              onPress={() => router.push('/admin/data')}
+            />
+          </View>
+          <View style={styles.tile}>
+            <Button
+              title="DELETE USER"
+              size="xl"
+              variant="destructive"
+              block
+              onPress={() => router.push('/admin/users')}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -46,27 +59,25 @@ export default function AdminIndexScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.canvasCream,
   },
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
   title: {
-    color: colors.text,
-    fontSize: fontSize.xxl,
-    fontWeight: '800',
     marginBottom: spacing.xs,
   },
   subtitle: {
-    color: colors.textSecondary,
-    fontSize: fontSize.md,
     marginBottom: spacing.xl,
   },
-  actions: {
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     gap: spacing.md,
   },
-  button: {
-    width: '100%',
+  tile: {
+    width: '48%',
   },
 });

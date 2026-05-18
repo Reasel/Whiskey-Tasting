@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   RefreshControl,
@@ -9,11 +8,13 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, fontSize } from '../../lib/theme';
+import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import { Toast } from '../../components/ui/Toast';
+import { AppText } from '../../components/ui/AppText';
+import { Eyebrow } from '../../components/ui/Eyebrow';
 import {
   fetchUsers,
   createUser,
@@ -106,7 +107,7 @@ export default function UsersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
         </View>
       </SafeAreaView>
     );
@@ -123,12 +124,15 @@ export default function UsersScreen() {
               setRefreshing(true);
               loadUsers();
             }}
-            tintColor={colors.primary}
+            tintColor={colors.whiskeyAmber}
           />
         }
       >
+        <AppText variant="pageTitle" style={styles.title}>USERS</AppText>
+        <Eyebrow style={styles.eyebrow}>MANAGE TASTERS</Eyebrow>
+
         <Card style={styles.addCard}>
-          <Text style={styles.addTitle}>Add User</Text>
+          <AppText variant="sectionTitle" style={styles.addTitle}>Add User</AppText>
           <Input
             value={newName}
             onChangeText={setNewName}
@@ -136,27 +140,27 @@ export default function UsersScreen() {
             autoCapitalize="words"
           />
           <Button
-            title={adding ? 'Adding...' : 'Add User'}
+            title={adding ? 'Adding...' : 'ADD USER'}
             onPress={handleAdd}
             loading={adding}
             disabled={!newName.trim() || adding}
           />
         </Card>
 
-        <Text style={styles.sectionTitle}>
+        <AppText variant="sectionTitle" style={styles.sectionTitle}>
           Users ({users.length})
-        </Text>
+        </AppText>
 
         {users.length === 0 ? (
-          <Text style={styles.emptyText}>No users yet.</Text>
+          <AppText variant="body" style={styles.emptyText}>No users yet.</AppText>
         ) : (
           users.map((user) => (
             <Card key={user.id} style={styles.userCard}>
               <View style={styles.userRow}>
-                <Text style={styles.userName}>{user.name}</Text>
+                <AppText variant="body">{user.name}</AppText>
                 <Button
-                  title="Delete"
-                  variant="danger"
+                  title="DELETE"
+                  variant="destructive"
                   size="sm"
                   onPress={() => handleDelete(user)}
                 />
@@ -179,7 +183,7 @@ export default function UsersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.canvasCream,
   },
   centered: {
     flex: 1,
@@ -190,24 +194,23 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
+  title: {
+    marginBottom: spacing.xs,
+  },
+  eyebrow: {
+    marginBottom: spacing.lg,
+  },
   addCard: {
     marginBottom: spacing.xl,
   },
   addTitle: {
-    color: colors.text,
-    fontSize: fontSize.lg,
-    fontWeight: '600',
     marginBottom: spacing.md,
   },
   sectionTitle: {
-    color: colors.text,
-    fontSize: fontSize.lg,
-    fontWeight: '600',
     marginBottom: spacing.md,
   },
   emptyText: {
-    color: colors.textSecondary,
-    fontSize: fontSize.md,
+    color: colors.mutedText,
     textAlign: 'center',
     padding: spacing.xl,
   },
@@ -218,10 +221,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  userName: {
-    color: colors.text,
-    fontSize: fontSize.md,
-    fontWeight: '500',
   },
 });
