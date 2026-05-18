@@ -53,19 +53,14 @@ export default function AdminLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: colors.canvasCream },
-        headerTintColor: colors.inkBlack,
-        headerTitleStyle: { fontWeight: '600' },
+        headerShown: false,
         contentStyle: { backgroundColor: colors.canvasCream },
       }}
     >
-      <Stack.Screen
-        name="index"
-        options={{ title: 'Administration', headerShown: false }}
-      />
-      <Stack.Screen name="themes" options={{ title: 'Manage Themes' }} />
-      <Stack.Screen name="users" options={{ title: 'Manage Users' }} />
-      <Stack.Screen name="data" options={{ title: 'Data View' }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="themes" options={{ headerShown: false }} />
+      <Stack.Screen name="users" options={{ headerShown: false }} />
+      <Stack.Screen name="data" options={{ headerShown: false }} />
     </Stack>
   );
 }

@@ -56,7 +56,7 @@ export default function UsersScreen() {
     try {
       await createUser(newName.trim());
       setNewName('');
-      setToast({ message: 'User added!', type: 'success', visible: true });
+      setToast({ message: 'User added.', type: 'success', visible: true });
       await loadUsers();
     } catch {
       setToast({

@@ -5,17 +5,11 @@ export default function TastingLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: colors.canvasCream },
-        headerTintColor: colors.inkBlack,
-        headerTitleStyle: { fontWeight: '600' },
+        headerShown: false,
         contentStyle: { backgroundColor: colors.canvasCream },
-        headerShadowVisible: false,
       }}
     >
-      <Stack.Screen
-        name="index"
-        options={{ title: 'Tasting', headerTitle: 'Tasting Submission' }}
-      />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
   );
 }

@@ -249,7 +249,7 @@ export default function TastingScreen() {
       await submitTasting(request);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setToast({
-        message: 'Tasting submitted! Pick the next person.',
+        message: 'Tasting submitted. Pick the next person.',
         type: 'success',
         visible: true,
       });

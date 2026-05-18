@@ -68,7 +68,7 @@ export default function ThemesScreen() {
       setNotes('');
       setNumWhiskeys('3');
       setShowForm(false);
-      setToast({ message: 'Theme created!', type: 'success', visible: true });
+      setToast({ message: 'Theme created.', type: 'success', visible: true });
       await loadThemes();
     } catch {
       setToast({
@@ -184,7 +184,7 @@ export default function ThemesScreen() {
 
         {themes.length === 0 ? (
           <View style={styles.empty}>
-            <AppText variant="body" style={styles.emptyText}>No themes yet. Create one!</AppText>
+            <AppText variant="body" style={styles.emptyText}>No themes yet. Create one.</AppText>
           </View>
         ) : (
           themes.map((theme) => (

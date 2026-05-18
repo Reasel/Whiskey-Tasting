@@ -100,10 +100,7 @@ export default function DataScreen() {
               whiskey.scores.map((score, idx) => (
                 <View
                   key={`${whiskey.whiskey_id}-${score.user_name}`}
-                  style={[
-                    styles.tableRow,
-                    idx % 2 === 0 && styles.tableRowAlt,
-                  ]}
+                  style={styles.tableRow}
                 >
                   <AppText
                     variant="tableCell"
@@ -176,7 +173,7 @@ const styles = StyleSheet.create({
   tableHeader: {
     flexDirection: 'row',
     borderBottomWidth: 2,
-    borderBottomColor: colors.whiskeyAmber,
+    borderBottomColor: colors.inkBlack,
     paddingBottom: spacing.sm,
     marginBottom: spacing.xs,
   },
@@ -192,9 +189,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: colors.lightGrey,
-  },
-  tableRowAlt: {
-    backgroundColor: colors.panelGrey,
   },
   cell: {
     flex: 1,
