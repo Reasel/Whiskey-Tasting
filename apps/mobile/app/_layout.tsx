@@ -13,8 +13,29 @@ import {
 import { Inter_400Regular } from '@expo-google-fonts/inter';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../lib/theme';
+import { AppText } from '../components/ui/AppText';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+function tabLabel(label: string) {
+  return ({ color }: { focused: boolean; color: string }) => (
+    <AppText
+      numberOfLines={1}
+      adjustsFontSizeToFit
+      minimumFontScale={0.6}
+      style={{
+        color,
+        fontFamily: 'JetBrainsMono_700Bold',
+        fontSize: 11,
+        letterSpacing: 0.6,
+        textTransform: 'uppercase',
+        textAlign: 'center',
+      }}
+    >
+      {label}
+    </AppText>
+  );
+}
 
 export default function RootLayout() {
   const insets = useSafeAreaInsets();
@@ -52,33 +73,27 @@ export default function RootLayout() {
             height: 64 + insets.bottom,
           },
           tabBarItemStyle: { borderRadius: 0 },
-          tabBarLabelStyle: {
-            fontFamily: 'JetBrainsMono_700Bold',
-            fontSize: 11,
-            letterSpacing: 0.6,
-            textTransform: 'uppercase',
-          },
         }}
       >
         <Tabs.Screen
           name="index"
-          options={{ tabBarLabel: 'HOME' }}
+          options={{ tabBarLabel: tabLabel('HOME') }}
         />
         <Tabs.Screen
           name="tasting"
-          options={{ tabBarLabel: 'TASTE' }}
+          options={{ tabBarLabel: tabLabel('TASTE') }}
         />
         <Tabs.Screen
           name="dashboard"
-          options={{ tabBarLabel: 'RESULTS' }}
+          options={{ tabBarLabel: tabLabel('RESULTS') }}
         />
         <Tabs.Screen
           name="admin"
-          options={{ tabBarLabel: 'ADMIN' }}
+          options={{ tabBarLabel: tabLabel('ADMIN') }}
         />
         <Tabs.Screen
           name="settings"
-          options={{ tabBarLabel: 'SETTINGS' }}
+          options={{ tabBarLabel: tabLabel('SETTINGS') }}
         />
       </Tabs>
     </View>
