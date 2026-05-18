@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   RefreshControl,
@@ -9,7 +8,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
-import { colors, spacing, fontSize, borderRadius } from '../lib/theme';
+import { colors, spacing } from '../lib/theme';
+import { AppText } from '../components/ui/AppText';
+import { Eyebrow } from '../components/ui/Eyebrow';
 import { Card } from '../components/ui/Card';
 import { Dropdown } from '../components/ui/Dropdown';
 import {
@@ -179,7 +180,7 @@ export default function DashboardScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
         </View>
       </SafeAreaView>
     );
@@ -189,10 +190,7 @@ export default function DashboardScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <Text style={styles.emptyTitle}>No Results Yet</Text>
-          <Text style={styles.emptyText}>
-            Submit some tastings to see results here.
-          </Text>
+          <AppText variant="body">No tastings yet.</AppText>
         </View>
       </SafeAreaView>
     );
@@ -206,12 +204,17 @@ export default function DashboardScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.primary}
+            tintColor={colors.whiskeyAmber}
           />
         }
       >
+        <AppText variant="pageTitle" style={styles.pageTitle}>
+          DATA VIEW
+        </AppText>
+        <Eyebrow style={styles.eyebrow}>VIEW SUBMITTED TASTINGS</Eyebrow>
+
         <Dropdown
-          label="Theme"
+          label="THEME"
           value={themeFilter}
           options={themeOptions}
           onChange={(v) =>
@@ -219,13 +222,13 @@ export default function DashboardScreen() {
           }
         />
         <Dropdown
-          label="Person"
+          label="PERSON"
           value={personFilter}
           options={personOptions}
           onChange={(v) => setPersonFilter(String(v))}
         />
         <Dropdown
-          label="Sort by"
+          label="SORT BY"
           value={sortBy}
           options={SORT_OPTIONS}
           onChange={(v) => setSortBy(v as SortKey)}
@@ -238,78 +241,137 @@ export default function DashboardScreen() {
           );
           return (
             <View key={themeScore.theme.id} style={styles.themeSection}>
-              <Text style={styles.themeName}>{themeScore.theme.name}</Text>
-
-              {rows.length === 0 ? (
-                <Card style={styles.emptyCard}>
-                  <Text style={styles.emptyText}>
+              <Card title={themeScore.theme.name}>
+                {rows.length === 0 ? (
+                  <AppText variant="body">
                     {personFilter === 'all'
                       ? 'No tastings yet for this theme.'
                       : `No scores from ${personFilter} for this theme.`}
-                  </Text>
-                </Card>
-              ) : (
-                rows.map((r) => (
-                  <View key={r.whiskeyId} style={styles.row}>
-                    <View style={styles.rankBadge}>
-                      <Text style={styles.rankText}>#{r.rank}</Text>
+                  </AppText>
+                ) : (
+                  <>
+                    {/* Column header row */}
+                    <View style={[styles.tableRow, styles.tableHeaderRow]}>
+                      <View style={styles.colRank}>
+                        <AppText variant="fieldLabel">#</AppText>
+                      </View>
+                      <View style={styles.colName}>
+                        <AppText variant="fieldLabel">WHISKEY</AppText>
+                      </View>
+                      <View style={styles.colScore}>
+                        <AppText variant="fieldLabel" style={styles.right}>A</AppText>
+                      </View>
+                      <View style={styles.colScore}>
+                        <AppText variant="fieldLabel" style={styles.right}>F</AppText>
+                      </View>
+                      <View style={styles.colScore}>
+                        <AppText variant="fieldLabel" style={styles.right}>Fi</AppText>
+                      </View>
+                      <View style={styles.colAvg}>
+                        <AppText variant="fieldLabel" style={styles.right}>AVG</AppText>
+                      </View>
                     </View>
-                    <View style={styles.rowInfo}>
-                      <Text style={styles.whiskeyName}>{r.name}</Text>
-                      {r.proof != null && (
-                        <Text style={styles.proof}>{r.proof}% ABV</Text>
-                      )}
-                      <Text style={styles.metrics}>
-                        A {r.aroma.toFixed(1)} · F {r.flavor.toFixed(1)} · Fi{' '}
-                        {r.finish.toFixed(1)}
-                        {personFilter === 'all'
-                          ? ` · ${r.tasterCount} taster${
-                              r.tasterCount === 1 ? '' : 's'
-                            }`
-                          : ''}
-                      </Text>
-                    </View>
-                    <View style={styles.avgBox}>
-                      <Text style={styles.avgValue}>
-                        {r.avg.toFixed(1)}
-                      </Text>
-                      <Text style={styles.avgLabel}>avg</Text>
-                    </View>
-                  </View>
-                ))
-              )}
+
+                    {rows.map((r) => (
+                      <View key={r.whiskeyId} style={styles.tableRow}>
+                        <View style={styles.colRank}>
+                          <AppText variant="tableCell">{r.rank}</AppText>
+                        </View>
+                        <View style={styles.colName}>
+                          <AppText variant="tableCell">{r.name}</AppText>
+                          {r.proof != null && (
+                            <AppText variant="tableCell" style={styles.proofText}>
+                              {r.proof}% ABV
+                            </AppText>
+                          )}
+                          {personFilter === 'all' && (
+                            <AppText variant="tableCell" style={styles.tasterText}>
+                              {r.tasterCount} taster{r.tasterCount === 1 ? '' : 's'}
+                            </AppText>
+                          )}
+                        </View>
+                        <View style={styles.colScore}>
+                          <AppText variant="tableCell" style={styles.right}>
+                            {r.aroma.toFixed(1)}
+                          </AppText>
+                        </View>
+                        <View style={styles.colScore}>
+                          <AppText variant="tableCell" style={styles.right}>
+                            {r.flavor.toFixed(1)}
+                          </AppText>
+                        </View>
+                        <View style={styles.colScore}>
+                          <AppText variant="tableCell" style={styles.right}>
+                            {r.finish.toFixed(1)}
+                          </AppText>
+                        </View>
+                        <View style={styles.colAvg}>
+                          <AppText variant="tableCell" style={[styles.right, styles.avgValue]}>
+                            {r.avg.toFixed(1)}
+                          </AppText>
+                        </View>
+                      </View>
+                    ))}
+                  </>
+                )}
+              </Card>
 
               {personFilter === 'all' &&
                 themeScore.whiskeys.some((w) => w.scores.length > 0) && (
-                  <Card style={styles.detailCard}>
-                    <Text style={styles.detailTitle}>Individual Scores</Text>
+                  <Card title="Individual Scores" style={styles.detailCard}>
+                    {/* Column header row */}
+                    <View style={[styles.tableRow, styles.tableHeaderRow]}>
+                      <View style={styles.detailColPerson}>
+                        <AppText variant="fieldLabel">PERSON</AppText>
+                      </View>
+                      <View style={styles.detailColWhiskey}>
+                        <AppText variant="fieldLabel">WHISKEY</AppText>
+                      </View>
+                      <View style={styles.colScore}>
+                        <AppText variant="fieldLabel" style={styles.right}>A</AppText>
+                      </View>
+                      <View style={styles.colScore}>
+                        <AppText variant="fieldLabel" style={styles.right}>F</AppText>
+                      </View>
+                      <View style={styles.colScore}>
+                        <AppText variant="fieldLabel" style={styles.right}>Fi</AppText>
+                      </View>
+                      <View style={styles.colAvg}>
+                        <AppText variant="fieldLabel" style={styles.right}>AVG</AppText>
+                      </View>
+                    </View>
+
                     {themeScore.whiskeys.map((whiskey) =>
                       whiskey.scores.map((score) => (
                         <View
                           key={`${whiskey.whiskey_id}-${score.user_name}`}
-                          style={styles.detailRow}
+                          style={styles.tableRow}
                         >
-                          <View style={styles.detailLeft}>
-                            <Text style={styles.detailUser}>
-                              {score.user_name}
-                            </Text>
-                            <Text style={styles.detailWhiskey}>
-                              {whiskey.whiskey_name}
-                            </Text>
+                          <View style={styles.detailColPerson}>
+                            <AppText variant="tableCell">{score.user_name}</AppText>
                           </View>
-                          <View style={styles.detailScores}>
-                            <Text style={styles.detailScore}>
-                              A:{score.aroma_score.toFixed(1)}
-                            </Text>
-                            <Text style={styles.detailScore}>
-                              F:{score.flavor_score.toFixed(1)}
-                            </Text>
-                            <Text style={styles.detailScore}>
-                              Fi:{score.finish_score.toFixed(1)}
-                            </Text>
-                            <Text style={styles.detailAvg}>
+                          <View style={styles.detailColWhiskey}>
+                            <AppText variant="tableCell">{whiskey.whiskey_name}</AppText>
+                          </View>
+                          <View style={styles.colScore}>
+                            <AppText variant="tableCell" style={styles.right}>
+                              {score.aroma_score.toFixed(1)}
+                            </AppText>
+                          </View>
+                          <View style={styles.colScore}>
+                            <AppText variant="tableCell" style={styles.right}>
+                              {score.flavor_score.toFixed(1)}
+                            </AppText>
+                          </View>
+                          <View style={styles.colScore}>
+                            <AppText variant="tableCell" style={styles.right}>
+                              {score.finish_score.toFixed(1)}
+                            </AppText>
+                          </View>
+                          <View style={styles.colAvg}>
+                            <AppText variant="tableCell" style={[styles.right, styles.avgValue]}>
                               {score.average_score.toFixed(1)}
-                            </Text>
+                            </AppText>
                           </View>
                         </View>
                       )),
@@ -327,7 +389,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.canvasCream,
   },
   centered: {
     flex: 1,
@@ -339,126 +401,61 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  emptyTitle: {
-    color: colors.text,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-    marginBottom: spacing.sm,
+  pageTitle: {
+    marginBottom: spacing.xs,
   },
-  emptyText: {
-    color: colors.textSecondary,
-    fontSize: fontSize.md,
-    textAlign: 'center',
-  },
-  emptyCard: {
-    marginBottom: spacing.md,
+  eyebrow: {
+    marginBottom: spacing.lg,
   },
   themeSection: {
     marginBottom: spacing.lg,
   },
-  themeName: {
-    color: colors.text,
-    fontSize: fontSize.lg,
-    fontWeight: '800',
-    marginBottom: spacing.sm,
-  },
-  row: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  rankBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-  },
-  rankText: {
-    color: colors.white,
-    fontSize: fontSize.sm,
-    fontWeight: '700',
-  },
-  rowInfo: {
-    flex: 1,
-  },
-  whiskeyName: {
-    color: colors.text,
-    fontSize: fontSize.md,
-    fontWeight: '600',
-  },
-  proof: {
-    color: colors.textSecondary,
-    fontSize: fontSize.sm,
-  },
-  metrics: {
-    color: colors.textMuted,
-    fontSize: 12,
-    marginTop: 2,
-  },
-  avgBox: {
-    alignItems: 'center',
-    marginLeft: spacing.md,
-  },
-  avgValue: {
-    color: colors.primary,
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-  },
-  avgLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-  },
   detailCard: {
     marginTop: spacing.sm,
   },
-  detailTitle: {
-    color: colors.text,
-    fontSize: fontSize.md,
-    fontWeight: '600',
-    marginBottom: spacing.md,
-  },
-  detailRow: {
+  tableRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: colors.lightGrey,
   },
-  detailLeft: {
+  tableHeaderRow: {
+    borderBottomColor: colors.inkBlack,
+  },
+  colRank: {
+    width: 24,
+    marginRight: spacing.sm,
+  },
+  colName: {
     flex: 1,
+    marginRight: spacing.sm,
   },
-  detailUser: {
-    color: colors.text,
-    fontSize: fontSize.sm,
-    fontWeight: '600',
+  colScore: {
+    width: 32,
+    marginRight: spacing.xs,
   },
-  detailWhiskey: {
-    color: colors.textMuted,
-    fontSize: 12,
+  colAvg: {
+    width: 36,
   },
-  detailScores: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    alignItems: 'center',
+  detailColPerson: {
+    flex: 1,
+    marginRight: spacing.sm,
   },
-  detailScore: {
-    color: colors.textSecondary,
-    fontSize: 12,
+  detailColWhiskey: {
+    flex: 1,
+    marginRight: spacing.sm,
   },
-  detailAvg: {
-    color: colors.primary,
-    fontSize: fontSize.sm,
-    fontWeight: '700',
-    minWidth: 30,
+  right: {
     textAlign: 'right',
+  },
+  avgValue: {
+    color: colors.whiskeyAmber,
+  },
+  proofText: {
+    color: colors.mutedText,
+  },
+  tasterText: {
+    color: colors.mutedText,
   },
 });
