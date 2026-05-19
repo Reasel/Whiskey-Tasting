@@ -32,6 +32,7 @@ pkgs.mkShell {
     androidSdk
     pkgs.jdk17
     pkgs.nodejs_22
+    pkgs.eas-cli
   ];
 
   ANDROID_SDK_ROOT = sdkRoot;
