@@ -61,7 +61,7 @@ export default function SettingsScreen() {
   const hasChanges = url !== savedUrl;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <AppText variant="pageTitle" style={styles.pageTitle}>SETTINGS</AppText>
         <Eyebrow style={styles.eyebrow}>CONFIGURE THE APP</Eyebrow>

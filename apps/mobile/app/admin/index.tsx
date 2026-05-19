@@ -11,7 +11,7 @@ export default function AdminIndexScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <AppText variant="pageTitle" style={styles.title}>ADMINISTRATION</AppText>
         <Eyebrow style={styles.subtitle}>MANAGE THEMES, USERS, AND SETTINGS</Eyebrow>

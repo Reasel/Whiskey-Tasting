@@ -312,7 +312,7 @@ export default function TastingScreen() {
   // Selection phase: choose theme + person.
   if (!userSelected) {
     return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
           <AppText variant="pageTitle" style={styles.pageTitle}>
             TASTING SUBMISSION
@@ -384,7 +384,7 @@ export default function TastingScreen() {
 
   // Tasting form.
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
