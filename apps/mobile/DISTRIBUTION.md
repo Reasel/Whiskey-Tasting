@@ -5,6 +5,11 @@ track: an email allowlist (≤100 testers). It is never publicly listed or
 searchable. Builds run on **EAS** (Expo's cloud) — no Android SDK or signing
 keystore is needed locally or in CI; EAS creates and stores the keystore once.
 
+> **NixOS / tooling:** there is no global `eas` command (don't `npm i -g`).
+> Always invoke it as `npx eas-cli@latest <args>`. `build:configure` is
+> optional — the upload keystore is auto-generated on the first
+> `npx eas-cli@latest build -p android` (answer "Yes" to generate it).
+
 ## Backend URL
 
 `lib/config.ts` defaults to `http://localhost:8010` so local dev keeps hitting

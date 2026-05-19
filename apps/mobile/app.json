@@ -31,6 +31,13 @@
     "plugins": [
       "expo-router",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "adcc8b42-9106-4b65-a11f-b3eb4d419221"
+      }
+    },
+    "owner": "reasel"
   }
 }
