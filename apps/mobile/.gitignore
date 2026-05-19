@@ -7,7 +7,11 @@ node_modules/
 .expo/
 dist/
 web-build/
-expo-env.d.ts
+# expo-env.d.ts is intentionally tracked (committed) so `tsc` in CI can
+# resolve process.env.EXPO_PUBLIC_* without running `expo start`/prebuild.
+
+# Google Play service-account key (written transiently by release CI; never commit)
+google-service-account.json
 
 # Native
 .kotlin/

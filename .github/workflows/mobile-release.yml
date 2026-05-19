@@ -1,0 +1,103 @@
+name: Mobile Release
+
+# Builds the Expo app on EAS (Expo's cloud — no Android SDK/keystore on the
+# runner; EAS manages the signing keystore). The keystore is created once via
+# `eas build:configure` (see apps/mobile/DISTRIBUTION.md) and lives in EAS, so
+# CI never handles it.
+#
+# Triggers:
+#   - push a tag `mobile-v*`  -> production AAB, auto-submitted to the Google
+#                                Play *internal testing* track
+#   - manual (Actions tab)    -> choose `preview` (shareable internal APK link)
+#                                or `production` (AAB, optionally submitted)
+#
+# Decoupled from the backend `v*` tags used by ci-cd.yml.
+
+on:
+  push:
+    tags: [ 'mobile-v*' ]
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'EAS build profile'
+        type: choice
+        options: [ preview, production ]
+        default: preview
+      submit:
+        description: 'Submit production build to Play internal track'
+        type: boolean
+        default: false
+
+concurrency:
+  group: mobile-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Resolve build profile / submit flag
+        id: cfg
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "profile=production" >> "$GITHUB_OUTPUT"
+            echo "submit=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "profile=${{ inputs.profile }}" >> "$GITHUB_OUTPUT"
+            if [ "${{ inputs.profile }}" = "production" ] && [ "${{ inputs.submit }}" = "true" ]; then
+              echo "submit=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "submit=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/mobile/package-lock.json
+
+      - name: Set up EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Write Play service-account key
+        if: steps.cfg.outputs.submit == 'true'
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "::error::GOOGLE_SERVICE_ACCOUNT_JSON secret is required to submit to Play"
+            exit 1
+          fi
+          printf '%s' "$GOOGLE_SERVICE_ACCOUNT_JSON" > google-service-account.json
+
+      - name: Build (and auto-submit to Play internal)
+        run: |
+          if [ "${{ steps.cfg.outputs.submit }}" = "true" ]; then
+            eas build --platform android --profile production --non-interactive --auto-submit
+          else
+            eas build --platform android --profile ${{ steps.cfg.outputs.profile }} --non-interactive --wait
+          fi
+
+      - name: Remove service-account key
+        if: always()
+        run: rm -f google-service-account.json
