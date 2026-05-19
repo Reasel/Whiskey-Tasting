@@ -41,6 +41,7 @@ export default function RootLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
+          tabBarLabelPosition: 'beside-icon',
           tabBarIcon: () => null,
           tabBarIconStyle: { display: 'none' },
           tabBarLabelStyle: {
@@ -58,7 +59,7 @@ export default function RootLayout() {
             borderTopWidth: 1,
             height: 56 + insets.bottom,
           },
-          tabBarItemStyle: { borderRadius: 0, justifyContent: 'center' },
+          tabBarItemStyle: { borderRadius: 0, justifyContent: 'center', alignItems: 'center' },
         }}
       >
         <Tabs.Screen
