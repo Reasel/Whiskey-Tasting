@@ -65,11 +65,11 @@ function WTTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
               minimumFontScale={0.7}
               style={{
                 fontFamily: 'JetBrainsMono_700Bold',
-                fontSize: 11,
-                letterSpacing: 0.5,
+                fontSize: 10,
+                letterSpacing: 0.2,
                 textTransform: 'uppercase',
                 textAlign: 'center',
-                paddingHorizontal: 4,
+                paddingHorizontal: 2,
                 color: focused ? colors.cardWhite : colors.steelGrey,
               }}
             >
@@ -83,8 +83,6 @@ function WTTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 }
 
 export default function RootLayout() {
-  const insets = useSafeAreaInsets();
-
   const [fontsLoaded, fontError] = useFonts({
     Merriweather_700Bold,
     JetBrainsMono_400Regular,
