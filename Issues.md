@@ -13,14 +13,12 @@ Tracking list of issues reported from user feedback. We'll work through these in
 - When switching themes, the currently selected person should persist (i.e. last selected user is remembered across theme switches).
 
 **Acceptance criteria:**
-- [ ] Settings screen has a "Default user" option.
-- [ ] On app start, the submission form defaults to the configured default user.
-- [ ] Switching themes preserves the currently selected user instead of resetting it.
-- [ ] Selection persists across app restarts (stored locally).
+- [x] Settings screen has a "Default user" option.
+- [x] On app start, the submission form defaults to the configured default user.
+- [x] Switching themes preserves the currently selected user instead of resetting it.
+- [x] Selection persists across app restarts (stored locally).
 
-**Notes / open questions:**
-- Should "default user" override the last-selected user, or only seed the initial selection?
-- Behavior on web vs mobile — should it sync, or is local-per-device fine?
+**Status:** Resolved on branch `claude/plan-mobile-apps-QG3gd`. Mobile only — web frontend was out of scope (no Settings page there yet). Two-key storage model: `default_username` (sticky, written only from Settings) wins on cold start; `last_username` is the in-session selection that survives theme switches; proxy/borrow submissions never touch `default_username`. Verified on-device: cold launch opens directly into scoring for the configured default, theme switching from the picker does not reset the user, and a borrow submission did not change the default after force-restart.
 
 ---
 
