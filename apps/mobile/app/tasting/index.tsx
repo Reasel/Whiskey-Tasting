@@ -30,7 +30,11 @@ import {
   type User,
   type SubmitTastingRequest,
 } from '../../lib/api';
-import { getLastUsername, setLastUsername } from '../../lib/storage';
+import {
+  getLastUsername,
+  setLastUsername,
+  getDefaultUsername,
+} from '../../lib/storage';
 
 type WhiskeyScores = {
   aroma_score: number;
@@ -96,97 +100,6 @@ export default function TastingScreen() {
     [initScores],
   );
 
-  const loadData = useCallback(async () => {
-    try {
-      const [themesResp, usersData, savedName] = await Promise.all([
-        fetchThemes(),
-        fetchUsers(),
-        getLastUsername(),
-      ]);
-      setThemes(themesResp.themes);
-      setUsers(usersData.users);
-      if (savedName) setUserName(savedName);
-
-      const firstTheme = themesResp.themes[0];
-      if (firstTheme) {
-        setSelectedThemeId(firstTheme.id);
-        await loadWhiskeys(firstTheme.id);
-      }
-    } catch {
-      setToast({
-        message: 'Could not connect to server.',
-        type: 'error',
-        visible: true,
-      });
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [loadWhiskeys]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // Track the current selection so the focus effect can react to a deleted
-  // theme without re-subscribing on every selection change.
-  const selectedThemeIdRef = useRef<number | null>(null);
-  useEffect(() => {
-    selectedThemeIdRef.current = selectedThemeId;
-  }, [selectedThemeId]);
-
-  // Refresh the theme/user lists whenever the tab regains focus so themes
-  // created in Admin show up here. The first focus is the initial mount,
-  // already covered by loadData() above, so skip it. The in-progress user
-  // and entered scores are left untouched while the selected theme still
-  // exists; if it was deleted, fall back to the first theme.
-  const didInitialLoad = useRef(false);
-  useFocusEffect(
-    useCallback(() => {
-      if (!didInitialLoad.current) {
-        didInitialLoad.current = true;
-        return;
-      }
-      let active = true;
-      (async () => {
-        try {
-          const [themesResp, usersData] = await Promise.all([
-            fetchThemes(),
-            fetchUsers(),
-          ]);
-          if (!active) return;
-          setThemes(themesResp.themes);
-          setUsers(usersData.users);
-
-          const cur = selectedThemeIdRef.current;
-          if (cur != null && !themesResp.themes.some((t) => t.id === cur)) {
-            // The selected theme was deleted elsewhere — fall back to the
-            // first theme and return to the selection screen.
-            const first = themesResp.themes[0] ?? null;
-            setSelectedThemeId(first ? first.id : null);
-            setUserSelected(false);
-            if (first) loadWhiskeys(first.id);
-          }
-        } catch {
-          // keep current state on a transient failure
-        }
-      })();
-      return () => {
-        active = false;
-      };
-    }, [loadWhiskeys]),
-  );
-
-  const handleThemeChange = useCallback(
-    (value: number | string) => {
-      const themeId = Number(value);
-      setSelectedThemeId(themeId);
-      setUserSelected(false);
-      loadWhiskeys(themeId);
-    },
-    [loadWhiskeys],
-  );
-
   const loadExistingScores = useCallback(
     async (name: string, themeId: number) => {
       try {
@@ -215,6 +128,132 @@ export default function TastingScreen() {
       }
     },
     [whiskeys, initScores],
+  );
+
+  const loadData = useCallback(async () => {
+    try {
+      const [themesResp, usersData, defaultName, savedName] = await Promise.all([
+        fetchThemes(),
+        fetchUsers(),
+        getDefaultUsername(),
+        getLastUsername(),
+      ]);
+      setThemes(themesResp.themes);
+      setUsers(usersData.users);
+
+      const firstTheme = themesResp.themes[0];
+      if (firstTheme) {
+        setSelectedThemeId(firstTheme.id);
+        await loadWhiskeys(firstTheme.id);
+      }
+
+      // Resolve initial submitter: explicit default wins; otherwise last
+      // picker selection. Skip the picker only if the resolved name still
+      // exists in the fetched users list — otherwise fall back silently.
+      const resolved = (defaultName || savedName || '').trim();
+      if (resolved) {
+        setUserName(resolved);
+        const stillExists = usersData.users.some((u) => u.name === resolved);
+        if (stillExists && firstTheme) {
+          setUserSelected(true);
+          await loadExistingScores(resolved, firstTheme.id);
+        }
+      }
+    } catch {
+      setToast({
+        message: 'Could not connect to server.',
+        type: 'error',
+        visible: true,
+      });
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [loadWhiskeys, loadExistingScores]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Track the current selection so the focus effect can react to a deleted
+  // theme without re-subscribing on every selection change.
+  const selectedThemeIdRef = useRef<number | null>(null);
+  useEffect(() => {
+    selectedThemeIdRef.current = selectedThemeId;
+  }, [selectedThemeId]);
+
+  const userSelectedRef = useRef(false);
+  useEffect(() => {
+    userSelectedRef.current = userSelected;
+  }, [userSelected]);
+
+  // Refresh the theme/user lists whenever the tab regains focus so themes
+  // created in Admin show up here. The first focus is the initial mount,
+  // already covered by loadData() above, so skip it. The in-progress user
+  // and entered scores are left untouched while the selected theme still
+  // exists; if it was deleted, fall back to the first theme.
+  const didInitialLoad = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (!didInitialLoad.current) {
+        didInitialLoad.current = true;
+        return;
+      }
+      let active = true;
+      (async () => {
+        try {
+          const [themesResp, usersData, defaultName] = await Promise.all([
+            fetchThemes(),
+            fetchUsers(),
+            getDefaultUsername(),
+          ]);
+          if (!active) return;
+          setThemes(themesResp.themes);
+          setUsers(usersData.users);
+
+          const cur = selectedThemeIdRef.current;
+          if (cur != null && !themesResp.themes.some((t) => t.id === cur)) {
+            // The selected theme was deleted elsewhere — fall back to the
+            // first theme and return to the selection screen.
+            const first = themesResp.themes[0] ?? null;
+            setSelectedThemeId(first ? first.id : null);
+            setUserSelected(false);
+            if (first) loadWhiskeys(first.id);
+            return;
+          }
+
+          // If the picker is currently visible (no user selected), re-apply
+          // a newly-configured default. Never yank a user already in scoring.
+          if (!userSelectedRef.current && defaultName) {
+            const stillExists = usersData.users.some((u) => u.name === defaultName);
+            if (stillExists && cur != null) {
+              setUserName(defaultName);
+              setUserSelected(true);
+              await loadExistingScores(defaultName, cur);
+            }
+          }
+        } catch {
+          // keep current state on a transient failure
+        }
+      })();
+      return () => {
+        active = false;
+      };
+    }, [loadWhiskeys, loadExistingScores]),
+  );
+
+  const handleThemeChange = useCallback(
+    (value: number | string) => {
+      const themeId = Number(value);
+      setSelectedThemeId(themeId);
+      loadWhiskeys(themeId);
+      if (userSelectedRef.current && userName.trim()) {
+        // Preserve the current submitter across theme switches; refresh
+        // their existing scores for the new theme.
+        loadExistingScores(userName.trim(), themeId);
+      }
+    },
+    [loadWhiskeys, loadExistingScores, userName],
   );
 
   const handleSelectUser = useCallback(
