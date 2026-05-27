@@ -25,8 +25,15 @@ the full root-cause analysis.
 
 ## Prerequisites
 
-- The deployed image already contains `apps/backend/scripts/cleanup_orphan_tastings.py`
-  and the cascade fix (commits in this branch).
+- This branch is merged and the `reasel/whiskey-tasting:staging` image has
+  been rebuilt (e.g. by CI) so it contains `apps/backend/scripts/cleanup_orphan_tastings.py`
+  and the cascade fix in `delete_whiskeys_by_theme`.
+- The host has pulled the new image:
+
+  ```bash
+  docker pull reasel/whiskey-tasting:staging
+  ```
+
 - You have shell access to the docker host running the `whiskey-tasting`
   compose stack.
 - The volume `whiskey-data` is mounted at `/app/backend/data` inside the
