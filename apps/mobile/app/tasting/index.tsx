@@ -36,6 +36,12 @@ import {
   getDefaultUsername,
 } from '../../lib/storage';
 
+// `created_at` is a UTC ISO 8601 string from the backend; lexicographic
+// compare matches chronological order, so no Date parsing is needed.
+function sortThemesByRecent(themes: Theme[]): Theme[] {
+  return [...themes].sort((a, b) => b.created_at.localeCompare(a.created_at));
+}
+
 type WhiskeyScores = {
   aroma_score: number;
   flavor_score: number;
@@ -145,11 +151,12 @@ export default function TastingScreen() {
         getDefaultUsername(),
         getLastUsername(),
       ]);
-      setThemes(themesResp.themes);
+      const sortedThemes = sortThemesByRecent(themesResp.themes);
+      setThemes(sortedThemes);
       setUsers(usersData.users);
       setDefaultUserName(defaultName ?? null);
 
-      const firstTheme = themesResp.themes[0];
+      const firstTheme = sortedThemes[0];
       let freshWhiskeys: Whiskey[] = [];
       if (firstTheme) {
         setSelectedThemeId(firstTheme.id);
@@ -224,15 +231,16 @@ export default function TastingScreen() {
             getDefaultUsername(),
           ]);
           if (!active) return;
-          setThemes(themesResp.themes);
+          const sortedThemes = sortThemesByRecent(themesResp.themes);
+          setThemes(sortedThemes);
           setUsers(usersData.users);
           setDefaultUserName(defaultName ?? null);
 
           const cur = selectedThemeIdRef.current;
-          if (cur != null && !themesResp.themes.some((t) => t.id === cur)) {
+          if (cur != null && !sortedThemes.some((t) => t.id === cur)) {
             // The selected theme was deleted elsewhere — fall back to the
-            // first theme and return to the selection screen.
-            const first = themesResp.themes[0] ?? null;
+            // most recent remaining theme and return to the selection screen.
+            const first = sortedThemes[0] ?? null;
             setSelectedThemeId(first ? first.id : null);
             setUserSelected(false);
             if (first) loadWhiskeys(first.id);
