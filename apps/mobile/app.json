@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Whiskey Tasting",
+    "slug": "whiskey-tasting",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "whiskey-tasting",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F0F0E8"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.whiskeytasting.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#151515",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "package": "com.whiskeytasting.app",
+      "usesCleartextTraffic": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "adcc8b42-9106-4b65-a11f-b3eb4d419221"
+      }
+    },
+    "owner": "reasel"
+  }
+}

@@ -76,6 +76,7 @@ WORKDIR /app
 # ============================================
 COPY apps/backend/pyproject.toml /app/backend/
 COPY apps/backend/app /app/backend/app
+COPY apps/backend/scripts /app/backend/scripts
 
 WORKDIR /app/backend
 
