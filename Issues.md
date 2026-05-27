@@ -31,13 +31,15 @@ Tracking list of issues reported from user feedback. We'll work through these in
 - The user list should reflect actual known users in the system, not a hardcoded subset of 5.
 
 **Acceptance criteria:**
-- [ ] Newly created themes show zero submissions until a real user submits.
-- [ ] Identify and remove any seed/demo data being injected into new themes.
-- [ ] Audit the user list source — confirm where the 5-user list comes from and replace with the full known-users list.
+- [x] Newly created themes show zero submissions until a real user submits.
+- [x] Identify and remove any seed/demo data being injected into new themes.
+- [x] Audit the user list source — confirm where the 5-user list comes from and replace with the full known-users list.
 
 **Notes / open questions:**
 - Is this seed data coming from `BackfillData.csv`, a backend fixture, or a mobile-side mock?
 - Need to enumerate full canonical user list (more than 5 people exist).
+
+**Status:** Resolved on branch `claude/plan-mobile-apps-QG3gd`. Root cause was *not* seed/demo data — `BackfillData.csv` exists at the repo root but is never loaded, and `GET /users` has always returned the full known-users list. The bug was orphan tasting rows being re-adopted by newly-created whiskeys: `delete_whiskeys_by_theme` removed the whiskey but never the associated tastings (despite a misleading comment in `delete_theme` claiming it cascaded), and TinyDB recycles whiskey `doc_id`s after container restart when the deleted doc held the high-water mark. New whiskeys assigned a recycled id silently inherited those orphans as "scores." Fix has two parts: (a) `delete_whiskeys_by_theme` now cascade-deletes tastings (with regression tests on both that path and the public `delete_theme` wrapper), and (b) a one-shot CLI script `apps/backend/scripts/cleanup_orphan_tastings.py` classifies and (with `--apply`) removes existing orphan + stale tasting rows. Staging cleanup is gated on an operator-run runbook at `apps/backend/scripts/CLEANUP_RUNBOOK.md`; until it runs against the live `database.json`, the 50 polluted rows remain (cleanup verified against a copy of the staging DB: 26 orphan + 24 stale removed, 2 preserved real submissions kept, 24 clean tastings untouched).
 
 ---
 
