@@ -68,9 +68,6 @@ export default function TastingScreen() {
     visible: boolean;
   }>({ message: '', type: 'info', visible: false });
 
-  const selectedTheme =
-    themes.find((t) => t.id === selectedThemeId) ?? null;
-
   const initScores = useCallback((whiskeysData: Whiskey[]) => {
     const initial: Record<number, WhiskeyScores> = {};
     whiskeysData.forEach((w, i) => {
@@ -474,7 +471,12 @@ export default function TastingScreen() {
         }
       >
         <View style={styles.themeHeader}>
-          <AppText variant="sectionTitle">{selectedTheme?.name ?? ''}</AppText>
+          <Dropdown
+            label="THEME"
+            value={selectedThemeId}
+            options={themeOptions}
+            onChange={handleThemeChange}
+          />
           <AppText variant="tableCell" style={styles.userLabel}>
             Tasting as: {userName}
           </AppText>
