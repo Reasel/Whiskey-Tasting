@@ -4,6 +4,7 @@ import { DEFAULT_SERVER_URL } from './config';
 const KEYS = {
   SERVER_URL: 'server_url',
   USERNAME: 'last_username',
+  DEFAULT_USERNAME: 'default_username',
 } as const;
 
 export async function getServerUrl(): Promise<string> {
@@ -21,4 +22,16 @@ export async function getLastUsername(): Promise<string | null> {
 
 export async function setLastUsername(name: string): Promise<void> {
   await AsyncStorage.setItem(KEYS.USERNAME, name);
+}
+
+export async function getDefaultUsername(): Promise<string | null> {
+  return AsyncStorage.getItem(KEYS.DEFAULT_USERNAME);
+}
+
+export async function setDefaultUsername(name: string): Promise<void> {
+  await AsyncStorage.setItem(KEYS.DEFAULT_USERNAME, name);
+}
+
+export async function clearDefaultUsername(): Promise<void> {
+  await AsyncStorage.removeItem(KEYS.DEFAULT_USERNAME);
 }
