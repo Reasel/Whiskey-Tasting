@@ -55,6 +55,7 @@ export default function TastingScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [userSelected, setUserSelected] = useState(false);
+  const [defaultUserName, setDefaultUserName] = useState<string | null>(null);
   const [toast, setToast] = useState<{
     message: string;
     type: 'success' | 'error' | 'info';
@@ -140,6 +141,7 @@ export default function TastingScreen() {
       ]);
       setThemes(themesResp.themes);
       setUsers(usersData.users);
+      setDefaultUserName(defaultName ?? null);
 
       const firstTheme = themesResp.themes[0];
       if (firstTheme) {
@@ -210,6 +212,7 @@ export default function TastingScreen() {
           if (!active) return;
           setThemes(themesResp.themes);
           setUsers(usersData.users);
+          setDefaultUserName(defaultName ?? null);
 
           const cur = selectedThemeIdRef.current;
           if (cur != null && !themesResp.themes.some((t) => t.id === cur)) {
@@ -372,26 +375,37 @@ export default function TastingScreen() {
             Select your name or enter a new one. You can submit for others too.
           </AppText>
 
-          {users.map((u) => (
-            <Card
-              key={u.id}
-              onPress={loadingWhiskeys ? undefined : () => handleSelectUser(u.name)}
-              style={[
-                styles.userCard,
-                userName === u.name && styles.userCardActive,
-              ]}
-            >
-              <AppText
-                variant="body"
+          {users.map((u) => {
+            const isDefault = defaultUserName != null && u.name === defaultUserName;
+            return (
+              <Card
+                key={u.id}
+                onPress={loadingWhiskeys ? undefined : () => handleSelectUser(u.name)}
                 style={[
-                  styles.userName,
-                  userName === u.name && styles.userNameActive,
+                  styles.userCard,
+                  userName === u.name && styles.userCardActive,
+                  isDefault && styles.userCardDefault,
                 ]}
               >
-                {u.name}
-              </AppText>
-            </Card>
-          ))}
+                <View style={styles.userCardRow}>
+                  <AppText
+                    variant="body"
+                    style={[
+                      styles.userName,
+                      userName === u.name && styles.userNameActive,
+                    ]}
+                  >
+                    {u.name}
+                  </AppText>
+                  {isDefault && (
+                    <AppText variant="fieldLabel" style={styles.defaultBadge}>
+                      DEFAULT
+                    </AppText>
+                  )}
+                </View>
+              </Card>
+            );
+          })}
 
           <View style={styles.divider} />
           <AppText variant="fieldLabel" style={styles.orLabel}>
@@ -546,6 +560,20 @@ const styles = StyleSheet.create({
   userCardActive: {
     borderColor: colors.whiskeyAmber,
     borderWidth: 2,
+  },
+  userCardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  userCardDefault: {
+    borderColor: colors.whiskeyAmber,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+  },
+  defaultBadge: {
+    color: colors.whiskeyAmber,
+    marginLeft: spacing.sm,
   },
   userName: {
     color: colors.inkBlack,
