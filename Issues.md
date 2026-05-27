@@ -57,3 +57,22 @@ Tracking list of issues reported from user feedback. We'll work through these in
 **Notes / open questions:**
 - Dropdown vs. button — which matches existing patterns better? (Lean toward matching the Switch User button for consistency.)
 - Does this apply to web only, mobile only, or both?
+
+---
+
+## Issue 4: Add a new user from the Default Submitter panel
+
+**Reported behavior:** Setting a default submitter in Settings only lets you choose from users that already exist on the server. There's no way to add a brand-new user from that panel.
+
+**Expected behavior:**
+- The Default Submitter panel in Settings should expose a way to enter a new user name (similar to the "OR ENTER A NEW NAME" input on the Taste tab selection phase).
+- Once entered, that new name should be created on the server (or at least usable as the default) and selectable as the default submitter going forward.
+
+**Acceptance criteria:**
+- [ ] Settings → Default Submitter panel includes a text input for a new user name.
+- [ ] Submitting a new name registers it as a user on the server (so it appears in the Taste tab picker too) and sets it as the default submitter.
+- [ ] Trimming + duplicate handling matches the existing user-pick behavior (trim whitespace, don't double-create an existing name).
+
+**Notes / open questions:**
+- Should the new user be created immediately, or only on the next tasting submission?
+- Should we share the same input affordance as the Taste tab picker for consistency?
