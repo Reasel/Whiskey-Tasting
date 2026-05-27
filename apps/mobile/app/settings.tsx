@@ -32,6 +32,7 @@ export default function SettingsScreen() {
   >('unknown');
 
   const [users, setUsers] = useState<User[]>([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
   const [usersError, setUsersError] = useState(false);
   const [defaultName, setDefaultNameState] = useState<string | null>(null);
 
@@ -45,12 +46,14 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     let active = true;
+    setUsersLoaded(false);
     (async () => {
       try {
         const data = await fetchUsers();
         if (!active) return;
         setUsers(data.users);
         setUsersError(false);
+        setUsersLoaded(true);
       } catch {
         if (!active) return;
         setUsersError(true);
@@ -103,7 +106,7 @@ export default function SettingsScreen() {
   const hasChanges = url !== savedUrl;
 
   const defaultStillExists =
-    defaultName == null || users.some((u) => u.name === defaultName);
+    defaultName == null || !usersLoaded || users.some((u) => u.name === defaultName);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -199,7 +202,7 @@ export default function SettingsScreen() {
             <AppText variant="body" style={styles.subtleText}>
               Could not load users. Check the server connection and try again.
             </AppText>
-          ) : users.length === 0 ? (
+          ) : !usersLoaded ? null : users.length === 0 ? (
             <AppText variant="body" style={styles.subtleText}>
               Submit a tasting once, then you can set yourself as default here.
             </AppText>
