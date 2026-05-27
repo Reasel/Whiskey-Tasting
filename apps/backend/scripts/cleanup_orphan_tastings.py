@@ -45,10 +45,17 @@ def classify(db: Database):
         if w is None:
             orphan.append(annotated)
         elif t["created_at"] >= w["created_at"]:
+            # `>=` rather than `>`: a tasting whose created_at exactly
+            # matches the whiskey's was born alongside the whiskey, so
+            # treat it as clean (cannot be inherited from a prior whiskey).
             clean.append(annotated)
         elif t["updated_at"] < w["created_at"]:
             stale.append(annotated)
         else:
+            # tasting.updated_at >= whiskey.created_at: row may have
+            # started as id-reuse contamination but has since been
+            # overwritten by create_or_update_tasting, so values reflect
+            # real scoring intent.
             preserved.append(annotated)
     return orphan, stale, preserved, clean
 
@@ -56,15 +63,15 @@ def classify(db: Database):
 def format_row(t: dict, users_by_id: dict, *, include_whiskey_created: bool) -> str:
     uname = users_by_id.get(t["user_id"], {}).get("name", f"id={t['user_id']}")
     w = t["whiskey"]
-    wname = repr(w["name"]) if w else "(deleted)"
+    wname = repr(w.get("name", f"id={w.get('id', '?')}")) if w else "(deleted)"
     line = (
         f"  tasting #{t['id']:3d}  user={uname:<8s}  whiskey_id={t['whiskey_id']:<3d}"
         f"  {wname}\n"
-        f"                created={t['created_at']}"
+        f"                created={t.get('created_at', '?')}"
     )
     if include_whiskey_created and w is not None:
-        line += f"  whiskey.created={w['created_at']}"
-    line += f"  updated={t['updated_at']}"
+        line += f"  whiskey.created={w.get('created_at', '?')}"
+    line += f"  updated={t.get('updated_at', '?')}"
     return line
 
 
@@ -84,6 +91,7 @@ def report(orphan, stale, preserved, clean, users_by_id, *, applied: bool) -> No
         print(format_row(t, users_by_id, include_whiskey_created=True))
     print()
 
+    # Clean rows are unaffected and uninteresting — only print the count.
     print(f"Clean tastings (created after their whiskey): {len(clean)}")
     print()
 
@@ -115,10 +123,9 @@ def main(argv: list[str] | None = None) -> int:
         users_by_id = {u["id"]: u for u in db.users.all()}
 
         if args.apply:
-            doc_ids = [t.doc_id for t in db.tastings.all() if t["whiskey_id"] in
-                       {x["whiskey_id"] for x in (orphan + stale)}
-                       and t["id"] in {x["id"] for x in (orphan + stale)}]
-            db.tastings.remove(doc_ids=doc_ids)
+            ids_to_delete = [t["id"] for t in orphan + stale]
+            if ids_to_delete:
+                db.tastings.remove(doc_ids=ids_to_delete)
 
         report(orphan, stale, preserved, clean, users_by_id, applied=args.apply)
     finally:
