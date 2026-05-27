@@ -32,6 +32,24 @@ the full root-cause analysis.
 - The volume `whiskey-data` is mounted at `/app/backend/data` inside the
   container, with `database.json` at that path.
 
+## Identify the actual volume name
+
+Docker Compose prefixes named volumes with the project name. On this host
+the volume is most likely `whiskey-tasting_whiskey-data`, but verify before
+proceeding:
+
+```bash
+docker volume ls | grep whiskey
+```
+
+Note the exact volume name returned (e.g. `whiskey-tasting_whiskey-data`).
+You will substitute this name in steps 4 and 5 below in place of
+`<VOLUME_NAME>`. If `docker volume ls` returns nothing, the volume does not
+exist under that name and you should stop and investigate before running
+anything else — a missing volume would cause `docker run -v <missing>:...`
+to silently create a new empty volume and the cleanup would "succeed"
+against nothing.
+
 ## Procedure
 
 All commands run on the docker host.
@@ -71,6 +89,10 @@ Clean tastings (created after their whiskey): 24
 DRY RUN — pass --apply to delete the 50 rows listed under Orphan + Stale.
 ```
 
+The Preserved and Clean counts may differ from this example if real scoring
+activity has occurred since the spec was written; focus on Orphan + Stale
+totaling around 50.
+
 Read the listed rows. If any preserved row looks wrong, STOP and investigate
 before proceeding. If the orphan + stale numbers look way off from 50, STOP —
 either the DB has drifted significantly since the spec was written, or the
@@ -78,8 +100,11 @@ script is misbehaving.
 
 ### 3. Stop the container before applying
 
-`create_or_update_tasting` can be called by a live user mid-cleanup, which
-would interleave writes. Quiesce the app first.
+TinyDB's JSON storage does a full-file read and full-file write on every
+operation, with no advisory locking. If `create_or_update_tasting` is called
+by a live user mid-cleanup, the concurrent writes race at the OS level on
+`database.json` itself — last writer wins, so either the user's submission
+or the cleanup's deletes can be silently discarded. Quiesce the app first.
 
 ```bash
 docker stop whiskey-tasting
@@ -93,7 +118,7 @@ one-shot container with the same image and volume.
 
 ```bash
 docker run --rm \
-  -v whiskey-data:/app/backend/data \
+  -v <VOLUME_NAME>:/app/backend/data \
   -w /app/backend \
   reasel/whiskey-tasting:staging \
   python -m scripts.cleanup_orphan_tastings --apply
@@ -109,7 +134,7 @@ APPLIED — deleted 50 rows under Orphan + Stale.
 
 ```bash
 docker run --rm \
-  -v whiskey-data:/app/backend/data \
+  -v <VOLUME_NAME>:/app/backend/data \
   -w /app/backend \
   reasel/whiskey-tasting:staging \
   python -m scripts.cleanup_orphan_tastings
