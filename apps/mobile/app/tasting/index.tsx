@@ -81,12 +81,13 @@ export default function TastingScreen() {
   }, []);
 
   const loadWhiskeys = useCallback(
-    async (themeId: number) => {
+    async (themeId: number): Promise<Whiskey[]> => {
       setLoadingWhiskeys(true);
       try {
         const whiskeysData = await fetchWhiskeysByTheme(themeId);
         setWhiskeys(whiskeysData);
         initScores(whiskeysData);
+        return whiskeysData;
       } catch {
         setWhiskeys([]);
         setToast({
@@ -94,6 +95,7 @@ export default function TastingScreen() {
           type: 'error',
           visible: true,
         });
+        return [];
       } finally {
         setLoadingWhiskeys(false);
       }
@@ -101,12 +103,16 @@ export default function TastingScreen() {
     [initScores],
   );
 
+  // Takes the whiskey list as a parameter rather than closing over `whiskeys`
+  // state. Closing would make this callback's identity churn on every refetch,
+  // which cascades into loadData and the focus effect re-running and
+  // re-triggering loadWhiskeys — an infinite loop.
   const loadExistingScores = useCallback(
-    async (name: string, themeId: number) => {
+    async (name: string, themeId: number, whiskeysList: Whiskey[]) => {
       try {
         const data = await fetchUserTastingsForTheme(name, themeId);
         const loaded: Record<number, WhiskeyScores> = {};
-        whiskeys.forEach((w, i) => {
+        whiskeysList.forEach((w, i) => {
           if (w.id == null) return;
           const existing = data.tastings[w.id];
           loaded[w.id] = existing
@@ -125,10 +131,10 @@ export default function TastingScreen() {
         });
         setScores(loaded);
       } catch {
-        initScores(whiskeys);
+        initScores(whiskeysList);
       }
     },
-    [whiskeys, initScores],
+    [initScores],
   );
 
   const loadData = useCallback(async () => {
@@ -144,9 +150,10 @@ export default function TastingScreen() {
       setDefaultUserName(defaultName ?? null);
 
       const firstTheme = themesResp.themes[0];
+      let freshWhiskeys: Whiskey[] = [];
       if (firstTheme) {
         setSelectedThemeId(firstTheme.id);
-        await loadWhiskeys(firstTheme.id);
+        freshWhiskeys = await loadWhiskeys(firstTheme.id);
       }
 
       // Resolve initial submitter: explicit default wins; otherwise last
@@ -158,7 +165,7 @@ export default function TastingScreen() {
         const stillExists = usersData.users.some((u) => u.name === resolved);
         if (stillExists && firstTheme) {
           setUserSelected(true);
-          await loadExistingScores(resolved, firstTheme.id);
+          await loadExistingScores(resolved, firstTheme.id, freshWhiskeys);
         }
       }
     } catch {
@@ -188,6 +195,13 @@ export default function TastingScreen() {
   useEffect(() => {
     userSelectedRef.current = userSelected;
   }, [userSelected]);
+
+  // Held in a ref so callbacks reading the current whiskeys (focus effect,
+  // handleSelectUser) don't have to subscribe to whiskeys via dep arrays.
+  const whiskeysRef = useRef<Whiskey[]>([]);
+  useEffect(() => {
+    whiskeysRef.current = whiskeys;
+  }, [whiskeys]);
 
   // Refresh the theme/user lists whenever the tab regains focus so themes
   // created in Admin show up here. The first focus is the initial mount,
@@ -232,7 +246,7 @@ export default function TastingScreen() {
             if (stillExists && cur != null) {
               setUserName(defaultName);
               setUserSelected(true);
-              await loadExistingScores(defaultName, cur);
+              await loadExistingScores(defaultName, cur, whiskeysRef.current);
             }
           }
         } catch {
@@ -246,14 +260,14 @@ export default function TastingScreen() {
   );
 
   const handleThemeChange = useCallback(
-    (value: number | string) => {
+    async (value: number | string) => {
       const themeId = Number(value);
       setSelectedThemeId(themeId);
-      loadWhiskeys(themeId);
+      const freshWhiskeys = await loadWhiskeys(themeId);
       if (userSelectedRef.current && userName.trim()) {
         // Preserve the current submitter across theme switches; refresh
         // their existing scores for the new theme.
-        loadExistingScores(userName.trim(), themeId);
+        await loadExistingScores(userName.trim(), themeId, freshWhiskeys);
       }
     },
     [loadWhiskeys, loadExistingScores, userName],
@@ -266,7 +280,7 @@ export default function TastingScreen() {
       setUserSelected(true);
       await setLastUsername(name);
       if (selectedThemeId != null) {
-        await loadExistingScores(name, selectedThemeId);
+        await loadExistingScores(name, selectedThemeId, whiskeysRef.current);
       }
     },
     [selectedThemeId, loadExistingScores, loadingWhiskeys],
