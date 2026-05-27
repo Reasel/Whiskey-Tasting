@@ -50,13 +50,15 @@ Tracking list of issues reported from user feedback. We'll work through these in
 - The Taste tab should expose a theme switcher — either a dropdown at the top, or a "Switch Theme" button similar to the existing "Switch User" button.
 
 **Acceptance criteria:**
-- [ ] Theme switcher is visible on the Taste tab.
-- [ ] Default selection is the most recently created theme.
-- [ ] Switching themes from the Taste tab updates the whiskey list / submission target accordingly.
+- [x] Theme switcher is visible on the Taste tab.
+- [x] Default selection is the most recently created theme.
+- [x] Switching themes from the Taste tab updates the whiskey list / submission target accordingly.
 
 **Notes / open questions:**
 - Dropdown vs. button — which matches existing patterns better? (Lean toward matching the Switch User button for consistency.)
 - Does this apply to web only, mobile only, or both?
+
+**Status:** Resolved on branch `claude/plan-mobile-apps-QG3gd`. Mobile only — web frontend out of scope (matches Issue 1 scope). Themes are sorted client-side by `created_at` desc; the new scoring-phase Dropdown reuses the existing `handleThemeChange` callback, so switching themes mid-tasting refetches whiskeys and the active user's existing scores. Verified on-device: default user lands in the scoring view on the most recent theme; the dropdown switches themes without leaving the scoring view; both phases list themes recent-first.
 
 ---
 
