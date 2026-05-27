@@ -339,6 +339,7 @@ class TestDatabaseTastings:
         test_db.delete_theme(theme["id"])
 
         assert test_db.tastings.all() == []
+        assert test_db.whiskeys.all() == []
 
 
 class TestDatabaseStats:
