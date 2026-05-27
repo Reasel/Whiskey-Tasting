@@ -291,6 +291,55 @@ class TestDatabaseTastings:
         tastings = test_db.get_user_tastings_for_theme(user["id"], theme["id"])
         assert len(tastings) == 3
 
+    def test_delete_whiskeys_by_theme_cascades_to_tastings(self, test_db):
+        """Deleting whiskeys for a theme must also delete their tastings.
+
+        Otherwise orphan tastings persist, and if TinyDB later recycles the
+        whiskey doc_id (which it does after process restart when the deleted
+        doc held the high-water mark), the orphan rows will appear as scores
+        for the new whiskey.
+        """
+        theme = test_db.create_theme("Test Theme", "")
+        user = test_db.get_or_create_user("Alice")
+        whiskey = test_db.create_whiskey(theme["id"], "Test Whiskey", 45.0)
+        test_db.create_or_update_tasting(
+            user_id=user["id"],
+            whiskey_id=whiskey["id"],
+            aroma_score=4.0,
+            flavor_score=4.0,
+            finish_score=4.0,
+            personal_rank=1,
+        )
+
+        assert len(test_db.get_tastings_by_theme(theme["id"])) == 1
+
+        test_db.delete_whiskeys_by_theme(theme["id"])
+
+        # The whiskey is gone, so get_tastings_by_theme returns []. Verify
+        # the row is also gone from the underlying tastings table directly,
+        # since that is the orphan we care about.
+        assert test_db.tastings.all() == []
+
+    def test_delete_theme_cascades_to_tastings(self, test_db):
+        """The public delete_theme path must cascade tastings via
+        delete_whiskeys_by_theme. Guards against future regressions if
+        delete_theme is ever refactored to bypass that helper."""
+        theme = test_db.create_theme("Test Theme", "")
+        user = test_db.get_or_create_user("Alice")
+        whiskey = test_db.create_whiskey(theme["id"], "Test Whiskey", 45.0)
+        test_db.create_or_update_tasting(
+            user_id=user["id"],
+            whiskey_id=whiskey["id"],
+            aroma_score=4.0,
+            flavor_score=4.0,
+            finish_score=4.0,
+            personal_rank=1,
+        )
+
+        test_db.delete_theme(theme["id"])
+
+        assert test_db.tastings.all() == []
+
 
 class TestDatabaseStats:
     """Test database statistics."""

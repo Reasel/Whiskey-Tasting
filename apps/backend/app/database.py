@@ -184,8 +184,19 @@ class Database:
         return self.get_whiskey(whiskey_id)
 
     def delete_whiskeys_by_theme(self, theme_id: int) -> int:
-        """Delete all whiskeys for a theme."""
+        """Delete all whiskeys for a theme and their associated tastings.
+
+        Tastings must be cascaded because TinyDB recycles whiskey doc_ids
+        after process restart (when the deleted whiskey held the high-water
+        mark), and any orphan tasting whose whiskey_id matches the recycled
+        id would silently re-attach to the new whiskey as a phantom score.
+        """
         Whiskey = Query()
+        whiskeys_to_delete = self.whiskeys.search(Whiskey.theme_id == theme_id)
+        whiskey_ids = [w["id"] for w in whiskeys_to_delete]
+        if whiskey_ids:
+            Tasting = Query()
+            self.tastings.remove(Tasting.whiskey_id.one_of(whiskey_ids))
         removed = self.whiskeys.remove(Whiskey.theme_id == theme_id)
         return len(removed)
 
