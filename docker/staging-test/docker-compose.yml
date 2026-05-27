@@ -1,0 +1,39 @@
+# Local end-to-end test of the `reasel/whiskey-tasting:staging` image.
+#
+# Use this to validate the cleanup script + cascade fix against a copy of the
+# real staging DB *before* deploying to whiskey.mjelde.us. The compose stack
+# pulls the same image CI publishes, exposes ports 3010/8010 on this host's
+# LAN IP, and mounts ./data as the backend data directory so you can seed,
+# inspect, and reset the DB freely without touching production.
+#
+# See README.md in this directory for the full workflow.
+
+services:
+  whiskey-tasting-staging-test:
+    image: reasel/whiskey-tasting:staging
+    container_name: whiskey-tasting-staging-test
+    pull_policy: always
+    ports:
+      - "3010:3010"
+      - "8010:8010"
+    volumes:
+      # Bind mount, not a named volume — easier to seed/inspect/reset for
+      # testing. The container runs as uid 1000 (appuser); the host dir must
+      # be writable by uid 1000 (true by default on a single-user dev box).
+      - ./data:/app/backend/data
+    environment:
+      - NODE_ENV=production
+      - HOSTNAME=0.0.0.0
+      - HOST=${HOST:-192.168.1.2}
+      - PORT=3010
+      - NEXT_PUBLIC_API_URL=http://${HOST:-192.168.1.2}:8010
+      - CORS_ORIGINS_STR_ADDITIONAL=http://${HOST:-192.168.1.2}:3010
+      # ntfy disabled for local testing — we don't want to spam the real
+      # notification topic from a test instance.
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
