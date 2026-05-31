@@ -1,0 +1,3 @@
+# Local test data — never commit.
+data/
+database-pre-cleanup-*.json
