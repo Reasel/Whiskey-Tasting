@@ -80,3 +80,62 @@ export function leaderboard(theme: ThemeScoresResponse): RankedWhiskey[] {
   });
   return rows;
 }
+
+/**
+ * "Closest to the group." For each whiskey, the group per-dimension average
+ * is the mean of aroma/flavor/finish across that whiskey's scores[]. For
+ * each taster, meanAbsDeviation is the mean over every
+ * whiskey × {aroma, flavor, finish} they DID score of
+ * |tasterScore - groupAvg|. Whiskeys a taster did not score are skipped so
+ * partial participation is not penalized. Sorted ascending; rank 1 = lowest
+ * deviation. A stable sort keeps original taster order on ties.
+ */
+export function consensus(theme: ThemeScoresResponse): ConsensusEntry[] {
+  // Per-whiskey group dimension averages.
+  const groupAvgs = new Map<
+    number,
+    { aroma: number; flavor: number; finish: number }
+  >();
+  for (const w of theme.whiskeys) {
+    if (w.scores.length === 0) continue;
+    groupAvgs.set(w.whiskey_id, {
+      aroma: mean(w.scores.map((s) => s.aroma_score)),
+      flavor: mean(w.scores.map((s) => s.flavor_score)),
+      finish: mean(w.scores.map((s) => s.finish_score)),
+    });
+  }
+
+  // Accumulate absolute deviations per taster, in first-seen order.
+  const order: string[] = [];
+  const sums = new Map<string, { sum: number; count: number }>();
+  for (const w of theme.whiskeys) {
+    const g = groupAvgs.get(w.whiskey_id);
+    if (!g) continue;
+    for (const s of w.scores) {
+      if (!sums.has(s.user_name)) {
+        sums.set(s.user_name, { sum: 0, count: 0 });
+        order.push(s.user_name);
+      }
+      const acc = sums.get(s.user_name)!;
+      acc.sum +=
+        Math.abs(s.aroma_score - g.aroma) +
+        Math.abs(s.flavor_score - g.flavor) +
+        Math.abs(s.finish_score - g.finish);
+      acc.count += 3;
+    }
+  }
+
+  const entries: ConsensusEntry[] = order.map((user_name) => {
+    const acc = sums.get(user_name)!;
+    return {
+      user_name,
+      meanAbsDeviation: acc.count ? acc.sum / acc.count : 0,
+      rank: 0,
+    };
+  });
+  entries.sort((a, b) => a.meanAbsDeviation - b.meanAbsDeviation);
+  entries.forEach((e, i) => {
+    e.rank = i + 1;
+  });
+  return entries;
+}

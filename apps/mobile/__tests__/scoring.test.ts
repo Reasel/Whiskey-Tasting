@@ -99,3 +99,20 @@ describe('leaderboard', () => {
     expect(last.score).toBe(0);
   });
 });
+
+describe('consensus', () => {
+  it('computes mean-abs-deviation per taster, skipping unscored whiskeys', () => {
+    const c = consensus(theme);
+    const byName = Object.fromEntries(c.map((e) => [e.user_name, e]));
+    expect(byName['Ann'].meanAbsDeviation).toBeCloseTo(1.0, 5);
+    expect(byName['Bob'].meanAbsDeviation).toBeCloseTo(0.5, 5);
+    expect(byName['Cy'].meanAbsDeviation).toBeCloseTo(1.0, 5);
+    expect(byName['Dee'].meanAbsDeviation).toBeCloseTo(0.0, 5);
+  });
+
+  it('sorts ascending (closest first) and ranks 1..N', () => {
+    const c = consensus(theme);
+    expect(c.map((e) => e.user_name)).toEqual(['Dee', 'Bob', 'Ann', 'Cy']);
+    expect(c.map((e) => e.rank)).toEqual([1, 2, 3, 4]);
+  });
+});
