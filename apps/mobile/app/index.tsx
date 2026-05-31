@@ -8,17 +8,25 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing } from '../lib/theme';
+import { colors, spacing, typography } from '../lib/theme';
 import { AppText } from '../components/ui/AppText';
 import { Eyebrow } from '../components/ui/Eyebrow';
 import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { GridBackground } from '../components/ui/GridBackground';
-import { fetchSystemStatus, type SystemStatus } from '../lib/api';
+import { Panel } from '../components/ui/Panel';
+import { GlowBox } from '../components/ui/GlowBox';
+import { PulsingDot } from '../components/ui/PulsingDot';
+import { AfterDarkBackground } from '../components/ui/AfterDarkBackground';
+import {
+  fetchActiveTheme,
+  fetchThemeScores,
+  type Theme,
+} from '../lib/api';
+
+type Tonight = { theme: Theme; pours: number; tasters: number };
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [status, setStatus] = useState<SystemStatus | null>(null);
+  const [tonight, setTonight] = useState<Tonight | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,9 +34,22 @@ export default function HomeScreen() {
   const loadData = useCallback(async () => {
     try {
       setError(null);
-      const statusData = await fetchSystemStatus();
-      setStatus(statusData);
-    } catch (e) {
+      const active = await fetchActiveTheme();
+      if (!active) {
+        setTonight(null);
+        return;
+      }
+      const scores = await fetchThemeScores(active.id);
+      const tasterNames = new Set<string>();
+      scores.whiskeys.forEach((w) =>
+        w.scores.forEach((s) => tasterNames.add(s.user_name)),
+      );
+      setTonight({
+        theme: active,
+        pours: scores.whiskeys.length,
+        tasters: tasterNames.size,
+      });
+    } catch {
       setError('Could not connect to server. Check your settings.');
     } finally {
       setLoading(false);
@@ -48,9 +69,9 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <GridBackground />
+        <AfterDarkBackground />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
+          <ActivityIndicator size="large" color={colors.amber} />
         </View>
       </SafeAreaView>
     );
@@ -58,7 +79,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <GridBackground />
+      <AfterDarkBackground />
       <ScrollView
         contentContainerStyle={styles.content}
         bounces={false}
@@ -67,62 +88,48 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.whiskeyAmber}
+            tintColor={colors.amber}
           />
         }
       >
         <View style={styles.hero}>
-          <AppText variant="pageTitle">WHISKEY TASTING</AppText>
+          <GlowBox intensity="strong" style={styles.heroGlow}>
+            <AppText variant="pageTitle">WHISKEY TASTING</AppText>
+          </GlowBox>
           <Eyebrow style={styles.eyebrow}>HAVE A DRINK!</Eyebrow>
         </View>
 
         {error && (
-          <Card style={styles.errorCard}>
+          <Panel style={styles.errorPanel}>
             <AppText variant="body" style={styles.errorText}>{error}</AppText>
             <Button
-              title="Open Settings"
+              title="OPEN SETTINGS"
               variant="ghost"
               size="sm"
               onPress={() => router.push('/settings')}
             />
-          </Card>
+          </Panel>
         )}
 
-        {status && (
-          <View style={styles.stats}>
-            <View style={styles.statCell}>
-              <Card style={styles.statCard}>
-                <AppText variant="sectionTitle" style={styles.statValue}>
-                  {status.database_stats.total_themes}
-                </AppText>
-                <AppText variant="fieldLabel" style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Themes</AppText>
-              </Card>
+        {tonight ? (
+          <View style={styles.tonight}>
+            <View style={styles.tonightTop}>
+              <PulsingDot size={10} color={colors.amber} />
+              <AppText variant="eyebrow" style={styles.tonightEyebrow}>TONIGHT</AppText>
             </View>
-            <View style={styles.statCell}>
-              <Card style={styles.statCard}>
-                <AppText variant="sectionTitle" style={styles.statValue}>
-                  {status.database_stats.total_whiskeys}
-                </AppText>
-                <AppText variant="fieldLabel" style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Whiskeys</AppText>
-              </Card>
-            </View>
-            <View style={styles.statCell}>
-              <Card style={styles.statCard}>
-                <AppText variant="sectionTitle" style={styles.statValue}>
-                  {status.database_stats.total_tastings}
-                </AppText>
-                <AppText variant="fieldLabel" style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Tastings</AppText>
-              </Card>
-            </View>
-            <View style={styles.statCell}>
-              <Card style={styles.statCard}>
-                <AppText variant="sectionTitle" style={styles.statValue}>
-                  {status.database_stats.total_users}
-                </AppText>
-                <AppText variant="fieldLabel" style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Users</AppText>
-              </Card>
-            </View>
+            <AppText variant="cardTitle" numberOfLines={2} adjustsFontSizeToFit>
+              {tonight.theme.name}
+            </AppText>
+            <AppText variant="fieldLabel" style={styles.tonightMeta}>
+              {tonight.pours} POURS · {tonight.tasters} TASTERS IN
+            </AppText>
           </View>
+        ) : (
+          !error && (
+            <View style={styles.tonight}>
+              <AppText variant="bodyMuted">No active theme. Create one in Admin.</AppText>
+            </View>
+          )
         )}
 
         <View style={styles.actions}>
@@ -135,6 +142,7 @@ export default function HomeScreen() {
           <Button
             title="VIEW RESULTS"
             size="xl"
+            variant="outline"
             block
             onPress={() => router.push('/dashboard')}
           />
@@ -147,7 +155,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.canvasCream,
+    backgroundColor: colors.bg,
     position: 'relative',
   },
   centered: {
@@ -161,43 +169,45 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   hero: {
-    marginBottom: spacing.lg,
+    marginTop: spacing.xxl,
+    marginBottom: spacing.xl,
+  },
+  heroGlow: {
+    alignSelf: 'flex-start',
   },
   eyebrow: {
-    marginTop: spacing.sm,
+    marginTop: spacing.smd,
   },
-  errorCard: {
+  errorPanel: {
     marginBottom: spacing.lg,
-    borderColor: colors.alertRed,
+    borderColor: colors.red,
   },
   errorText: {
-    color: colors.alertRed,
+    color: colors.red,
     marginBottom: spacing.sm,
   },
-  stats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  tonight: {
+    backgroundColor: colors.panel,
+    borderWidth: 1,
+    borderColor: colors.line,
+    padding: spacing.lg,
     marginBottom: spacing.xl,
     gap: spacing.sm,
   },
-  statCell: {
-    flex: 1,
-  },
-  statCard: {
-    flex: 1,
+  tonightTop: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xs,
+    gap: spacing.sm,
   },
-  statValue: {
-    textAlign: 'center',
+  tonightEyebrow: {
+    color: colors.amber,
   },
-  statLabel: {
-    textAlign: 'center',
+  tonightMeta: {
+    color: colors.dim,
     marginTop: spacing.xs,
-    color: colors.mutedText,
   },
   actions: {
     gap: spacing.md,
+    marginTop: 'auto',
   },
 });

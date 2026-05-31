@@ -76,6 +76,16 @@ export async function fetchAllThemesScores(): Promise<ThemeScoresResponse[]> {
   return response.json();
 }
 
+export async function fetchThemeScores(
+  themeId: number,
+): Promise<ThemeScoresResponse> {
+  const response = await apiFetch(`/tastings/themes/${themeId}/scores`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch theme scores: ${response.statusText}`);
+  }
+  return response.json();
+}
+
 export async function submitTasting(
   request: SubmitTastingRequest,
 ): Promise<{ message: string }> {
