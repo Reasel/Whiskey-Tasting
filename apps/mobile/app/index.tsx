@@ -76,7 +76,7 @@ export default function HomeScreen() {
       >
         {/* Hero */}
         <View style={styles.hero}>
-          <AppText variant="pageTitle" style={styles.heroTitle}>WHISKEY{'\n'}TASTING</AppText>
+          <AppText variant="pageTitle" numberOfLines={2} style={styles.heroTitle}>WHISKEY{'\n'}TASTING</AppText>
           <AppText style={styles.heroEyebrow}>// HAVE A DRINK!</AppText>
         </View>
 
