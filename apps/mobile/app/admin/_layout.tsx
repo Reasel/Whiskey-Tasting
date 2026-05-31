@@ -12,6 +12,7 @@ import { Input } from '../../components/ui/Input';
 import { Panel } from '../../components/ui/Panel';
 import { AppText } from '../../components/ui/AppText';
 import { Eyebrow } from '../../components/ui/Eyebrow';
+import { AfterDarkBackground } from '../../components/ui/AfterDarkBackground';
 
 const ADMIN_PASSWORD = 'admin';
 
@@ -31,6 +32,7 @@ export default function AdminLayout() {
   if (!authenticated) {
     return (
       <SafeAreaView style={styles.container}>
+        <AfterDarkBackground />
         <View style={styles.loginContainer}>
           <Panel style={{ maxWidth: 420, alignSelf: 'center', width: '100%' }}>
             <AppText variant="pageTitle" style={styles.title}>ADMINISTRATION</AppText>
@@ -54,13 +56,12 @@ export default function AdminLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: colors.canvasCream },
+        contentStyle: { backgroundColor: colors.bg },
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="themes" options={{ headerShown: false }} />
       <Stack.Screen name="users" options={{ headerShown: false }} />
-      <Stack.Screen name="data" options={{ headerShown: false }} />
     </Stack>
   );
 }
@@ -68,7 +69,7 @@ export default function AdminLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.canvasCream,
+    backgroundColor: colors.bg,
   },
   loginContainer: {
     flex: 1,
