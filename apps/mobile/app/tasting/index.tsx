@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -606,12 +607,17 @@ export default function TastingScreen() {
 
         <View style={styles.submitBar}>
           <View style={styles.progressTrack}>
-            <View
-              style={[
-                styles.progressFill,
-                { width: `${Math.round(progress * 100)}%` },
-              ]}
-            />
+            <View style={[styles.progressFillWrap, { width: `${Math.round(progress * 100)}%` }]}>
+              <Svg width="100%" height="6">
+                <Defs>
+                  <LinearGradient id="pgGrad" x1="0" y1="0" x2="1" y2="0">
+                    <Stop offset="0" stopColor={colors.ember} />
+                    <Stop offset="1" stopColor={colors.amber} />
+                  </LinearGradient>
+                </Defs>
+                <Rect x="0" y="0" width="100%" height="6" fill="url(#pgGrad)" />
+              </Svg>
+            </View>
           </View>
           <AppText variant="fieldLabel" style={styles.progressLabel}>
             {filledFields} / {totalFields} FIELDS
@@ -740,12 +746,18 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 6,
-    backgroundColor: colors.line,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderWidth: 1,
+    borderColor: colors.line,
     overflow: 'hidden',
   },
-  progressFill: {
+  progressFillWrap: {
     height: 6,
-    backgroundColor: colors.amber,
+    shadowColor: colors.amber,
+    shadowRadius: 8,
+    shadowOpacity: 0.7,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 4,
   },
   progressLabel: {
     color: colors.dim,
