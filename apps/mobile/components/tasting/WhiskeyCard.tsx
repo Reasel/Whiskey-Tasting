@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { colors, spacing } from '../../lib/theme';
+import { colors, spacing, fonts } from '../../lib/theme';
 import { AppText } from '../ui/AppText';
 import { TactileRating } from '../ui/TactileRating';
 import { RankPills } from '../ui/RankPills';
@@ -44,34 +44,28 @@ export function WhiskeyCard({
         </View>
       </View>
 
-      <View style={styles.field}>
-        <AppText variant="fieldLabel" style={styles.label}>AROMA</AppText>
-        <TactileRating
-          value={scores.aroma_score}
-          onChange={(v) => onScoreChange('aroma_score', v)}
-        />
-      </View>
-      <View style={styles.field}>
-        <AppText variant="fieldLabel" style={styles.label}>FLAVOR</AppText>
-        <TactileRating
-          value={scores.flavor_score}
-          onChange={(v) => onScoreChange('flavor_score', v)}
-        />
-      </View>
-      <View style={styles.field}>
-        <AppText variant="fieldLabel" style={styles.label}>FINISH</AppText>
-        <TactileRating
-          value={scores.finish_score}
-          onChange={(v) => onScoreChange('finish_score', v)}
-        />
-      </View>
-      <View style={styles.field}>
-        <AppText variant="fieldLabel" style={styles.label}>PERSONAL RANK</AppText>
-        <RankPills
-          value={scores.personal_rank}
-          count={totalWhiskeys}
-          onChange={(v) => onScoreChange('personal_rank', v)}
-        />
+      {/* 2×2 score grid */}
+      <View style={styles.grid}>
+        <View style={styles.cell}>
+          <AppText variant="fieldLabel" style={styles.label}>AROMA</AppText>
+          <TactileRating value={scores.aroma_score} onChange={(v) => onScoreChange('aroma_score', v)} />
+        </View>
+        <View style={styles.cell}>
+          <AppText variant="fieldLabel" style={styles.label}>FLAVOR</AppText>
+          <TactileRating value={scores.flavor_score} onChange={(v) => onScoreChange('flavor_score', v)} />
+        </View>
+        <View style={styles.cell}>
+          <AppText variant="fieldLabel" style={styles.label}>FINISH</AppText>
+          <TactileRating value={scores.finish_score} onChange={(v) => onScoreChange('finish_score', v)} />
+        </View>
+        <View style={styles.cell}>
+          <AppText variant="fieldLabel" style={styles.label}>PERSONAL RANK</AppText>
+          <RankPills
+            value={scores.personal_rank}
+            count={totalWhiskeys}
+            onChange={(v) => onScoreChange('personal_rank', v)}
+          />
+        </View>
       </View>
     </View>
   );
@@ -82,30 +76,28 @@ const styles = StyleSheet.create({
     backgroundColor: colors.raise,
     borderWidth: 1,
     borderColor: colors.line,
-    padding: spacing.lg,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.md,
-    marginBottom: spacing.lg,
+    padding: spacing.lg,
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
   },
-  pourNo: {
-    color: colors.amber,
-    marginTop: 4,
+  pourNo: { color: colors.amber, marginTop: 4 },
+  headerText: { flex: 1 },
+  proof: { color: colors.muted, marginTop: 2 },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: spacing.lg,
+    gap: spacing.lg,
   },
-  headerText: {
-    flex: 1,
-  },
-  proof: {
-    color: colors.muted,
-    marginTop: 2,
-  },
-  field: {
-    marginBottom: spacing.lg,
+  cell: {
+    width: '47%',
     gap: spacing.sm,
   },
-  label: {
-    color: colors.dim,
-  },
+  label: { color: colors.dim },
 });
