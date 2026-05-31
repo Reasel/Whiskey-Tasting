@@ -13,6 +13,7 @@ import { AppText } from '../components/ui/AppText';
 import { Eyebrow } from '../components/ui/Eyebrow';
 import { Tabs } from '../components/ui/Tabs';
 import { AfterDarkBackground } from '../components/ui/AfterDarkBackground';
+import { ResultsReveal } from '../components/dashboard/ResultsReveal';
 import {
   fetchActiveTheme,
   fetchThemeScores,
@@ -111,7 +112,11 @@ export default function DashboardScreen() {
           ) : (
             <View style={styles.tabBody}>
               {tab === 'results' && (
-                <View>{/* 4b: The Results reveal */}</View>
+                <ResultsReveal
+                  revealKey={revealKey}
+                  activeTheme={activeTheme}
+                  scores={activeScores}
+                />
               )}
               {tab === 'all' && (
                 <View>{/* 4c: All Whiskeys table */}</View>
