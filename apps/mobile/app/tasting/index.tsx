@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
@@ -18,7 +18,8 @@ import { WhiskeyCard } from '../../components/tasting/WhiskeyCard';
 import { Toast } from '../../components/ui/Toast';
 import { AppText } from '../../components/ui/AppText';
 import { Eyebrow } from '../../components/ui/Eyebrow';
-import { Panel } from '../../components/ui/Panel';
+import { CustomTasterToggle } from '../../components/ui/CustomTasterToggle';
+import { CelebrateOverlay } from '../../components/ui/CelebrateOverlay';
 import {
   fetchThemes,
   fetchWhiskeysByTheme,
@@ -62,6 +63,13 @@ export default function TastingScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [userSelected, setUserSelected] = useState(false);
   const [defaultUserName, setDefaultUserName] = useState<string | null>(null);
+  const router = useRouter();
+  const [customTaster, setCustomTaster] = useState(false);
+  const [celebrate, setCelebrate] = useState<{
+    visible: boolean;
+    userName: string;
+    themeName: string;
+  }>({ visible: false, userName: '', themeName: '' });
   const [toast, setToast] = useState<{
     message: string;
     type: 'success' | 'error' | 'info';
@@ -298,26 +306,36 @@ export default function TastingScreen() {
     initScores(whiskeys);
   }, [userName, whiskeys, initScores, loadingWhiskeys]);
 
+  const clampRating = (n: number) => Math.min(5, Math.max(1, n));
+
   const handleSubmit = useCallback(async () => {
     if (!userName.trim() || selectedThemeId == null) return;
+
+    // Clamp aroma/flavor/finish to 1–5 before POST (backend doesn't validate).
+    // personal_rank is left as-is (RankPills already constrains it to 1..N).
+    const clamped: SubmitTastingRequest['whiskey_scores'] = {};
+    Object.entries(scores).forEach(([id, s]) => {
+      clamped[Number(id)] = {
+        aroma_score: clampRating(s.aroma_score),
+        flavor_score: clampRating(s.flavor_score),
+        finish_score: clampRating(s.finish_score),
+        personal_rank: s.personal_rank,
+      };
+    });
+
+    const submittedName = userName.trim();
+    const submittedTheme =
+      themes.find((t) => t.id === selectedThemeId)?.name ?? '';
 
     setSubmitting(true);
     try {
       const request: SubmitTastingRequest = {
-        user_name: userName.trim(),
-        whiskey_scores: scores,
+        user_name: submittedName,
+        whiskey_scores: clamped,
       };
       await submitTasting(request);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setToast({
-        message: 'Tasting submitted. Pick the next person.',
-        type: 'success',
-        visible: true,
-      });
-      // Proxy flow: return to a fresh person picker, keep the theme.
-      setUserSelected(false);
-      setUserName('');
-      initScores(whiskeys);
+      setCelebrate({ visible: true, userName: submittedName, themeName: submittedTheme });
     } catch {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setToast({
@@ -328,7 +346,17 @@ export default function TastingScreen() {
     } finally {
       setSubmitting(false);
     }
-  }, [userName, selectedThemeId, scores, whiskeys, initScores]);
+  }, [userName, selectedThemeId, scores, themes]);
+
+  // Dismiss the overlay and return to a fresh person picker (proxy flow),
+  // keeping the theme — mirrors the previous post-submit reset.
+  const resetAfterSubmit = useCallback(() => {
+    setCelebrate((c) => ({ ...c, visible: false }));
+    setUserSelected(false);
+    setUserName('');
+    setCustomTaster(false);
+    initScores(whiskeys);
+  }, [whiskeys, initScores]);
 
   const updateScore = useCallback(
     (whiskeyId: number, field: keyof WhiskeyScores, value: number) => {
@@ -343,11 +371,30 @@ export default function TastingScreen() {
     [],
   );
 
+  const scoreList = whiskeys
+    .map((w) => (w.id != null ? scores[w.id] : undefined))
+    .filter((s): s is WhiskeyScores => s != null);
+  const totalFields = scoreList.length * 4;
+  const filledFields = scoreList.reduce(
+    (acc, s) =>
+      acc +
+      (s.aroma_score > 0 ? 1 : 0) +
+      (s.flavor_score > 0 ? 1 : 0) +
+      (s.finish_score > 0 ? 1 : 0) +
+      (s.personal_rank > 0 ? 1 : 0),
+    0,
+  );
+  const progress = totalFields > 0 ? filledFields / totalFields : 0;
+  const canSubmit =
+    userName.trim().length > 0 &&
+    totalFields > 0 &&
+    filledFields === totalFields;
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
+          <ActivityIndicator size="large" color={colors.amber} />
         </View>
       </SafeAreaView>
     );
@@ -389,59 +436,71 @@ export default function TastingScreen() {
 
           <View style={styles.sectionHeader}>
             <AppText variant="fieldLabel">WHO ARE YOU?</AppText>
+            <CustomTasterToggle
+              custom={customTaster}
+              onToggle={() => {
+                setCustomTaster((c) => !c);
+                setUserName('');
+              }}
+            />
           </View>
-          <AppText variant="body" style={styles.sectionSubtitle}>
-            Select your name or enter a new one. You can submit for others too.
-          </AppText>
 
-          {users.map((u) => {
-            const isDefault = defaultUserName != null && u.name === defaultUserName;
-            return (
-              <Card
-                key={u.id}
-                onPress={loadingWhiskeys ? undefined : () => handleSelectUser(u.name)}
-                style={[
-                  styles.userCard,
-                  userName === u.name && styles.userCardActive,
-                  isDefault && styles.userCardDefault,
-                ]}
-              >
-                <View style={styles.userCardRow}>
-                  <AppText
-                    variant="body"
+          {customTaster ? (
+            <>
+              <AppText variant="bodyMuted" style={styles.sectionSubtitle}>
+                Type a name to submit as someone new.
+              </AppText>
+              <Input
+                value={userName}
+                onChangeText={setUserName}
+                placeholder="Type a name…"
+                autoCapitalize="words"
+              />
+              <Button
+                title="CONTINUE"
+                onPress={handleContinueAsNew}
+                disabled={!userName.trim() || loadingWhiskeys}
+                style={{ marginTop: spacing.md }}
+              />
+            </>
+          ) : (
+            <>
+              <AppText variant="bodyMuted" style={styles.sectionSubtitle}>
+                Tap your name. You can submit for others too.
+              </AppText>
+              {users.map((u) => {
+                const isDefault = defaultUserName != null && u.name === defaultUserName;
+                return (
+                  <Card
+                    key={u.id}
+                    onPress={loadingWhiskeys ? undefined : () => handleSelectUser(u.name)}
                     style={[
-                      styles.userName,
-                      userName === u.name && styles.userNameActive,
+                      styles.userCard,
+                      userName === u.name && styles.userCardActive,
+                      isDefault && styles.userCardDefault,
                     ]}
                   >
-                    {u.name}
-                  </AppText>
-                  {isDefault && (
-                    <AppText variant="fieldLabel" style={styles.defaultBadge}>
-                      DEFAULT
-                    </AppText>
-                  )}
-                </View>
-              </Card>
-            );
-          })}
-
-          <View style={styles.divider} />
-          <AppText variant="fieldLabel" style={styles.orLabel}>
-            OR ENTER A NEW NAME
-          </AppText>
-          <Input
-            value={userName}
-            onChangeText={setUserName}
-            placeholder="Your name..."
-            autoCapitalize="words"
-          />
-          <Button
-            title="CONTINUE"
-            onPress={handleContinueAsNew}
-            disabled={!userName.trim() || loadingWhiskeys}
-            style={{ marginTop: spacing.md }}
-          />
+                    <View style={styles.userCardRow}>
+                      <AppText
+                        variant="body"
+                        style={[
+                          styles.userName,
+                          userName === u.name && styles.userNameActive,
+                        ]}
+                      >
+                        {u.name}
+                      </AppText>
+                      {isDefault && (
+                        <AppText variant="fieldLabel" style={styles.defaultBadge}>
+                          DEFAULT
+                        </AppText>
+                      )}
+                    </View>
+                  </Card>
+                );
+              })}
+            </>
+          )}
         </ScrollView>
 
         <Toast
@@ -449,6 +508,20 @@ export default function TastingScreen() {
           type={toast.type}
           visible={toast.visible}
           onHide={() => setToast((t) => ({ ...t, visible: false }))}
+        />
+
+        <CelebrateOverlay
+          visible={celebrate.visible}
+          userName={celebrate.userName}
+          themeName={celebrate.themeName}
+          onSeeResults={() => {
+            resetAfterSubmit();
+            router.push('/dashboard');
+          }}
+          onHome={() => {
+            resetAfterSubmit();
+            router.push('/');
+          }}
         />
       </SafeAreaView>
     );
@@ -466,7 +539,7 @@ export default function TastingScreen() {
               setRefreshing(true);
               loadData();
             }}
-            tintColor={colors.whiskeyAmber}
+            tintColor={colors.amber}
           />
         }
       >
@@ -477,10 +550,10 @@ export default function TastingScreen() {
             options={themeOptions}
             onChange={handleThemeChange}
           />
-          <AppText variant="tableCell" style={styles.userLabel}>
-            Tasting as: {userName}
-          </AppText>
-          <View style={styles.changeUserWrap}>
+          <View style={styles.tastingAsRow}>
+            <AppText variant="tableCell" style={styles.userLabel}>
+              Tasting as: {userName}
+            </AppText>
             <Button
               title="CHANGE USER"
               variant="outline"
@@ -491,9 +564,16 @@ export default function TastingScreen() {
         </View>
 
         {loadingWhiskeys ? (
-          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
+          <ActivityIndicator size="large" color={colors.amber} />
         ) : (
-          <Panel title="Scores">
+          <View>
+            <View style={styles.scoresHeader}>
+              <Eyebrow>Scores</Eyebrow>
+              <AppText variant="bodyMuted" style={styles.scoresInstruction}>
+                Rate each pour 1–5 for aroma, flavor and finish, then set your
+                personal rank.
+              </AppText>
+            </View>
             <View style={styles.scoreList}>
               {whiskeys.map((whiskey, index) =>
                 whiskey.id != null ? (
@@ -518,17 +598,31 @@ export default function TastingScreen() {
                 ) : null,
               )}
             </View>
-          </Panel>
+          </View>
         )}
 
-        <Button
-          title="SUBMIT TASTING"
-          size="lg"
-          onPress={handleSubmit}
-          loading={submitting}
-          disabled={submitting || loadingWhiskeys}
-          style={styles.submitButton}
-        />
+        <View style={styles.submitBar}>
+          <View style={styles.progressTrack}>
+            <View
+              style={[
+                styles.progressFill,
+                { width: `${Math.round(progress * 100)}%` },
+              ]}
+            />
+          </View>
+          <AppText variant="fieldLabel" style={styles.progressLabel}>
+            {filledFields} / {totalFields} FIELDS
+          </AppText>
+          <Button
+            title="SUBMIT"
+            size="lg"
+            block
+            onPress={handleSubmit}
+            loading={submitting}
+            disabled={submitting || loadingWhiskeys || !canSubmit}
+            style={styles.submitButton}
+          />
+        </View>
       </ScrollView>
 
       <Toast
@@ -537,6 +631,20 @@ export default function TastingScreen() {
         visible={toast.visible}
         onHide={() => setToast((t) => ({ ...t, visible: false }))}
       />
+
+      <CelebrateOverlay
+        visible={celebrate.visible}
+        userName={celebrate.userName}
+        themeName={celebrate.themeName}
+        onSeeResults={() => {
+          resetAfterSubmit();
+          router.push('/dashboard');
+        }}
+        onHome={() => {
+          resetAfterSubmit();
+          router.push('/');
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -544,7 +652,7 @@ export default function TastingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.canvasCream,
+    backgroundColor: colors.bg,
   },
   centered: {
     flex: 1,
@@ -561,7 +669,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptyText: {
-    color: colors.steelGrey,
+    color: colors.muted,
     textAlign: 'center',
   },
   pageTitle: {
@@ -573,16 +681,18 @@ const styles = StyleSheet.create({
   sectionHeader: {
     marginTop: spacing.lg,
     marginBottom: spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   sectionSubtitle: {
-    color: colors.steelGrey,
     marginBottom: spacing.lg,
   },
   userCard: {
     marginBottom: spacing.sm,
   },
   userCardActive: {
-    borderColor: colors.whiskeyAmber,
+    borderColor: colors.amber,
     borderWidth: 2,
   },
   userCardRow: {
@@ -591,44 +701,61 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   userCardDefault: {
-    borderColor: colors.whiskeyAmber,
+    borderColor: colors.amber,
     borderStyle: 'dashed',
     borderWidth: 1,
   },
   defaultBadge: {
-    color: colors.whiskeyAmber,
+    color: colors.amber,
     marginLeft: spacing.sm,
   },
   userName: {
-    color: colors.inkBlack,
+    color: colors.cream,
   },
   userNameActive: {
-    color: colors.whiskeyAmber,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.inkBlack,
-    marginVertical: spacing.lg,
-  },
-  orLabel: {
-    marginBottom: spacing.md,
+    color: colors.amber,
   },
   themeHeader: {
     marginBottom: spacing.lg,
   },
+  tastingAsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+  },
   userLabel: {
-    color: colors.steelGrey,
-    marginTop: spacing.xs,
-    marginBottom: spacing.sm,
+    color: colors.dim,
   },
-  changeUserWrap: {
-    alignSelf: 'flex-start',
+  scoresHeader: {
+    marginBottom: spacing.md,
+    gap: spacing.xs,
   },
-  submitButton: {
-    marginTop: spacing.lg,
-    width: '100%',
+  scoresInstruction: {
+    color: colors.muted,
   },
   scoreList: {
     gap: spacing.md,
+  },
+  submitBar: {
+    marginTop: spacing.xl,
+    gap: spacing.sm,
+  },
+  progressTrack: {
+    height: 6,
+    backgroundColor: colors.line,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: 6,
+    backgroundColor: colors.amber,
+  },
+  progressLabel: {
+    color: colors.dim,
+    textAlign: 'right',
+  },
+  submitButton: {
+    width: '100%',
+    marginTop: spacing.xs,
   },
 });
