@@ -15,6 +15,7 @@ import { Tabs } from '../components/ui/Tabs';
 import { AfterDarkBackground } from '../components/ui/AfterDarkBackground';
 import { ResultsReveal } from '../components/dashboard/ResultsReveal';
 import { AllWhiskeysTable } from '../components/dashboard/AllWhiskeysTable';
+import { ByThemeView } from '../components/dashboard/ByThemeView';
 import {
   fetchActiveTheme,
   fetchThemeScores,
@@ -120,9 +121,7 @@ export default function DashboardScreen() {
                 />
               )}
               {tab === 'all' && <AllWhiskeysTable allScores={allScores} />}
-              {tab === 'theme' && (
-                <View>{/* 4d: By Theme accordion */}</View>
-              )}
+              {tab === 'theme' && <ByThemeView allScores={allScores} />}
               {tab === 'person' && (
                 <View>{/* 4e: By Person cards */}</View>
               )}
