@@ -5,12 +5,12 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "scheme": "whiskey-tasting",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F0F0E8"
+      "backgroundColor": "#15120c"
     },
     "ios": {
       "supportsTablet": true,
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#151515",
+        "backgroundColor": "#15120c",
         "foregroundImage": "./assets/android-icon-foreground.png"
       },
       "package": "com.whiskeytasting.app",
