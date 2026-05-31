@@ -5,7 +5,10 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
-import { Merriweather_700Bold } from '@expo-google-fonts/merriweather';
+import {
+  Fraunces_900Black,
+  Fraunces_600SemiBold,
+} from '@expo-google-fonts/fraunces';
 import {
   JetBrainsMono_400Regular,
   JetBrainsMono_500Medium,
@@ -13,7 +16,7 @@ import {
 } from '@expo-google-fonts/jetbrains-mono';
 import { Inter_400Regular } from '@expo-google-fonts/inter';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../lib/theme';
+import { colors, fonts } from '../lib/theme';
 import { AppText } from '../components/ui/AppText';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -24,9 +27,9 @@ function WTTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     <View
       style={{
         flexDirection: 'row',
-        backgroundColor: colors.canvasCream,
+        backgroundColor: colors.panel,
         borderTopWidth: 1,
-        borderTopColor: colors.inkBlack,
+        borderTopColor: colors.line,
         height: 52 + insets.bottom,
         paddingBottom: insets.bottom,
       }}
@@ -56,7 +59,7 @@ function WTTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
               flex: 1,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: focused ? colors.whiskeyAmber : 'transparent',
+              backgroundColor: focused ? colors.amber : 'transparent',
             }}
           >
             <AppText
@@ -64,13 +67,13 @@ function WTTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
               adjustsFontSizeToFit
               minimumFontScale={0.7}
               style={{
-                fontFamily: 'JetBrainsMono_700Bold',
+                fontFamily: fonts.monoBold,
                 fontSize: 10,
                 letterSpacing: 0.2,
                 textTransform: 'uppercase',
                 textAlign: 'center',
                 paddingHorizontal: 2,
-                color: focused ? colors.cardWhite : colors.steelGrey,
+                color: focused ? colors.bg : colors.dim,
               }}
             >
               {label}
@@ -84,7 +87,8 @@ function WTTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Merriweather_700Bold,
+    Fraunces_900Black,
+    Fraunces_600SemiBold,
     JetBrainsMono_400Regular,
     JetBrainsMono_500Medium,
     JetBrainsMono_700Bold,
@@ -96,12 +100,12 @@ export default function RootLayout() {
   }, []);
 
   if (!fontsLoaded && !fontError) {
-    return <View style={{ flex: 1, backgroundColor: colors.canvasCream }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
   }
 
   return (
-    <View style={{ flex: 1 }} onLayout={onReady}>
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: colors.bg }} onLayout={onReady}>
+      <StatusBar style="light" />
       <Tabs
         tabBar={(props) => <WTTabBar {...props} />}
         screenOptions={{ headerShown: false }}
