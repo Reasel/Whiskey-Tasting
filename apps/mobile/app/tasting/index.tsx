@@ -18,6 +18,7 @@ import { WhiskeyCard } from '../../components/tasting/WhiskeyCard';
 import { Toast } from '../../components/ui/Toast';
 import { AppText } from '../../components/ui/AppText';
 import { Eyebrow } from '../../components/ui/Eyebrow';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CustomTasterToggle } from '../../components/ui/CustomTasterToggle';
 import { CelebrateOverlay } from '../../components/ui/CelebrateOverlay';
 import {
@@ -422,10 +423,12 @@ export default function TastingScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
-          <AppText variant="pageTitle" style={styles.pageTitle}>
-            TASTING SUBMISSION
-          </AppText>
-          <Eyebrow style={styles.eyebrow}>SUBMIT OR EDIT TASTING SCORES</Eyebrow>
+          <ScreenHeader
+            title="TASTING SUBMISSION"
+            eyebrow="SUBMIT OR EDIT TASTING SCORES"
+            backLabel="HOME"
+            onBack={() => router.back()}
+          />
 
           <Dropdown
             label="THEME"
@@ -671,12 +674,6 @@ const styles = StyleSheet.create({
   emptyText: {
     color: colors.muted,
     textAlign: 'center',
-  },
-  pageTitle: {
-    marginBottom: spacing.xs,
-  },
-  eyebrow: {
-    marginBottom: spacing.lg,
   },
   sectionHeader: {
     marginTop: spacing.lg,

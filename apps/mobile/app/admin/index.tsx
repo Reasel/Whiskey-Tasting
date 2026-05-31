@@ -1,11 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing } from '../../lib/theme';
-import { Button } from '../../components/ui/Button';
+import { colors, spacing, fonts } from '../../lib/theme';
 import { AppText } from '../../components/ui/AppText';
-import { Eyebrow } from '../../components/ui/Eyebrow';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { AfterDarkBackground } from '../../components/ui/AfterDarkBackground';
 
 export default function AdminIndexScreen() {
@@ -15,35 +14,28 @@ export default function AdminIndexScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <AfterDarkBackground />
       <ScrollView contentContainerStyle={styles.content}>
-        <AppText variant="pageTitle" style={styles.title}>ADMINISTRATION</AppText>
-        <Eyebrow style={styles.subtitle}>MANAGE THEMES, USERS, AND SETTINGS</Eyebrow>
+        <ScreenHeader
+          title="ADMINISTRATION"
+          eyebrow="MANAGE THEMES, USERS, AND SETTINGS"
+        />
 
         <View style={styles.grid}>
-          <View style={styles.tile}>
-            <Button
-              title="MANAGE THEMES"
-              size="xl"
-              block
-              onPress={() => router.push('/admin/themes')}
-            />
-          </View>
-          <View style={styles.tile}>
-            <Button
-              title="MANAGE USERS"
-              size="xl"
-              block
-              onPress={() => router.push('/admin/users')}
-            />
-          </View>
-          <View style={styles.tileWide}>
-            <Button
-              title="VIEW RESULTS"
-              size="xl"
-              variant="outline"
-              block
-              onPress={() => router.push('/dashboard')}
-            />
-          </View>
+          <Pressable style={({ pressed }) => [styles.tile, pressed && styles.tilePressed]} onPress={() => router.push('/admin/themes')}>
+            <AppText style={styles.tileSub}>// ADJUST POURS</AppText>
+            <AppText style={styles.tileLabel}>Manage Themes</AppText>
+          </Pressable>
+          <Pressable style={({ pressed }) => [styles.tile, pressed && styles.tilePressed]} onPress={() => router.push('/admin/users')}>
+            <AppText style={styles.tileSub}>// NEW TASTER</AppText>
+            <AppText style={styles.tileLabel}>Manage Users</AppText>
+          </Pressable>
+          <Pressable style={({ pressed }) => [styles.tile, pressed && styles.tilePressed]} onPress={() => router.push('/dashboard')}>
+            <AppText style={styles.tileSub}>// SEE SCORES</AppText>
+            <AppText style={styles.tileLabel}>View Results</AppText>
+          </Pressable>
+          <Pressable style={({ pressed }) => [styles.tile, pressed && styles.tilePressed]} onPress={() => router.push('/settings')}>
+            <AppText style={styles.tileSub}>// SERVER · USERS</AppText>
+            <AppText style={styles.tileLabel}>Settings</AppText>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -51,30 +43,28 @@ export default function AdminIndexScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.bg,
-  },
-  content: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
-  title: {
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    marginBottom: spacing.xl,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-  },
+  container: { flex: 1, backgroundColor: colors.bg },
+  content: { padding: spacing.lg, paddingBottom: spacing.xxl },
+  grid: { gap: spacing.md },
   tile: {
-    width: '48%',
+    backgroundColor: colors.raise,
+    borderWidth: 1,
+    borderColor: colors.line,
+    padding: spacing.xl,
+    paddingBottom: spacing.lg,
+    minHeight: 100,
+    gap: spacing.xs,
   },
-  tileWide: {
-    width: '100%',
+  tilePressed: { borderColor: colors.amber },
+  tileSub: {
+    fontFamily: fonts.monoMedium,
+    fontSize: 11,
+    letterSpacing: 1.8,
+    color: colors.amber,
+  },
+  tileLabel: {
+    fontFamily: fonts.serifSemi,
+    fontSize: 22,
+    color: colors.cream,
   },
 });

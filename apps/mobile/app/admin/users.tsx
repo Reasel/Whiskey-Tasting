@@ -8,13 +8,14 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import { Toast } from '../../components/ui/Toast';
 import { AppText } from '../../components/ui/AppText';
-import { Eyebrow } from '../../components/ui/Eyebrow';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import {
   fetchUsers,
   createUser,
@@ -23,6 +24,7 @@ import {
 } from '../../lib/api';
 
 export default function UsersScreen() {
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -128,8 +130,12 @@ export default function UsersScreen() {
           />
         }
       >
-        <AppText variant="pageTitle" style={styles.title}>USERS</AppText>
-        <Eyebrow style={styles.eyebrow}>MANAGE TASTERS</Eyebrow>
+        <ScreenHeader
+          title="MANAGE USERS"
+          eyebrow="ADD OR REMOVE TASTERS"
+          backLabel="ADMIN"
+          onBack={() => router.back()}
+        />
 
         <Card style={styles.addCard}>
           <AppText variant="sectionTitle" style={styles.addTitle}>Add User</AppText>
@@ -193,12 +199,6 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
-  },
-  title: {
-    marginBottom: spacing.xs,
-  },
-  eyebrow: {
-    marginBottom: spacing.lg,
   },
   addCard: {
     marginBottom: spacing.xl,

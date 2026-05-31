@@ -7,10 +7,10 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { colors, spacing } from '../lib/theme';
 import { AppText } from '../components/ui/AppText';
-import { Eyebrow } from '../components/ui/Eyebrow';
+import { ScreenHeader } from '../components/ui/ScreenHeader';
 import { Tabs } from '../components/ui/Tabs';
 import { AfterDarkBackground } from '../components/ui/AfterDarkBackground';
 import { ResultsReveal } from '../components/dashboard/ResultsReveal';
@@ -35,6 +35,7 @@ const TAB_OPTIONS: { label: string; value: TabKey }[] = [
 ];
 
 export default function DashboardScreen() {
+  const router = useRouter();
   const [tab, setTab] = useState<TabKey>('results');
   const [activeTheme, setActiveTheme] = useState<Theme | null>(null);
   const [activeScores, setActiveScores] =
@@ -96,10 +97,12 @@ export default function DashboardScreen() {
             />
           }
         >
-          <AppText variant="pageTitle" style={styles.pageTitle}>
-            DATA VIEW
-          </AppText>
-          <Eyebrow style={styles.eyebrow}>THE TASTING, REVEALED</Eyebrow>
+          <ScreenHeader
+            title="DATA VIEW"
+            eyebrow="THE TASTING, REVEALED"
+            backLabel="HOME"
+            onBack={() => router.back()}
+          />
 
           <Tabs
             options={TAB_OPTIONS}
@@ -141,8 +144,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  pageTitle: { marginBottom: spacing.xs },
-  eyebrow: { marginBottom: spacing.lg },
   tabs: { marginBottom: spacing.lg },
   tabBody: { marginTop: spacing.sm },
   centered: {

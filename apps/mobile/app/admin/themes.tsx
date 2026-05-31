@@ -8,13 +8,14 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import { Toast } from '../../components/ui/Toast';
 import { AppText } from '../../components/ui/AppText';
-import { Eyebrow } from '../../components/ui/Eyebrow';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { Stepper } from '../../components/ui/Stepper';
 import {
   fetchThemes,
@@ -26,6 +27,7 @@ import {
 } from '../../lib/api';
 
 export default function ThemesScreen() {
+  const router = useRouter();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -175,8 +177,12 @@ export default function ThemesScreen() {
           />
         }
       >
-        <AppText variant="pageTitle" style={styles.title}>THEMES</AppText>
-        <Eyebrow style={styles.eyebrow}>MANAGE TASTING THEMES</Eyebrow>
+        <ScreenHeader
+          title="NEW THEME"
+          eyebrow="CREATE A NEW TASTING THEME"
+          backLabel="ADMIN"
+          onBack={() => router.back()}
+        />
 
         <Button
           title={showForm ? 'CANCEL' : 'CREATE NEW THEME'}
@@ -292,12 +298,6 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
-  },
-  title: {
-    marginBottom: spacing.xs,
-  },
-  eyebrow: {
-    marginBottom: spacing.lg,
   },
   createButton: {
     marginBottom: spacing.lg,
