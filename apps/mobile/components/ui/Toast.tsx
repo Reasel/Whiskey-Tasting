@@ -42,14 +42,14 @@ export function Toast({
   if (!visible) return null;
 
   // type is kept in the interface for API compatibility but visual style is
-  // now uniform (white box, black border) per design system.
+  // now uniform (dark panel, hairline border) per the After Dark design system.
   void type;
 
   return (
     <Animated.View style={[styles.positioner, { opacity }]}>
       <HardShadow offset="card">
         <View style={styles.container}>
-          <AppText variant="tableCell" style={{ color: colors.inkBlack }}>
+          <AppText variant="tableCell" style={{ color: colors.cream }}>
             {message}
           </AppText>
         </View>
@@ -66,9 +66,9 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   container: {
-    backgroundColor: colors.cardWhite,
+    backgroundColor: colors.panel,
     borderWidth: 1,
-    borderColor: colors.inkBlack,
+    borderColor: colors.line,
     borderRadius: 0,
     padding: spacing.md,
   },
