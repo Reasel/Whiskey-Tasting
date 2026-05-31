@@ -6,8 +6,8 @@ interface AppTextProps extends TextProps {
   variant?: TypoVariant;
 }
 
-/** The ONLY text component. `variant` selects a fixed type-triad preset
- *  so Merriweather/JetBrains Mono/Inter can never drift. The large
+/** The ONLY text component. `variant` selects a fixed After Dark preset
+ *  so Fraunces/JetBrains Mono/Inter can never drift. The large
  *  `pageTitle` auto-scales to a single line so long unbreakable titles
  *  (e.g. "ADMINISTRATION") never clip — RN's adjustsFontSizeToFit is
  *  only reliable on Android with numberOfLines={1}. Callers can still
