@@ -139,3 +139,24 @@ export function consensus(theme: ThemeScoresResponse): ConsensusEntry[] {
   });
   return entries;
 }
+
+/**
+ * Flatten every theme's scored whiskeys into rows for the All Whiskeys
+ * table. Whiskeys with no scores are excluded.
+ */
+export function allWhiskeys(all: ThemeScoresResponse[]): AllWhiskeyRow[] {
+  const rows: AllWhiskeyRow[] = [];
+  for (const theme of all) {
+    for (const w of theme.whiskeys) {
+      if (w.scores.length === 0) continue;
+      rows.push({
+        whiskey_name: w.whiskey_name,
+        theme_name: theme.theme.name,
+        proof: w.proof,
+        score: mean(w.scores.map((s) => s.average_score)),
+        tasters: w.scores.length,
+      });
+    }
+  }
+  return rows;
+}

@@ -116,3 +116,16 @@ describe('consensus', () => {
     expect(c.map((e) => e.rank)).toEqual([1, 2, 3, 4]);
   });
 });
+
+describe('allWhiskeys', () => {
+  it('flattens all themes, one row per scored whiskey, excludes unscored', () => {
+    const rows = allWhiskeys([theme, emptyTheme]);
+    expect(rows).toHaveLength(3); // emptyTheme's whiskey is excluded
+    const a = rows.find((r) => r.whiskey_name === 'Whiskey A')!;
+    expect(a.theme_name).toBe('Bourbon Night');
+    expect(a.proof).toBe(90);
+    expect(a.score).toBeCloseTo(4.0, 5);
+    expect(a.tasters).toBe(3);
+    expect(rows.some((r) => r.whiskey_name === 'No Scores')).toBe(false);
+  });
+});
