@@ -129,3 +129,30 @@ describe('allWhiskeys', () => {
     expect(rows.some((r) => r.whiskey_name === 'No Scores')).toBe(false);
   });
 });
+
+describe('byPerson', () => {
+  it('groups the active theme by taster with their own whiskey rows', () => {
+    const groups = byPerson(theme);
+    const names = groups.map((g) => g.user_name);
+    expect(names).toContain('Ann');
+    expect(names).toContain('Dee');
+
+    const ann = groups.find((g) => g.user_name === 'Ann')!;
+    expect(ann.rows.map((r) => r.whiskey_name)).toEqual([
+      'Whiskey A',
+      'Whiskey B',
+    ]);
+    const annA = ann.rows.find((r) => r.whiskey_name === 'Whiskey A')!;
+    expect(annA.aroma).toBe(5);
+    expect(annA.average).toBeCloseTo(5.0, 5);
+    // Ann's personal leaderboard: A (5) ahead of B (2).
+    expect(annA.rank).toBe(1);
+    const annB = ann.rows.find((r) => r.whiskey_name === 'Whiskey B')!;
+    expect(annB.rank).toBe(2);
+
+    const dee = groups.find((g) => g.user_name === 'Dee')!;
+    expect(dee.rows).toHaveLength(1);
+    expect(dee.rows[0].whiskey_name).toBe('Whiskey C');
+    expect(dee.rows[0].rank).toBe(1);
+  });
+});

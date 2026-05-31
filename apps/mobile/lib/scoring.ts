@@ -160,3 +160,40 @@ export function allWhiskeys(all: ThemeScoresResponse[]): AllWhiskeyRow[] {
   }
   return rows;
 }
+
+/**
+ * Group the active theme's scores by taster. Each taster's rows are their
+ * own whiskeys, ranked by that taster's average desc (their personal
+ * leaderboard, not personal_rank, which may be unset).
+ */
+export function byPerson(theme: ThemeScoresResponse): PersonGroup[] {
+  const order: string[] = [];
+  const map = new Map<string, PersonWhiskeyRow[]>();
+  for (const w of theme.whiskeys) {
+    for (const s of w.scores) {
+      if (!map.has(s.user_name)) {
+        map.set(s.user_name, []);
+        order.push(s.user_name);
+      }
+      map.get(s.user_name)!.push({
+        whiskey_name: w.whiskey_name,
+        proof: w.proof,
+        aroma: s.aroma_score,
+        flavor: s.flavor_score,
+        finish: s.finish_score,
+        average: s.average_score,
+        rank: 0,
+      });
+    }
+  }
+  return order.map((user_name) => {
+    const rows = map.get(user_name)!;
+    // Rank each taster's whiskeys by their own average desc.
+    [...rows]
+      .sort((a, b) => b.average - a.average)
+      .forEach((r, i) => {
+        r.rank = i + 1;
+      });
+    return { user_name, rows };
+  });
+}
