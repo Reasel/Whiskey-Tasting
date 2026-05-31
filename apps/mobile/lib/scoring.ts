@@ -197,3 +197,23 @@ export function byPerson(theme: ThemeScoresResponse): PersonGroup[] {
     return { user_name, rows };
   });
 }
+
+/**
+ * Per-taster breakdown for one whiskey (the By Theme accordion body),
+ * sorted by each taster's average desc with rank derived locally.
+ */
+export function whiskeyBreakdown(whiskey: WhiskeyScores): TasterRow[] {
+  const rows: TasterRow[] = whiskey.scores.map((s) => ({
+    user_name: s.user_name,
+    aroma: s.aroma_score,
+    flavor: s.flavor_score,
+    finish: s.finish_score,
+    average: s.average_score,
+    rank: 0,
+  }));
+  rows.sort((a, b) => b.average - a.average);
+  rows.forEach((r, i) => {
+    r.rank = i + 1;
+  });
+  return rows;
+}

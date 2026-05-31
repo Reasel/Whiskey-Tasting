@@ -156,3 +156,20 @@ describe('byPerson', () => {
     expect(dee.rows[0].rank).toBe(1);
   });
 });
+
+describe('whiskeyBreakdown', () => {
+  it('returns per-taster rows ranked by their average desc', () => {
+    const w = theme.whiskeys[0]; // Whiskey A
+    const rows = whiskeyBreakdown(w);
+    expect(rows.map((r) => r.user_name)).toEqual(['Ann', 'Bob', 'Cy']);
+    expect(rows.map((r) => r.rank)).toEqual([1, 2, 3]);
+    expect(rows[0].aroma).toBe(5);
+    expect(rows[0].average).toBeCloseTo(5.0, 5);
+    expect(rows[2].average).toBeCloseTo(3.0, 5);
+  });
+
+  it('handles a whiskey with no scores', () => {
+    const w = emptyTheme.whiskeys[0];
+    expect(whiskeyBreakdown(w)).toEqual([]);
+  });
+});
