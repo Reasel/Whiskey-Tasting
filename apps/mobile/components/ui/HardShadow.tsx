@@ -13,9 +13,11 @@ interface HardShadowProps {
 }
 
 /**
- * Solid offset block shadow with NO blur, on both platforms. RN native
+ * Offset block shadow with NO blur, on both platforms. On the After Dark
+ * surfaces the block is a translucent dark rectangle (see shadowSpec),
+ * reading as a structural drop offset rather than a soft glow. RN native
  * shadow props cannot do offset-no-blur on Android (elevation is always
- * blurred + centered), so we render a sibling solid View behind the child.
+ * blurred + centered), so we render a sibling View behind the child.
  */
 export function HardShadow({
   children,
