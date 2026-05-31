@@ -16,6 +16,7 @@ import { AfterDarkBackground } from '../components/ui/AfterDarkBackground';
 import { ResultsReveal } from '../components/dashboard/ResultsReveal';
 import { AllWhiskeysTable } from '../components/dashboard/AllWhiskeysTable';
 import { ByThemeView } from '../components/dashboard/ByThemeView';
+import { ByPersonView } from '../components/dashboard/ByPersonView';
 import {
   fetchActiveTheme,
   fetchThemeScores,
@@ -123,7 +124,7 @@ export default function DashboardScreen() {
               {tab === 'all' && <AllWhiskeysTable allScores={allScores} />}
               {tab === 'theme' && <ByThemeView allScores={allScores} />}
               {tab === 'person' && (
-                <View>{/* 4e: By Person cards */}</View>
+                <ByPersonView activeTheme={activeTheme} scores={activeScores} />
               )}
             </View>
           )}
