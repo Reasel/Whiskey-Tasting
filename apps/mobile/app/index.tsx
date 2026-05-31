@@ -5,15 +5,12 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, typography } from '../lib/theme';
+import { colors, spacing, fonts } from '../lib/theme';
 import { AppText } from '../components/ui/AppText';
-import { Eyebrow } from '../components/ui/Eyebrow';
-import { Button } from '../components/ui/Button';
-import { Panel } from '../components/ui/Panel';
-import { GlowBox } from '../components/ui/GlowBox';
 import { PulsingDot } from '../components/ui/PulsingDot';
 import { AfterDarkBackground } from '../components/ui/AfterDarkBackground';
 import {
@@ -24,58 +21,49 @@ import {
 
 type Tonight = { theme: Theme; pours: number; tasters: number };
 
+const TILES = [
+  {
+    sub: 'RATE THE POURS',
+    label: 'Tasting\nSubmission',
+    route: '/tasting' as const,
+  },
+  {
+    sub: 'SEE THE RESULTS',
+    label: 'Data View',
+    route: '/dashboard' as const,
+  },
+  {
+    sub: 'RUN THE NIGHT',
+    label: 'Administration',
+    route: '/admin' as const,
+  },
+];
+
 export default function HomeScreen() {
   const router = useRouter();
   const [tonight, setTonight] = useState<Tonight | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
-      setError(null);
       const active = await fetchActiveTheme();
-      if (!active) {
-        setTonight(null);
-        return;
-      }
+      if (!active) { setTonight(null); return; }
       const scores = await fetchThemeScores(active.id);
       const tasterNames = new Set<string>();
-      scores.whiskeys.forEach((w) =>
-        w.scores.forEach((s) => tasterNames.add(s.user_name)),
-      );
-      setTonight({
-        theme: active,
-        pours: scores.whiskeys.length,
-        tasters: tasterNames.size,
-      });
+      scores.whiskeys.forEach((w) => w.scores.forEach((s) => tasterNames.add(s.user_name)));
+      setTonight({ theme: active, pours: scores.whiskeys.length, tasters: tasterNames.size });
     } catch {
-      setError('Could not connect to server. Check your settings.');
+      setTonight(null);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useEffect(() => { loadData(); }, [loadData]);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    loadData();
-  }, [loadData]);
-
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <AfterDarkBackground />
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.amber} />
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const onRefresh = useCallback(() => { setRefreshing(true); loadData(); }, [loadData]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -84,68 +72,55 @@ export default function HomeScreen() {
         contentContainerStyle={styles.content}
         bounces={false}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.amber}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.amber} />}
       >
+        {/* Hero */}
         <View style={styles.hero}>
-          <GlowBox intensity="strong" style={styles.heroGlow}>
-            <AppText variant="pageTitle">WHISKEY TASTING</AppText>
-          </GlowBox>
-          <Eyebrow style={styles.eyebrow}>HAVE A DRINK!</Eyebrow>
+          <AppText variant="pageTitle" style={styles.heroTitle}>WHISKEY{'\n'}TASTING</AppText>
+          <AppText style={styles.heroEyebrow}>// HAVE A DRINK!</AppText>
         </View>
 
-        {error && (
-          <Panel style={styles.errorPanel}>
-            <AppText variant="body" style={styles.errorText}>{error}</AppText>
-            <Button
-              title="OPEN SETTINGS"
-              variant="ghost"
-              size="sm"
-              onPress={() => router.push('/settings')}
-            />
-          </Panel>
-        )}
-
-        {tonight ? (
-          <View style={styles.tonight}>
-            <View style={styles.tonightTop}>
-              <PulsingDot size={10} color={colors.amber} />
-              <AppText variant="eyebrow" style={styles.tonightEyebrow}>TONIGHT</AppText>
+        {/* Tonight strip */}
+        {loading ? (
+          <View style={styles.tonightStrip}>
+            <ActivityIndicator size="small" color={colors.amber} />
+          </View>
+        ) : tonight ? (
+          <View style={styles.tonightStrip}>
+            <View style={styles.tonightLeft}>
+              <PulsingDot size={8} color={colors.amber} />
+              <AppText style={styles.tonightLabel}>TONIGHT</AppText>
             </View>
-            <AppText variant="cardTitle" numberOfLines={2} adjustsFontSizeToFit>
-              {tonight.theme.name}
-            </AppText>
-            <AppText variant="fieldLabel" style={styles.tonightMeta}>
-              {tonight.pours} POURS · {tonight.tasters} TASTERS IN
-            </AppText>
+            <AppText style={styles.tonightName} numberOfLines={1}>{tonight.theme.name}</AppText>
+            <View style={styles.tonightStats}>
+              <AppText style={styles.tonightStat}>
+                <AppText style={styles.tonightStatBold}>{tonight.pours}</AppText> POURS
+              </AppText>
+              <View style={styles.sep} />
+              <AppText style={styles.tonightStat}>
+                <AppText style={styles.tonightStatBold}>{tonight.tasters}</AppText> IN
+              </AppText>
+            </View>
           </View>
         ) : (
-          !error && (
-            <View style={styles.tonight}>
-              <AppText variant="bodyMuted">No active theme. Create one in Admin.</AppText>
-            </View>
-          )
+          <View style={styles.tonightStrip}>
+            <AppText style={styles.tonightLabel}>NO ACTIVE THEME</AppText>
+          </View>
         )}
 
-        <View style={styles.actions}>
-          <Button
-            title="START TASTING"
-            size="xl"
-            block
-            onPress={() => router.push('/tasting/')}
-          />
-          <Button
-            title="VIEW RESULTS"
-            size="xl"
-            variant="outline"
-            block
-            onPress={() => router.push('/dashboard')}
-          />
+        {/* Navigation tiles */}
+        <View style={styles.tiles}>
+          {TILES.map((t) => (
+            <Pressable
+              key={t.route}
+              style={({ pressed }) => [styles.tile, pressed && styles.tilePressed]}
+              onPress={() => router.push(t.route)}
+            >
+              <AppText style={styles.tileSub}>// {t.sub}</AppText>
+              <AppText style={styles.tileLabel}>{t.label}</AppText>
+              <AppText style={styles.tileArrow}>→</AppText>
+            </Pressable>
+          ))}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -153,61 +128,83 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.bg,
-    position: 'relative',
+  container: { flex: 1, backgroundColor: colors.bg },
+  content: { padding: spacing.lg, paddingBottom: spacing.xxl },
+
+  hero: { alignItems: 'center', marginTop: spacing.xxl, marginBottom: spacing.xl },
+  heroTitle: { textAlign: 'center', lineHeight: 48 },
+  heroEyebrow: {
+    fontFamily: fonts.monoMedium,
+    fontSize: 12,
+    letterSpacing: 1.8,
+    color: colors.amber,
+    marginTop: spacing.sm,
   },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    padding: spacing.lg,
-    paddingBottom: spacing.lg,
-    flexGrow: 1,
-  },
-  hero: {
-    marginTop: spacing.xxl,
-    marginBottom: spacing.xl,
-  },
-  heroGlow: {
-    alignSelf: 'flex-start',
-  },
-  eyebrow: {
-    marginTop: spacing.smd,
-  },
-  errorPanel: {
-    marginBottom: spacing.lg,
-    borderColor: colors.red,
-  },
-  errorText: {
-    color: colors.red,
-    marginBottom: spacing.sm,
-  },
-  tonight: {
-    backgroundColor: colors.panel,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: spacing.lg,
-    marginBottom: spacing.xl,
-    gap: spacing.sm,
-  },
-  tonightTop: {
+
+  tonightStrip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
+    flexWrap: 'wrap',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 1,
+    borderColor: colors.line,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.xl,
   },
-  tonightEyebrow: {
+  tonightLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  tonightLabel: {
+    fontFamily: fonts.monoBold,
+    fontSize: 12,
+    letterSpacing: 1.6,
     color: colors.amber,
   },
-  tonightMeta: {
-    color: colors.dim,
-    marginTop: spacing.xs,
+  tonightName: {
+    fontFamily: fonts.serifSemi,
+    fontSize: 20,
+    color: colors.cream,
+    flex: 1,
   },
-  actions: {
-    gap: spacing.md,
+  tonightStats: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginLeft: 'auto' },
+  tonightStat: { fontFamily: fonts.monoRegular, fontSize: 12, letterSpacing: 1.4, color: colors.dim },
+  tonightStatBold: { fontFamily: fonts.monoBold, color: colors.amber },
+  sep: { width: 1, height: 14, backgroundColor: colors.line },
+
+  tiles: { gap: spacing.md },
+  tile: {
+    backgroundColor: colors.raise,
+    borderWidth: 1,
+    borderColor: colors.line,
+    padding: spacing.xl,
+    paddingBottom: spacing.lg,
+    minHeight: 140,
+    gap: spacing.xs,
+  },
+  tilePressed: {
+    borderColor: colors.amber,
+    shadowColor: colors.amber,
+    shadowRadius: 20,
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  tileSub: {
+    fontFamily: fonts.monoMedium,
+    fontSize: 11,
+    letterSpacing: 1.8,
+    color: colors.amber,
+  },
+  tileLabel: {
+    fontFamily: fonts.serifSemi,
+    fontSize: 26,
+    lineHeight: 30,
+    color: colors.cream,
     marginTop: 'auto',
+  },
+  tileArrow: {
+    fontFamily: fonts.monoMedium,
+    fontSize: 22,
+    color: colors.amber,
+    alignSelf: 'flex-end',
   },
 });
