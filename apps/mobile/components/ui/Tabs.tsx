@@ -18,19 +18,26 @@ interface TabsProps {
 }
 
 /** Square segmented control. Active = amber fill + dark mono label;
- *  inactive = raise fill + dim label. Instant swap, no animation. */
+ *  inactive = raise fill + dim label. Instant swap, no animation.
+ *  4+ options automatically wrap into a 2-column grid. */
 export function Tabs({ options, value, onChange, style }: TabsProps) {
+  const wrap = options.length >= 4;
+  const cols = wrap ? 2 : options.length;
   return (
-    <View style={[styles.tabs, style]}>
+    <View style={[styles.tabs, wrap && styles.tabsWrap, style]}>
       {options.map((opt, i) => {
         const active = String(opt.value) === String(value);
+        const col = i % cols;
+        const row = Math.floor(i / cols);
         return (
           <Pressable
             key={String(opt.value)}
             onPress={() => onChange(opt.value)}
             style={[
               styles.tab,
-              i > 0 && styles.tabDivider,
+              wrap ? { width: `${100 / cols}%` as unknown as number } : { flex: 1 },
+              col > 0 && styles.tabBorderLeft,
+              row > 0 && styles.tabBorderTop,
               { backgroundColor: active ? colors.amber : colors.raise },
             ]}
           >
@@ -72,15 +79,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderWidth: 1,
     borderColor: colors.line,
-    borderRadius: 0,
   },
+  tabsWrap: { flexWrap: 'wrap' },
   tab: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.smd,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
   },
-  tabDivider: { borderLeftWidth: 1, borderLeftColor: colors.line },
+  tabBorderLeft: { borderLeftWidth: 1, borderLeftColor: colors.line },
+  tabBorderTop: { borderTopWidth: 1, borderTopColor: colors.line },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
