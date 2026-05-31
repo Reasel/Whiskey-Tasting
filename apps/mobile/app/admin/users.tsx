@@ -107,7 +107,7 @@ export default function UsersScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
+          <ActivityIndicator size="large" color={colors.amber} />
         </View>
       </SafeAreaView>
     );
@@ -124,7 +124,7 @@ export default function UsersScreen() {
               setRefreshing(true);
               loadUsers();
             }}
-            tintColor={colors.whiskeyAmber}
+            tintColor={colors.amber}
           />
         }
       >
@@ -183,7 +183,7 @@ export default function UsersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.canvasCream,
+    backgroundColor: colors.bg,
   },
   centered: {
     flex: 1,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   emptyText: {
-    color: colors.mutedText,
+    color: colors.muted,
     textAlign: 'center',
     padding: spacing.xl,
   },
