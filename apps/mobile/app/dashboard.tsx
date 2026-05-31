@@ -14,6 +14,7 @@ import { Eyebrow } from '../components/ui/Eyebrow';
 import { Tabs } from '../components/ui/Tabs';
 import { AfterDarkBackground } from '../components/ui/AfterDarkBackground';
 import { ResultsReveal } from '../components/dashboard/ResultsReveal';
+import { AllWhiskeysTable } from '../components/dashboard/AllWhiskeysTable';
 import {
   fetchActiveTheme,
   fetchThemeScores,
@@ -118,9 +119,7 @@ export default function DashboardScreen() {
                   scores={activeScores}
                 />
               )}
-              {tab === 'all' && (
-                <View>{/* 4c: All Whiskeys table */}</View>
-              )}
+              {tab === 'all' && <AllWhiskeysTable allScores={allScores} />}
               {tab === 'theme' && (
                 <View>{/* 4d: By Theme accordion */}</View>
               )}
