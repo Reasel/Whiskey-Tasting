@@ -6,12 +6,14 @@ import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { AppText } from '../../components/ui/AppText';
 import { Eyebrow } from '../../components/ui/Eyebrow';
+import { AfterDarkBackground } from '../../components/ui/AfterDarkBackground';
 
 export default function AdminIndexScreen() {
   const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <AfterDarkBackground />
       <ScrollView contentContainerStyle={styles.content}>
         <AppText variant="pageTitle" style={styles.title}>ADMINISTRATION</AppText>
         <Eyebrow style={styles.subtitle}>MANAGE THEMES, USERS, AND SETTINGS</Eyebrow>
@@ -33,12 +35,13 @@ export default function AdminIndexScreen() {
               onPress={() => router.push('/admin/users')}
             />
           </View>
-          <View style={styles.tile}>
+          <View style={styles.tileWide}>
             <Button
-              title="VIEW DATA"
+              title="VIEW RESULTS"
               size="xl"
+              variant="outline"
               block
-              onPress={() => router.push('/admin/data')}
+              onPress={() => router.push('/dashboard')}
             />
           </View>
         </View>
@@ -50,7 +53,7 @@ export default function AdminIndexScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.canvasCream,
+    backgroundColor: colors.bg,
   },
   content: {
     padding: spacing.lg,
@@ -70,5 +73,8 @@ const styles = StyleSheet.create({
   },
   tile: {
     width: '48%',
+  },
+  tileWide: {
+    width: '100%',
   },
 });
