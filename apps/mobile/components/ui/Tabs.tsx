@@ -17,8 +17,8 @@ interface TabsProps {
   style?: StyleProp<ViewStyle>;
 }
 
-/** Square segmented control. Active = amber fill + white mono label;
- *  inactive = panel-grey + steel-grey. Instant swap, no animation. */
+/** Square segmented control. Active = amber fill + dark mono label;
+ *  inactive = raise fill + dim label. Instant swap, no animation. */
 export function Tabs({ options, value, onChange, style }: TabsProps) {
   return (
     <View style={[styles.tabs, style]}>
@@ -31,12 +31,12 @@ export function Tabs({ options, value, onChange, style }: TabsProps) {
             style={[
               styles.tab,
               i > 0 && styles.tabDivider,
-              { backgroundColor: active ? colors.whiskeyAmber : colors.panelGrey },
+              { backgroundColor: active ? colors.amber : colors.raise },
             ]}
           >
             <AppText
               variant="buttonLabel"
-              style={{ color: active ? colors.cardWhite : colors.steelGrey }}
+              style={{ color: active ? colors.bg : colors.dim }}
             >
               {opt.label}
             </AppText>
@@ -60,8 +60,8 @@ export function ToggleRow({ label, value, onValueChange }: ToggleRowProps) {
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ true: colors.whiskeyAmber, false: colors.lightGrey }}
-        thumbColor={colors.cardWhite}
+        trackColor={{ true: colors.amber, false: colors.line }}
+        thumbColor={colors.cream}
       />
     </View>
   );
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   tabs: {
     flexDirection: 'row',
     borderWidth: 1,
-    borderColor: colors.inkBlack,
+    borderColor: colors.line,
     borderRadius: 0,
   },
   tab: {
@@ -80,14 +80,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: spacing.smd,
   },
-  tabDivider: { borderLeftWidth: 1, borderLeftColor: colors.inkBlack },
+  tabDivider: { borderLeftWidth: 1, borderLeftColor: colors.line },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.cardWhite,
+    backgroundColor: colors.panel,
     borderWidth: 1,
-    borderColor: colors.inkBlack,
+    borderColor: colors.line,
     padding: spacing.md,
   },
 });
