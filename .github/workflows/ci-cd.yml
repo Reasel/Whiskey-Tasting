@@ -124,8 +124,41 @@ jobs:
     steps:
     - run: echo "All tests passed"
 
-  build-and-deploy-staging:
+  notify-staging-deploy:
     needs: [test]
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify staging deploy pending
+      env:
+        NTFY_URL: ${{ secrets.NTFY_URL }}
+        NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+        NTFY_AUTH_USER: ${{ secrets.NTFY_AUTH_USER }}
+        NTFY_AUTH_PASS: ${{ secrets.NTFY_AUTH_PASS }}
+      run: |
+        if [ -z "$NTFY_URL" ] || [ -z "$NTFY_TOPIC" ]; then
+          echo "NTFY not configured, skipping notification"
+          exit 0
+        fi
+        RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        AUTH_ARGS=()
+        if [ -n "$NTFY_TOKEN" ]; then
+          AUTH_ARGS+=(-H "Authorization: Bearer $NTFY_TOKEN")
+        elif [ -n "$NTFY_AUTH_USER" ] && [ -n "$NTFY_AUTH_PASS" ]; then
+          AUTH_ARGS+=(-u "$NTFY_AUTH_USER:$NTFY_AUTH_PASS")
+        fi
+        curl -sf \
+          "${AUTH_ARGS[@]}" \
+          -H "Title: Staging deploy needs approval" \
+          -H "Priority: high" \
+          -H "Tags: rocket" \
+          -H "Click: $RUN_URL" \
+          -d "Commit ${{ github.sha }} by ${{ github.actor }} is waiting for staging approval — tap to review." \
+          "$NTFY_URL/$NTFY_TOPIC" || true
+
+  build-and-deploy-staging:
+    needs: [test, notify-staging-deploy]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: staging
@@ -156,8 +189,41 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
-  build-and-deploy-production:
+  notify-production-deploy:
     needs: [test]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify production deploy pending
+      env:
+        NTFY_URL: ${{ secrets.NTFY_URL }}
+        NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+        NTFY_AUTH_USER: ${{ secrets.NTFY_AUTH_USER }}
+        NTFY_AUTH_PASS: ${{ secrets.NTFY_AUTH_PASS }}
+      run: |
+        if [ -z "$NTFY_URL" ] || [ -z "$NTFY_TOPIC" ]; then
+          echo "NTFY not configured, skipping notification"
+          exit 0
+        fi
+        RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        AUTH_ARGS=()
+        if [ -n "$NTFY_TOKEN" ]; then
+          AUTH_ARGS+=(-H "Authorization: Bearer $NTFY_TOKEN")
+        elif [ -n "$NTFY_AUTH_USER" ] && [ -n "$NTFY_AUTH_PASS" ]; then
+          AUTH_ARGS+=(-u "$NTFY_AUTH_USER:$NTFY_AUTH_PASS")
+        fi
+        curl -sf \
+          "${AUTH_ARGS[@]}" \
+          -H "Title: Production deploy needs approval" \
+          -H "Priority: urgent" \
+          -H "Tags: rocket,warning" \
+          -H "Click: $RUN_URL" \
+          -d "Tag ${{ github.ref_name }} by ${{ github.actor }} is waiting for production approval — tap to review." \
+          "$NTFY_URL/$NTFY_TOPIC" || true
+
+  build-and-deploy-production:
+    needs: [test, notify-production-deploy]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: production

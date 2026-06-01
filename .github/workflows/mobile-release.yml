@@ -33,7 +33,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  notify-mobile-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify mobile deploy pending
+      env:
+        NTFY_URL: ${{ secrets.NTFY_URL }}
+        NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+        NTFY_AUTH_USER: ${{ secrets.NTFY_AUTH_USER }}
+        NTFY_AUTH_PASS: ${{ secrets.NTFY_AUTH_PASS }}
+      run: |
+        if [ -z "$NTFY_URL" ] || [ -z "$NTFY_TOPIC" ]; then
+          echo "NTFY not configured, skipping notification"
+          exit 0
+        fi
+        PROFILE="${{ inputs.profile || 'production' }}"
+        RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        AUTH_ARGS=()
+        if [ -n "$NTFY_TOKEN" ]; then
+          AUTH_ARGS+=(-H "Authorization: Bearer $NTFY_TOKEN")
+        elif [ -n "$NTFY_AUTH_USER" ] && [ -n "$NTFY_AUTH_PASS" ]; then
+          AUTH_ARGS+=(-u "$NTFY_AUTH_USER:$NTFY_AUTH_PASS")
+        fi
+        curl -sf \
+          "${AUTH_ARGS[@]}" \
+          -H "Title: Mobile deploy needs approval" \
+          -H "Priority: high" \
+          -H "Tags: iphone,rocket" \
+          -H "Click: $RUN_URL" \
+          -d "Mobile $PROFILE build (${{ github.ref_name }}) by ${{ github.actor }} is waiting for approval — tap to review." \
+          "$NTFY_URL/$NTFY_TOPIC" || true
+
   release:
+    needs: [notify-mobile-deploy]
     runs-on: ubuntu-latest
     environment: production
     defaults:
