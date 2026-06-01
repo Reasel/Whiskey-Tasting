@@ -262,7 +262,6 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.line,
   },
   consRowTop: {
-    backgroundColor: colors.glowSoft,
     borderBottomColor: colors.amber,
   },
   consRank: { width: 28 },
