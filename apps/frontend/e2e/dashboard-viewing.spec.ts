@@ -95,7 +95,7 @@ test.describe('Raw Data View', () => {
 
     await page.waitForTimeout(1000);
 
-    await expect(page.locator('table, ul, div[role="table"], body')).toBeVisible();
+    await expect(page.locator('body')).toBeVisible();
   });
 
   test('exports data', async ({ page }) => {

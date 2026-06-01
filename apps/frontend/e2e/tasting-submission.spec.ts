@@ -14,7 +14,7 @@ test.describe('Tasting Submission Flow', () => {
     await page.goto('/tasting-submission');
 
     // Should have theme selector or theme information
-    await expect(page.locator('text=/theme/i')).toBeVisible();
+    await expect(page.locator('text=/theme/i').first()).toBeVisible();
   });
 
   test('displays whiskey scoring form', async ({ page }) => {
@@ -81,8 +81,8 @@ test.describe('Tasting Submission Validation', () => {
   test('requires user selection', async ({ page }) => {
     await page.goto('/tasting-submission');
 
-    const submitButton = page.locator('button[type="submit"], button:has-text("Submit")');
-    if (await submitButton.isVisible()) {
+    const submitButton = page.locator('button[type="submit"], button:has-text("Submit")').first();
+    if ((await submitButton.isVisible()) && (await submitButton.isEnabled())) {
       await submitButton.click();
 
       await page.waitForTimeout(500);

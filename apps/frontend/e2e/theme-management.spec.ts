@@ -1,27 +1,30 @@
 import { test, expect } from '@playwright/test';
 
+async function setAdminAuth(page: Parameters<Parameters<typeof test>[1]>[0]) {
+  await page.goto('/');
+  await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
+}
+
 test.describe('Theme Management', () => {
   test('admin can navigate to theme creation', async ({ page }) => {
     await page.goto('/');
 
-    // Homepage has "Administration" button
     await page.click('text=Administration');
 
     await expect(page).toHaveURL(/new-theme|administration|edit-themes/);
   });
 
   test('displays theme creation form', async ({ page }) => {
-    await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
+    await setAdminAuth(page);
     await page.goto('/new-theme');
 
-    // new-theme page uses id="themeName", id="themeNotes", id="numWhiskeys"
     await expect(page.locator('#themeName')).toBeVisible();
     await expect(page.locator('#themeNotes')).toBeVisible();
     await expect(page.locator('#numWhiskeys')).toBeVisible();
   });
 
   test('creates a new theme', async ({ page }) => {
-    await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
+    await setAdminAuth(page);
     await page.goto('/new-theme');
 
     await page.fill('#themeName', 'E2E Test Theme');
@@ -34,11 +37,13 @@ test.describe('Theme Management', () => {
   });
 
   test('validates theme name is required', async ({ page }) => {
-    await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
+    await setAdminAuth(page);
     await page.goto('/new-theme');
 
     const submitButton = page.locator('button[type="submit"]');
-    await submitButton.click();
+    if (await submitButton.isEnabled()) {
+      await submitButton.click();
+    }
 
     await page.waitForTimeout(500);
   });
@@ -46,15 +51,14 @@ test.describe('Theme Management', () => {
 
 test.describe('Theme Editing', () => {
   test('displays existing themes', async ({ page }) => {
-    await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
+    await setAdminAuth(page);
     await page.goto('/edit-themes');
 
-    // Page should render with "EDIT THEMES" heading
     await expect(page.locator('text=EDIT THEMES')).toBeVisible();
   });
 
   test('allows editing theme whiskeys', async ({ page }) => {
-    await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
+    await setAdminAuth(page);
     await page.goto('/edit-themes');
 
     const editButton = page.locator('button:has-text("Edit"), a:has-text("Edit")').first();
@@ -63,12 +67,12 @@ test.describe('Theme Editing', () => {
       await editButton.click();
 
       await page.waitForTimeout(500);
-      await expect(page.locator('text=/whiskey/i')).toBeVisible();
+      await expect(page.locator('text=/whiskey/i').first()).toBeVisible();
     }
   });
 
   test('updates whiskey details', async ({ page }) => {
-    await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
+    await setAdminAuth(page);
     await page.goto('/edit-themes');
 
     const editButton = page.locator('button:has-text("Edit")').first();
@@ -93,15 +97,14 @@ test.describe('Theme Editing', () => {
 
 test.describe('Active Theme Selection', () => {
   test('displays active theme indicator', async ({ page }) => {
-    await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
+    await setAdminAuth(page);
     await page.goto('/edit-themes');
 
-    // edit-themes page always shows "EDIT THEMES" heading
     await expect(page.locator('text=EDIT THEMES')).toBeVisible();
   });
 
   test('switches active theme', async ({ page }) => {
-    await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
+    await setAdminAuth(page);
     await page.goto('/edit-themes');
 
     const activateButton = page

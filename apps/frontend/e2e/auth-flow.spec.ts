@@ -75,6 +75,7 @@ test.describe('User Management', () => {
   });
 
   test('creates new user', async ({ page }) => {
+    await page.goto('/');
     await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
     await page.goto('/add-user');
 
@@ -87,6 +88,7 @@ test.describe('User Management', () => {
   });
 
   test('validates user name is required', async ({ page }) => {
+    await page.goto('/');
     await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
     await page.goto('/add-user');
 
@@ -107,6 +109,7 @@ test.describe('User Deletion', () => {
   });
 
   test('displays list of users to delete', async ({ page }) => {
+    await page.goto('/');
     await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
     await page.goto('/delete-user');
 
@@ -116,6 +119,7 @@ test.describe('User Deletion', () => {
   });
 
   test('deletes a user', async ({ page }) => {
+    await page.goto('/');
     await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
     await page.goto('/delete-user');
 
@@ -146,6 +150,7 @@ test.describe('Admin Access', () => {
   });
 
   test('displays admin panel', async ({ page }) => {
+    await page.goto('/');
     await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
     await page.goto('/administration');
 
@@ -154,6 +159,7 @@ test.describe('Admin Access', () => {
   });
 
   test('provides links to management pages', async ({ page }) => {
+    await page.goto('/');
     await page.evaluate(() => localStorage.setItem('adminAuthenticated', 'true'));
     await page.goto('/administration');
 

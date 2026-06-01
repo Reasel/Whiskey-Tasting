@@ -14,6 +14,6 @@ test.describe('Tablet Experience', () => {
     await page.goto('/dashboard');
 
     // Results should be displayed clearly
-    await expect(page.locator('text=/whiskey|theme/i')).toBeVisible();
+    await expect(page.locator('text=/whiskey|theme/i').first()).toBeVisible();
   });
 });
