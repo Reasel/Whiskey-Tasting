@@ -15,6 +15,7 @@ import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import { Toast } from '../../components/ui/Toast';
 import { AppText } from '../../components/ui/AppText';
+import { RichNotes } from '../../components/ui/RichNotes';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { Stepper } from '../../components/ui/Stepper';
 import {
@@ -260,7 +261,12 @@ export default function ThemesScreen() {
                 <View style={styles.themeInfo}>
                   <AppText variant="sectionTitle">{theme.name}</AppText>
                   {theme.notes ? (
-                    <AppText variant="body" style={styles.themeNotes}>{theme.notes}</AppText>
+                    <RichNotes
+                      text={theme.notes}
+                      variant="body"
+                      style={{ marginTop: 2 }}
+                      textStyle={{ color: colors.dim }}
+                    />
                   ) : null}
                 </View>
                 <Button

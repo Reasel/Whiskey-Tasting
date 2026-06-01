@@ -9,14 +9,13 @@ import {
 import { colors, spacing, fonts } from '../../lib/theme';
 import { AppText } from '../ui/AppText';
 import { Eyebrow } from '../ui/Eyebrow';
-import { GlowBox } from '../ui/GlowBox';
 import { PodiumGlass } from '../ui/PodiumGlass';
 import { RankedBar } from '../ui/RankedBar';
 import { leaderboard, consensus } from '../../lib/scoring';
 import type { ThemeScoresResponse } from '../../lib/api';
 
 // Podium fill percentages by medal place (handoff spec).
-const PODIUM_FILL: Record<1 | 2 | 3, number> = { 1: 64, 2: 82, 3: 50 };
+const PODIUM_FILL: Record<1 | 2 | 3, number> = { 1: 82, 2: 64, 3: 50 };
 
 interface Props {
   // revealKey changes on each refresh to retrigger the cascade.
@@ -215,7 +214,7 @@ function ConsensusRow({
     </View>
   );
 
-  return top ? <GlowBox intensity="soft">{row}</GlowBox> : row;
+  return row;
 }
 
 const styles = StyleSheet.create({
@@ -263,7 +262,6 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.line,
   },
   consRowTop: {
-    backgroundColor: colors.glowSoft,
     borderBottomColor: colors.amber,
   },
   consRank: { width: 28 },

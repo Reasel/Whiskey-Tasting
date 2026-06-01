@@ -3,7 +3,6 @@ import { View, Pressable, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, fonts } from '../../lib/theme';
 import { AppText } from './AppText';
-import { GlowBox } from './GlowBox';
 
 interface RankPillsProps {
   value: number;
@@ -33,11 +32,7 @@ export function RankPills({ value, count, onChange }: RankPillsProps) {
             </AppText>
           </Pressable>
         );
-        return active ? (
-          <GlowBox key={n} intensity="soft" style={styles.cell}>
-            {pill}
-          </GlowBox>
-        ) : (
+        return (
           <View key={n} style={styles.cell}>
             {pill}
           </View>
