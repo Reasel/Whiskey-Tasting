@@ -78,6 +78,7 @@ export default function NewTheme() {
                 Theme Name
               </label>
               <input
+                id="themeName"
                 type="text"
                 value={themeName}
                 onChange={(e) => setThemeName(e.target.value)}
@@ -96,6 +97,7 @@ export default function NewTheme() {
                 Description / Notes
               </label>
               <textarea
+                id="themeNotes"
                 value={themeNotes}
                 onChange={(e) => setThemeNotes(e.target.value)}
                 placeholder="Enter theme description…"

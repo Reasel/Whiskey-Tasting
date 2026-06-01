@@ -67,6 +67,7 @@ export default function AddUser() {
                 User Name
               </label>
               <input
+                id="userName"
                 type="text"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}

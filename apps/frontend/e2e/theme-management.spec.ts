@@ -20,7 +20,6 @@ test.describe('Theme Management', () => {
 
     await expect(page.locator('#themeName')).toBeVisible();
     await expect(page.locator('#themeNotes')).toBeVisible();
-    await expect(page.locator('#numWhiskeys')).toBeVisible();
   });
 
   test('creates a new theme', async ({ page }) => {
@@ -29,7 +28,6 @@ test.describe('Theme Management', () => {
 
     await page.fill('#themeName', 'E2E Test Theme');
     await page.fill('#themeNotes', 'Created by E2E test');
-    await page.fill('#numWhiskeys', '3');
 
     await page.click('button[type="submit"], button:has-text("Create")');
 
