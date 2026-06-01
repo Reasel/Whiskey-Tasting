@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter, Merriweather, JetBrains_Mono } from 'next/font/google';
+import { Inter, Fraunces, JetBrains_Mono } from 'next/font/google';
 import './(default)/css/globals.css';
 import { ToastProvider } from '@/components/ui/toast';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
-const merriweather = Merriweather({
-  weight: ['400', '700'],
+const fraunces = Fraunces({
+  weight: ['600', '900'],
   subsets: ['latin'],
-  variable: '--font-serif',
+  variable: '--font-fraunces',
 });
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
@@ -19,16 +19,14 @@ export const metadata: Metadata = {
   description: 'Log Whiskey Tasting entries for the night',
   applicationName: 'Whiskey Tasting',
   keywords: ['whiskey', 'tasting'],
-  icons: {
-    icon: '/logo.svg',
-  },
+  icons: { icon: '/logo.svg' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-US" className="h-full">
       <body
-        className={`${inter.variable} ${merriweather.variable} ${jetbrains.variable} antialiased min-h-full`}
+        className={`${inter.variable} ${fraunces.variable} ${jetbrains.variable} antialiased min-h-full`}
       >
         <ToastProvider>{children}</ToastProvider>
       </body>
