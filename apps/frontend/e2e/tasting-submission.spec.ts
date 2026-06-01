@@ -1,4 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, devices } from '@playwright/test';
+
+test.use({ ...devices['iPhone 12'] });
 
 test.describe('Tasting Submission Flow', () => {
   test('user can navigate to tasting submission page', async ({ page }) => {
@@ -119,8 +121,6 @@ test.describe('Tasting Submission Validation', () => {
 });
 
 test.describe('Mobile Tasting Submission', () => {
-  test.use({ ...devices['iPhone 12'] });
-
   test('tasting form is usable on mobile', async ({ page }) => {
     await page.goto('/tasting-submission');
 
@@ -137,5 +137,3 @@ test.describe('Mobile Tasting Submission', () => {
     }
   });
 });
-
-import { devices } from '@playwright/test';
