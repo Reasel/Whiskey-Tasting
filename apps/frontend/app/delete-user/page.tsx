@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchUsers, deleteUser, User } from '@/lib/api/users';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/toast';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
@@ -20,10 +18,9 @@ export default function DeleteUser() {
 
   const loadUsers = useCallback(async () => {
     try {
-      const response = await fetchUsers();
-      setUsers(response.users);
-    } catch (error) {
-      console.error('Error loading users:', error);
+      const res = await fetchUsers();
+      setUsers(res.users);
+    } catch {
       showToast('Failed to load users', 'error');
     } finally {
       setLoading(false);
@@ -31,106 +28,84 @@ export default function DeleteUser() {
   }, [showToast]);
 
   useEffect(() => {
-    const auth = localStorage.getItem('adminAuthenticated');
-    if (auth !== 'true') {
-      router.push('/administration');
-      return;
-    }
+    if (localStorage.getItem('adminAuthenticated') !== 'true') { router.push('/administration'); return; }
     loadUsers();
   }, [router, loadUsers]);
 
-  const handleDelete = async () => {
+  async function handleDelete() {
     if (!selectedUser) return;
-
     setDeleting(true);
     try {
       await deleteUser(selectedUser.id!);
       showToast('User deleted successfully', 'success');
-      // Reload users list
       loadUsers();
       setSelectedUser(null);
-    } catch (error) {
-      console.error('Error:', error);
+    } catch {
       showToast('Failed to delete user', 'error');
     } finally {
       setDeleting(false);
       setShowConfirm(false);
     }
-  };
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F0F0E8] flex justify-center items-center">
-        <div className="text-lg">Loading users...</div>
+      <div className="ad-screen flex items-center justify-center">
+        <p className="font-mono text-[13px] uppercase tracking-[.22em]" style={{ color: 'var(--amber)' }}>{'// LOADING...'}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F0F0E8] flex justify-center items-start py-12 px-4 md:px-8">
-      <div className="w-full max-w-4xl border border-black bg-[#F0F0E8] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]">
-        {/* Header */}
-        <div className="border-b border-black p-8 md:p-12">
-          <div className="flex justify-between items-start">
+    <>
+      <div className="ad-screen screen-enter">
+        <div className="ad-panel" style={{ maxWidth: 720 }}>
+          <div className="ad-panel-head">
             <div>
-              <h1 className="font-serif text-5xl md:text-7xl text-black tracking-tight leading-[0.95]">
+              <h1 className="font-fraunces font-black leading-[.94] tracking-[-0.02em] m-0" style={{ fontSize: 'clamp(40px, 6vw, 78px)', color: 'var(--cream)' }}>
                 DELETE USER
               </h1>
-              <p className="mt-6 text-sm font-mono text-steel-grey uppercase tracking-wide max-w-md font-bold">
+              <p className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0" style={{ color: 'var(--amber)' }}>
                 {'// REMOVE A TASTER FROM THE SYSTEM'}
               </p>
             </div>
-            <Link href="/administration">
-              <Button variant="outline" className="font-mono text-sm uppercase tracking-wider">
-                ← BACK
-              </Button>
-            </Link>
+            <Button variant="outline" onClick={() => router.push('/administration')} className="whitespace-nowrap">
+              ← ADMIN
+            </Button>
           </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-8 md:p-12">
-          {users.length === 0 ? (
-            <p className="text-gray-600">No users found to delete.</p>
-          ) : (
-            <div className="space-y-6 max-w-md">
-              <div className="space-y-2">
-                <Label htmlFor="userSelect">Select User to Delete</Label>
-                <select
-                  id="userSelect"
-                  value={selectedUser?.id || ''}
-                  onChange={(e) => {
-                    const userId = parseInt(e.target.value);
-                    const user = users.find((u) => u.id === userId) || null;
-                    setSelectedUser(user);
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
+          <div className="ad-panel-body">
+            {users.length === 0 ? (
+              <p className="font-sans text-sm" style={{ color: 'var(--muted)' }}>No users found to delete.</p>
+            ) : (
+              <div className="flex flex-col gap-6 max-w-md">
+                <div className="flex flex-col gap-[9px]">
+                  <label className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>
+                    Select User to Delete
+                  </label>
+                  <select
+                    value={selectedUser?.id ?? ''}
+                    onChange={(e) => setSelectedUser(users.find((u) => u.id === parseInt(e.target.value)) ?? null)}
+                    className="ad-select"
+                    required
+                  >
+                    <option value="">Choose a user…</option>
+                    {users.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+                  </select>
+                </div>
+                <Button
+                  variant="destructive"
+                  disabled={!selectedUser || deleting}
+                  onClick={() => setShowConfirm(true)}
+                  className="self-start"
                 >
-                  <option value="">Choose a user...</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
-                    </option>
-                  ))}
-                </select>
+                  {deleting ? 'DELETING…' : 'DELETE USER'}
+                </Button>
+                <p className="font-mono text-[11px] uppercase tracking-[.14em]" style={{ color: 'var(--red)' }}>
+                  WARNING — permanently removes the user and all their tasting data.
+                </p>
               </div>
-
-              <Button
-                onClick={() => setShowConfirm(true)}
-                variant="destructive"
-                disabled={!selectedUser || deleting}
-                className="w-full md:w-auto"
-              >
-                {deleting ? 'DELETING...' : 'DELETE USER'}
-              </Button>
-
-              <p className="text-sm text-red-600 font-bold">
-                ⚠️ WARNING: This will permanently delete the user and all their tasting data. This
-                action cannot be undone.
-              </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -138,13 +113,13 @@ export default function DeleteUser() {
         open={showConfirm}
         onOpenChange={setShowConfirm}
         title="Confirm User Deletion"
-        description={`Are you sure you want to delete "${selectedUser?.name}"? This will permanently remove the user and all their tasting records. This action cannot be undone.`}
+        description={`Delete "${selectedUser?.name}"? This permanently removes the user and all their tasting records.`}
         confirmLabel="DELETE USER"
         cancelLabel="CANCEL"
         onConfirm={handleDelete}
         onCancel={() => setShowConfirm(false)}
         variant="danger"
       />
-    </div>
+    </>
   );
 }

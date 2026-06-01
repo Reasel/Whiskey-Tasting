@@ -1,12 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createUser } from '@/lib/api/users';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/toast';
 
 export default function AddUser() {
@@ -16,20 +13,15 @@ export default function AddUser() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const auth = localStorage.getItem('adminAuthenticated');
-    if (auth !== 'true') {
-      router.push('/administration');
-    }
+    if (localStorage.getItem('adminAuthenticated') !== 'true') router.push('/administration');
   }, [router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!userName.trim()) return;
-
     setSubmitting(true);
     try {
       await createUser(userName.trim());
-      // Redirect to administration
       router.push('/administration');
     } catch (error) {
       console.error('Error:', error);
@@ -37,57 +29,45 @@ export default function AddUser() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-[#F0F0E8] flex justify-center items-start py-12 px-4 md:px-8">
-      <div className="w-full max-w-4xl border border-black bg-[#F0F0E8] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]">
-        {/* Header */}
-        <div className="border-b border-black p-8 md:p-12">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="font-serif text-5xl md:text-7xl text-black tracking-tight leading-[0.95]">
-                ADD USER
-              </h1>
-              <p className="mt-6 text-sm font-mono text-steel-grey uppercase tracking-wide max-w-md font-bold">
-                {'// ADD A NEW TASTER'}
-              </p>
-            </div>
-            <Link href="/">
-              <Button variant="outline" className="font-mono text-sm uppercase tracking-wider">
-                ← HOME
-              </Button>
-            </Link>
+    <div className="ad-screen screen-enter">
+      <div className="ad-panel" style={{ maxWidth: 720 }}>
+        <div className="ad-panel-head">
+          <div>
+            <h1 className="font-fraunces font-black leading-[.94] tracking-[-0.02em] m-0" style={{ fontSize: 'clamp(40px, 6vw, 78px)', color: 'var(--cream)' }}>
+              ADD USER
+            </h1>
+            <p className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0" style={{ color: 'var(--amber)' }}>
+              {'// ADD A NEW TASTER'}
+            </p>
           </div>
+          <Button variant="outline" onClick={() => router.push('/administration')} className="whitespace-nowrap">
+            ← ADMIN
+          </Button>
         </div>
-
-        {/* Content */}
-        <div className="p-8 md:p-12">
-          <form onSubmit={handleSubmit} className="space-y-6 max-w-md">
-            <div className="space-y-2">
-              <Label htmlFor="userName">User Name</Label>
-              <Input
-                id="userName"
+        <div className="ad-panel-body">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-md">
+            <div className="flex flex-col gap-[9px]">
+              <label className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>
+                User Name
+              </label>
+              <input
                 type="text"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                placeholder="Enter user name..."
+                placeholder="Enter user name…"
+                className="ad-select"
                 required
               />
             </div>
-
-            <Button
-              type="submit"
-              variant="default"
-              disabled={submitting}
-              className="w-full md:w-auto"
-            >
-              {submitting ? 'ADDING...' : 'ADD USER'}
+            <Button type="submit" variant="default" disabled={submitting} className="self-start">
+              {submitting ? 'ADDING…' : 'ADD USER'}
             </Button>
           </form>
-
-          <p className="mt-6 text-sm text-gray-600">
-            Users will appear in the tasting submission dropdown after being added here.
+          <p className="font-sans text-sm mt-6" style={{ color: 'var(--muted)' }}>
+            Users appear in the tasting submission dropdown after being added here.
           </p>
         </div>
       </div>
