@@ -16,7 +16,7 @@ import { leaderboard, consensus } from '../../lib/scoring';
 import type { ThemeScoresResponse } from '../../lib/api';
 
 // Podium fill percentages by medal place (handoff spec).
-const PODIUM_FILL: Record<1 | 2 | 3, number> = { 1: 64, 2: 82, 3: 50 };
+const PODIUM_FILL: Record<1 | 2 | 3, number> = { 1: 82, 2: 64, 3: 50 };
 
 interface Props {
   // revealKey changes on each refresh to retrigger the cascade.

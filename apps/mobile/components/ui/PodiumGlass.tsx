@@ -9,7 +9,6 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 import { colors } from '../../lib/theme';
-import { GlowBox } from './GlowBox';
 
 interface PodiumGlassProps {
   place: 1 | 2 | 3;
@@ -65,32 +64,30 @@ export function PodiumGlass({ place, fillPct, animate }: PodiumGlassProps) {
   const path = `M${TOP_INSET} 0 L${GLASS_WIDTH - TOP_INSET} 0 L${GLASS_WIDTH - TOP_INSET * 2} ${h} L${TOP_INSET * 2} ${h} Z`;
 
   return (
-    <GlowBox intensity={place === 1 ? 'strong' : 'soft'} color={colors.glow}>
-      <View style={styles.wrap}>
-        <Svg width={GLASS_WIDTH} height={h}>
-          <Defs>
-            <ClipPath id={`glass-${place}`}>
-              <Path d={path} />
-            </ClipPath>
-            <LinearGradient id={`fill-${place}`} x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0" stopColor={colors.amberSoft} />
-              <Stop offset="1" stopColor={colors.ember} />
-            </LinearGradient>
-          </Defs>
-          {/* Glass body */}
-          <Path d={path} fill={colors.panel} stroke={colors.line} strokeWidth={1} />
-          {/* Animated amber fill, masked to the glass shape */}
-          <AnimatedRect
-            x={0}
-            y={fillY}
-            width={GLASS_WIDTH}
-            height={fillHeight}
-            fill={`url(#fill-${place})`}
-            clipPath={`url(#glass-${place})`}
-          />
-        </Svg>
-      </View>
-    </GlowBox>
+    <View style={styles.wrap}>
+      <Svg width={GLASS_WIDTH} height={h}>
+        <Defs>
+          <ClipPath id={`glass-${place}`}>
+            <Path d={path} />
+          </ClipPath>
+          <LinearGradient id={`fill-${place}`} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={colors.amberSoft} />
+            <Stop offset="1" stopColor={colors.ember} />
+          </LinearGradient>
+        </Defs>
+        {/* Glass body */}
+        <Path d={path} fill={colors.panel} stroke={colors.line} strokeWidth={1} />
+        {/* Animated amber fill, masked to the glass shape */}
+        <AnimatedRect
+          x={0}
+          y={fillY}
+          width={GLASS_WIDTH}
+          height={fillHeight}
+          fill={`url(#fill-${place})`}
+          clipPath={`url(#glass-${place})`}
+        />
+      </Svg>
+    </View>
   );
 }
 
