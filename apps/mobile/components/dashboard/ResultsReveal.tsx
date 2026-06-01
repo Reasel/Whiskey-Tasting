@@ -9,7 +9,6 @@ import {
 import { colors, spacing, fonts } from '../../lib/theme';
 import { AppText } from '../ui/AppText';
 import { Eyebrow } from '../ui/Eyebrow';
-import { GlowBox } from '../ui/GlowBox';
 import { PodiumGlass } from '../ui/PodiumGlass';
 import { RankedBar } from '../ui/RankedBar';
 import { leaderboard, consensus } from '../../lib/scoring';
@@ -215,7 +214,7 @@ function ConsensusRow({
     </View>
   );
 
-  return top ? <GlowBox intensity="soft">{row}</GlowBox> : row;
+  return row;
 }
 
 const styles = StyleSheet.create({
