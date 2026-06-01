@@ -29,9 +29,7 @@ export default function Home() {
           const themeScore = scoresData.find((t) => t.theme.id === themeData.id);
           if (themeScore) {
             const tasters = new Set<string>();
-            themeScore.whiskeys.forEach((w) =>
-              w.scores.forEach((s) => tasters.add(s.user_name))
-            );
+            themeScore.whiskeys.forEach((w) => w.scores.forEach((s) => tasters.add(s.user_name)));
             setTasterCount(tasters.size);
           }
         }
@@ -44,8 +42,8 @@ export default function Home() {
 
   const tiles = [
     { sub: '// RATE THE POURS', label: 'Tasting Submission', href: '/tasting-submission' },
-    { sub: '// SEE THE RESULTS', label: 'Data View',          href: '/data-view' },
-    { sub: '// RUN THE NIGHT',   label: 'Administration',     href: '/administration' },
+    { sub: '// SEE THE RESULTS', label: 'Data View', href: '/data-view' },
+    { sub: '// RUN THE NIGHT', label: 'Administration', href: '/administration' },
   ];
 
   return (
@@ -63,7 +61,6 @@ export default function Home() {
         {/* Hero */}
         <div className="text-center mb-11">
           <div className="flex justify-center mb-5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.svg"
               alt=""
@@ -113,10 +110,7 @@ export default function Home() {
               <span>
                 <b style={{ color: 'var(--amber)' }}>{whiskeyCount}</b> POURS
               </span>
-              <span
-                className="inline-block w-px h-4"
-                style={{ background: 'var(--line)' }}
-              />
+              <span className="inline-block w-px h-4" style={{ background: 'var(--line)' }} />
               <span>
                 <b style={{ color: 'var(--amber)' }}>{tasterCount}</b> TASTERS IN
               </span>
@@ -127,11 +121,7 @@ export default function Home() {
         {/* Tile grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {tiles.map((tile) => (
-            <button
-              key={tile.href}
-              onClick={() => router.push(tile.href)}
-              className="ad-tile"
-            >
+            <button key={tile.href} onClick={() => router.push(tile.href)} className="ad-tile">
               <span className="ad-tile-sub">{tile.sub}</span>
               <span className="ad-tile-label">{tile.label}</span>
               <span className="ad-tile-arrow">→</span>
