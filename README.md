@@ -171,10 +171,16 @@ If you're contributing to the code, read [AGENTS.md](AGENTS.md) for guidance on 
 
 ### Web App
 
-| Home | Tasting Submission | Data View |
-|------|-------------------|-----------|
-| ![Web Home](assets/web-home.png) | ![Web Tasting](assets/web-tasting.png) | ![Web Data View](assets/web-dataview.png) |
+| Home | Tasting Submission | Administration |
+|------|-------------------|----------------|
+| ![Web Home](assets/web-home.png) | ![Web Tasting](assets/web-tasting.png) | ![Web Admin](assets/web-admin.png) |
 
-| Dashboard | Administration |
-|-----------|----------------|
-| ![Web Dashboard](assets/web-dashboard.png) | ![Web Admin](assets/web-admin-dashboard.png) |
+**Data View — 4 tabs**
+
+| The Results | All Whiskeys | By Theme | By Person |
+|-------------|-------------|----------|-----------|
+| ![Results Tab](assets/web-dataview-results.png) | ![All Whiskeys Tab](assets/web-dataview-all.png) | ![By Theme Tab](assets/web-dataview-theme.png) | ![By Person Tab](assets/web-dataview-person.png) |
+
+| New Theme |
+|-----------|
+| ![New Theme](assets/web-new-theme.png) |
