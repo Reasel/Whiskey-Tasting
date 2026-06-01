@@ -26,7 +26,7 @@ export function PipRater({ value, onChange }: PipRaterProps) {
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const raw = e.target.value.replace(/[^0-9.]/g, '');
+    const raw = e.target.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.?\d*).*$/, '$1');
     setInputStr(raw);
     const parsed = parseFloat(raw);
     if (!isNaN(parsed)) {

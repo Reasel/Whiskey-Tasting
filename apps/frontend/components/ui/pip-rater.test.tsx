@@ -34,6 +34,13 @@ describe('PipRater', () => {
     expect(input.value).toBe('4.2');
   });
 
+  it('allows only one decimal point in input', () => {
+    render(<PipRater value={0} onChange={vi.fn()} />);
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: '4.2.3' } });
+    expect(input.value).toBe('4.2');
+  });
+
   it('calls onChange with parsed decimal value on input change', () => {
     const onChange = vi.fn();
     render(<PipRater value={0} onChange={onChange} />);
