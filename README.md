@@ -153,16 +153,28 @@ If you're contributing to the code, read [AGENTS.md](AGENTS.md) for guidance on 
 
 ## Screenshots
 
-Here are some screenshots of the application in action:
+### Mobile App
 
-![Home Page](assets/Screenshot_20260113_101727.png)
-![Theme Selection](assets/Screenshot_20260113_101742.png)
-![Whiskey List](assets/Screenshot_20260113_101748.png)
-![Tasting Form](assets/Screenshot_20260113_101756.png)
-![Rating Interface](assets/Screenshot_20260113_101803.png)
-![Results View](assets/Screenshot_20260113_101811.png)
-![Dashboard](assets/Screenshot_20260113_101820.png)
-![User Management](assets/Screenshot_20260113_101825.png)
-![Theme Editor](assets/Screenshot_20260113_101842.png)
-![Data View](assets/Screenshot_20260113_101853.png)
-![Administration](assets/Screenshot_20260113_101901.png)
+| Home | Tasting Submission | Tasting Scoring |
+|------|-------------------|-----------------|
+| ![Mobile Home](assets/mobile-home.png) | ![Mobile Tasting](assets/mobile-tasting.png) | ![Mobile Scoring](assets/mobile-scoring.png) |
+
+**Data View — 4 tabs**
+
+| The Results | All Whiskeys | By Theme | By Person |
+|-------------|-------------|----------|-----------|
+| ![Results Tab](assets/mobile-dataview-results.png) | ![All Whiskeys Tab](assets/mobile-dataview-all.png) | ![By Theme Tab](assets/mobile-dataview-theme.png) | ![By Person Tab](assets/mobile-dataview-person.png) |
+
+| Administration |
+|----------------|
+| ![Mobile Admin](assets/mobile-admin.png) |
+
+### Web App
+
+| Home | Tasting Submission | Data View |
+|------|-------------------|-----------|
+| ![Web Home](assets/web-home.png) | ![Web Tasting](assets/web-tasting.png) | ![Web Data View](assets/web-dataview.png) |
+
+| Dashboard | Administration |
+|-----------|----------------|
+| ![Web Dashboard](assets/web-dashboard.png) | ![Web Admin](assets/web-admin-dashboard.png) |

@@ -12,7 +12,7 @@ interface PanelProps {
   style?: StyleProp<ViewStyle>;
 }
 
-/** A bordered section block (cream fill, hard panel shadow). Full width
+/** A bordered section block (panel fill, hard panel shadow). Full width
  *  on phone — NOT a centered max-width box. Optional header sub-block. */
 export function Panel({ children, title, eyebrow, style }: PanelProps) {
   return (
@@ -34,15 +34,15 @@ export function Panel({ children, title, eyebrow, style }: PanelProps) {
 
 const styles = StyleSheet.create({
   panel: {
-    backgroundColor: colors.canvasCream,
+    backgroundColor: colors.panel,
     borderRadius: 0,
     borderWidth: 1,
-    borderColor: colors.inkBlack,
+    borderColor: colors.line,
   },
   header: {
     padding: spacing.xl,
     borderBottomWidth: 1,
-    borderBottomColor: colors.inkBlack,
+    borderBottomColor: colors.line,
     gap: spacing.xs,
   },
   body: { padding: spacing.xl },

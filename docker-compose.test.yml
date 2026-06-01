@@ -1,0 +1,25 @@
+services:
+  whiskey-tasting-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3011:3010"
+      - "8011:8010"
+    environment:
+      - NODE_ENV=test
+      - NEXT_PUBLIC_API_URL=http://localhost:8011
+      - ADMIN_PASSWORD=test123
+      - HOST=0.0.0.0
+      - PORT=8010
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/api/v1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    volumes:
+      - test-data:/app/apps/backend/data
+
+volumes:
+  test-data:

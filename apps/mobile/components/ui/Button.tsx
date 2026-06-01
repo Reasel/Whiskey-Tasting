@@ -43,27 +43,27 @@ const VARIANT_ALIAS: Record<LegacyVariant, Variant> = {
 const SIZE_ALIAS: Record<LegacySize, Size> = { md: 'default' };
 
 const FILL: Record<Variant, string> = {
-  default: colors.whiskeyAmber,
-  destructive: colors.alertRed,
-  success: colors.signalGreen,
-  warning: colors.alertOrange,
-  outline: colors.canvasCream,
-  secondary: colors.panelGrey,
+  default: colors.amber,
+  destructive: colors.red,
+  success: colors.green,
+  warning: colors.red,
+  outline: colors.panel,
+  secondary: colors.raise,
   ghost: 'transparent',
   link: 'transparent',
 };
 const PRESSED_FILL: Partial<Record<Variant, string>> = {
-  default: colors.amberDark,
+  default: colors.ember,
 };
 const LABEL_COLOR: Record<Variant, string> = {
-  default: colors.cardWhite,
-  destructive: colors.cardWhite,
-  success: colors.cardWhite,
-  warning: colors.cardWhite,
-  outline: colors.inkBlack,
-  secondary: colors.inkBlack,
-  ghost: colors.inkBlack,
-  link: colors.whiskeyAmber,
+  default: colors.bg,
+  destructive: colors.bg,
+  success: colors.bg,
+  warning: colors.bg,
+  outline: colors.cream,
+  secondary: colors.cream,
+  ghost: colors.cream,
+  link: colors.amber,
 };
 const HEIGHT: Record<Size, number> = {
   sm: 32,
@@ -118,7 +118,7 @@ export function Button({
           width: sz === 'icon' ? HEIGHT.icon : undefined,
           backgroundColor: fill,
           borderWidth: flat ? 0 : 1,
-          borderColor: colors.inkBlack,
+          borderColor: colors.line,
           opacity: isDisabled ? 0.5 : 1,
           transform: [
             { translateX: pressed && !flat ? 2 : 0 },

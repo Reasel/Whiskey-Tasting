@@ -8,22 +8,26 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { colors, spacing } from '../../lib/theme';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import { Toast } from '../../components/ui/Toast';
 import { AppText } from '../../components/ui/AppText';
-import { Eyebrow } from '../../components/ui/Eyebrow';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { Stepper } from '../../components/ui/Stepper';
 import {
   fetchThemes,
   createTheme,
+  updateWhiskeys,
   deleteTheme,
   type Theme,
   type CreateThemeRequest,
 } from '../../lib/api';
 
 export default function ThemesScreen() {
+  const router = useRouter();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -31,7 +35,31 @@ export default function ThemesScreen() {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [notes, setNotes] = useState('');
-  const [numWhiskeys, setNumWhiskeys] = useState('3');
+  const [count, setCount] = useState(3);
+  const [rows, setRows] = useState<{ name: string; proof: string }[]>(
+    Array.from({ length: 3 }, () => ({ name: '', proof: '' })),
+  );
+
+  const setCountClamped = useCallback((n: number) => {
+    const clamped = Math.min(8, Math.max(1, n));
+    setCount(clamped);
+    setRows((prev) => {
+      const next = [...prev];
+      if (clamped > next.length) {
+        while (next.length < clamped) next.push({ name: '', proof: '' });
+      } else {
+        next.length = clamped;
+      }
+      return next;
+    });
+  }, []);
+
+  const updateRow = useCallback(
+    (i: number, field: 'name' | 'proof', value: string) => {
+      setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, [field]: value } : r)));
+    },
+    [],
+  );
   const [toast, setToast] = useState<{
     message: string;
     type: 'success' | 'error' | 'info';
@@ -61,12 +89,21 @@ export default function ThemesScreen() {
       const request: CreateThemeRequest = {
         name: name.trim(),
         notes: notes.trim(),
-        num_whiskeys: parseInt(numWhiskeys) || 3,
+        num_whiskeys: count,
       };
-      await createTheme(request);
+      const created = await createTheme(request);
+      // Persist the per-row name/proof entered in the form.
+      const whiskeys = rows.map((r) => {
+        const proofNum = parseFloat(r.proof);
+        return {
+          name: r.name.trim(),
+          proof: Number.isFinite(proofNum) ? proofNum : null,
+        };
+      });
+      await updateWhiskeys(created.theme.id, whiskeys);
       setName('');
       setNotes('');
-      setNumWhiskeys('3');
+      setCountClamped(3);
       setShowForm(false);
       setToast({ message: 'Theme created.', type: 'success', visible: true });
       await loadThemes();
@@ -79,7 +116,7 @@ export default function ThemesScreen() {
     } finally {
       setCreating(false);
     }
-  }, [name, notes, numWhiskeys, loadThemes]);
+  }, [name, notes, count, rows, setCountClamped, loadThemes]);
 
   const handleDelete = useCallback(
     (theme: Theme) => {
@@ -119,7 +156,7 @@ export default function ThemesScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.whiskeyAmber} />
+          <ActivityIndicator size="large" color={colors.amber} />
         </View>
       </SafeAreaView>
     );
@@ -136,12 +173,16 @@ export default function ThemesScreen() {
               setRefreshing(true);
               loadThemes();
             }}
-            tintColor={colors.whiskeyAmber}
+            tintColor={colors.amber}
           />
         }
       >
-        <AppText variant="pageTitle" style={styles.title}>THEMES</AppText>
-        <Eyebrow style={styles.eyebrow}>MANAGE TASTING THEMES</Eyebrow>
+        <ScreenHeader
+          title="NEW THEME"
+          eyebrow="CREATE A NEW TASTING THEME"
+          backLabel="ADMIN"
+          onBack={() => router.back()}
+        />
 
         <Button
           title={showForm ? 'CANCEL' : 'CREATE NEW THEME'}
@@ -153,26 +194,52 @@ export default function ThemesScreen() {
         {showForm && (
           <Card style={styles.formCard}>
             <Input
-              label="Theme Name"
+              label="THEME NAME"
               value={name}
               onChangeText={setName}
               placeholder="e.g., Bourbon Night"
             />
             <Input
-              label="Notes"
+              label="NOTES"
               value={notes}
               onChangeText={setNotes}
               placeholder="Description..."
               multiline
               numberOfLines={3}
             />
-            <Input
-              label="Number of Whiskeys (1-20)"
-              value={numWhiskeys}
-              onChangeText={setNumWhiskeys}
-              keyboardType="number-pad"
-              placeholder="3"
-            />
+
+            <View style={styles.stepperRow}>
+              <AppText variant="fieldLabel">NUMBER OF WHISKEYS</AppText>
+              <Stepper value={count} min={1} max={8} onChange={setCountClamped} />
+            </View>
+
+            <View style={styles.whiskeyRows}>
+              {rows.map((row, i) => (
+                <View key={i} style={styles.whiskeyRow}>
+                  <AppText variant="eyebrow" style={styles.rowNo}>
+                    {String(i + 1).padStart(2, '0')}
+                  </AppText>
+                  <View style={styles.rowName}>
+                    <Input
+                      value={row.name}
+                      onChangeText={(v) => updateRow(i, 'name', v)}
+                      placeholder="Whiskey name"
+                      containerStyle={styles.rowInput}
+                    />
+                  </View>
+                  <View style={styles.rowProof}>
+                    <Input
+                      value={row.proof}
+                      onChangeText={(v) => updateRow(i, 'proof', v)}
+                      placeholder="Proof"
+                      keyboardType="decimal-pad"
+                      containerStyle={styles.rowInput}
+                    />
+                  </View>
+                </View>
+              ))}
+            </View>
+
             <Button
               title={creating ? 'Creating...' : 'CREATE THEME'}
               onPress={handleCreate}
@@ -221,7 +288,7 @@ export default function ThemesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.canvasCream,
+    backgroundColor: colors.bg,
   },
   centered: {
     flex: 1,
@@ -232,12 +299,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  title: {
-    marginBottom: spacing.xs,
-  },
-  eyebrow: {
-    marginBottom: spacing.lg,
-  },
   createButton: {
     marginBottom: spacing.lg,
     width: '100%',
@@ -245,12 +306,40 @@ const styles = StyleSheet.create({
   formCard: {
     marginBottom: spacing.lg,
   },
+  stepperRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  whiskeyRows: {
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  whiskeyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  rowNo: {
+    color: colors.amber,
+    width: 24,
+  },
+  rowName: {
+    flex: 3,
+  },
+  rowProof: {
+    flex: 1,
+  },
+  rowInput: {
+    marginBottom: 0,
+  },
   empty: {
     alignItems: 'center',
     padding: spacing.xl,
   },
   emptyText: {
-    color: colors.mutedText,
+    color: colors.muted,
   },
   themeCard: {
     marginBottom: spacing.md,
@@ -265,7 +354,7 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   themeNotes: {
-    color: colors.steelGrey,
+    color: colors.dim,
     marginTop: 2,
   },
 });

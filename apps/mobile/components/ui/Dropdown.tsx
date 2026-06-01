@@ -50,7 +50,7 @@ export function Dropdown({
           <AppText variant="body" style={selected ? styles.valueText : styles.placeholderText}>
             {selected ? selected.label : placeholder}
           </AppText>
-          <Ionicons name="chevron-down" size={18} color={colors.steelGrey} />
+          <Ionicons name="chevron-down" size={18} color={colors.dim} />
         </TouchableOpacity>
       </HardShadow>
 
@@ -102,7 +102,7 @@ export function Dropdown({
                         <Ionicons
                           name="checkmark"
                           size={18}
-                          color={colors.cardWhite}
+                          color={colors.bg}
                         />
                       )}
                     </TouchableOpacity>
@@ -128,19 +128,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.cardWhite,
+    backgroundColor: colors.panel,
     borderWidth: 1,
-    borderColor: colors.inkBlack,
+    borderColor: colors.line,
     borderRadius: 0,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     minHeight: 48,
   },
   valueText: {
-    color: colors.inkBlack,
+    color: colors.cream,
   },
   placeholderText: {
-    color: colors.mutedText,
+    color: colors.muted,
   },
   backdrop: {
     flex: 1,
@@ -149,10 +149,10 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   sheet: {
-    backgroundColor: colors.cardWhite,
+    backgroundColor: colors.panel,
     borderRadius: 0,
     borderWidth: 1,
-    borderColor: colors.inkBlack,
+    borderColor: colors.line,
     maxHeight: '70%',
     overflow: 'hidden',
   },
@@ -163,20 +163,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.lightGrey,
-    backgroundColor: colors.cardWhite,
+    borderBottomColor: colors.line,
+    backgroundColor: colors.panel,
   },
   optionLast: {
     borderBottomWidth: 0,
   },
   optionActive: {
-    backgroundColor: colors.whiskeyAmber,
+    backgroundColor: colors.amber,
   },
   optionText: {
-    color: colors.inkBlack,
+    color: colors.cream,
   },
   optionTextActive: {
-    color: colors.cardWhite,
+    color: colors.bg,
     fontWeight: '700',
   },
   empty: {
@@ -185,6 +185,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: colors.mutedText,
+    color: colors.muted,
   },
 });

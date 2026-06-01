@@ -43,11 +43,11 @@ export function Card({ children, title, onPress, style }: CardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardWhite,
+    backgroundColor: colors.panel,
     borderRadius: 0,
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.inkBlack,
+    borderColor: colors.line,
   },
   title: { marginBottom: spacing.md },
 });

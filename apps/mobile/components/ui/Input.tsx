@@ -31,7 +31,7 @@ export function Input({
       ) : null}
       <TextInput
         style={[styles.input, error ? styles.inputError : null, style]}
-        placeholderTextColor={colors.mutedText}
+        placeholderTextColor={colors.muted}
         {...props}
       />
       {error ? (
@@ -47,21 +47,21 @@ const styles = StyleSheet.create({
   wrap: { gap: spacing.xs, marginBottom: spacing.md },
   label: {},
   input: {
-    backgroundColor: colors.cardWhite,
+    backgroundColor: colors.panel,
     borderWidth: 1,
-    borderColor: colors.inkBlack,
+    borderColor: colors.line,
     borderRadius: 0,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.smd,
     fontFamily: 'Inter_400Regular',
     fontSize: 16,
-    color: colors.inkBlack,
+    color: colors.cream,
     minHeight: 48,
   },
   inputError: {
-    borderColor: colors.alertRed,
+    borderColor: colors.red,
   },
   errorText: {
-    color: colors.alertRed,
+    color: colors.red,
   },
 });

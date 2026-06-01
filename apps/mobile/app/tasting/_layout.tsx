@@ -6,7 +6,7 @@ export default function TastingLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: colors.canvasCream },
+        contentStyle: { backgroundColor: colors.bg },
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />

@@ -6,13 +6,15 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { colors, spacing } from '../lib/theme';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Panel } from '../components/ui/Panel';
 import { Card } from '../components/ui/Card';
 import { AppText } from '../components/ui/AppText';
-import { Eyebrow } from '../components/ui/Eyebrow';
+import { ScreenHeader } from '../components/ui/ScreenHeader';
+import { AfterDarkBackground } from '../components/ui/AfterDarkBackground';
 import {
   getServerUrl,
   setServerUrl,
@@ -24,6 +26,7 @@ import { clearApiCache, fetchUsers, type User } from '../lib/api';
 import { APP_VERSION, APP_NAME } from '../lib/config';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const [url, setUrl] = useState('');
   const [savedUrl, setSavedUrl] = useState('');
   const [testing, setTesting] = useState(false);
@@ -110,9 +113,14 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <AfterDarkBackground />
       <ScrollView contentContainerStyle={styles.content}>
-        <AppText variant="pageTitle" style={styles.pageTitle}>SETTINGS</AppText>
-        <Eyebrow style={styles.eyebrow}>CONFIGURE THE APP</Eyebrow>
+        <ScreenHeader
+          title="SETTINGS"
+          eyebrow="SERVER CONNECTION · DEFAULTS"
+          backLabel="ADMIN"
+          onBack={() => router.back()}
+        />
 
         <Panel title="Server Connection" style={styles.panel}>
           <AppText variant="body" style={styles.description}>
@@ -158,8 +166,8 @@ export default function SettingsScreen() {
                 {
                   color:
                     connectionStatus === 'connected'
-                      ? colors.signalGreen
-                      : colors.alertRed,
+                      ? colors.green
+                      : colors.red,
                 },
               ]}
             >
@@ -243,23 +251,17 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.canvasCream,
+    backgroundColor: colors.bg,
   },
   content: {
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  pageTitle: {
-    marginBottom: spacing.xs,
-  },
-  eyebrow: {
-    marginBottom: spacing.xl,
-  },
   panel: {
     marginBottom: spacing.lg,
   },
   description: {
-    color: colors.mutedText,
+    color: colors.muted,
     marginBottom: spacing.lg,
   },
   buttonRow: {
@@ -287,19 +289,19 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   subtleText: {
-    color: colors.mutedText,
+    color: colors.muted,
   },
   userCard: {
     marginBottom: spacing.sm,
   },
   userCardActive: {
-    borderColor: colors.whiskeyAmber,
+    borderColor: colors.amber,
     borderWidth: 2,
   },
   userName: {
-    fontWeight: '600',
+    color: colors.cream,
   },
   userNameActive: {
-    color: colors.whiskeyAmber,
+    color: colors.amber,
   },
 });
