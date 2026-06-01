@@ -35,14 +35,6 @@ jobs:
         cd apps/backend
         python -m pytest --cov=app --cov-report=xml --cov-report=term
 
-    - name: Upload backend coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./apps/backend/coverage.xml
-        flags: backend
-        name: backend-coverage
-      continue-on-error: true
-
   test-frontend:
     runs-on: ubuntu-latest
 
@@ -66,14 +58,6 @@ jobs:
       run: |
         cd apps/frontend
         npm run test:coverage
-
-    - name: Upload frontend coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./apps/frontend/coverage/lcov.info
-        flags: frontend
-        name: frontend-coverage
-      continue-on-error: true
 
     - name: Run linter
       run: |
