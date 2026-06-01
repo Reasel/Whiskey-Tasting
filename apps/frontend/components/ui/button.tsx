@@ -1,29 +1,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-/**
- * Swiss International Style Button Component
- *
- * Design Principles:
- * - Hard shadows (no blur) that create depth
- * - Square corners (rounded-none) - Brutalist aesthetic
- * - High contrast black borders
- * - Hover: translate + shadow removal creates "press" effect
- * - Clear semantic variants for different actions
- */
-
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /**
-   * Visual variant determining color and purpose:
-   * - `default`: Whiskey Amber (#F59E0B) - Primary actions (save, submit, create)
-   * - `destructive`: Alert Red (#DC2626) - Destructive actions (delete, remove)
-   * - `success`: Signal Green (#15803D) - Positive actions (download, confirm, complete)
-   * - `warning`: Alert Orange (#F97316) - Caution actions (reset, clear, undo)
-   * - `outline`: Transparent + black border - Secondary actions (cancel, back)
-   * - `secondary`: Panel Grey (#E5E5E0) - Tertiary actions
-   * - `ghost`: No background - Subtle actions (icon buttons, navigation)
-   * - `link`: Text only with underline - Inline links
-   */
   variant?:
     | 'default'
     | 'destructive'
@@ -33,136 +11,76 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
     | 'secondary'
     | 'ghost'
     | 'link';
-  /**
-   * Button size:
-   * - `default`: Standard button (h-10)
-   * - `sm`: Small button (h-8)
-   * - `lg`: Large button (h-12)
-   * - `icon`: Square icon button (h-9 w-9)
-   */
   size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'default', size = 'default', ...props }, ref) => {
-    // Base styles applied to ALL buttons
-    // Swiss Design: clean, functional, high contrast
-    const baseStyles = cn(
-      // Layout & Typography
+    const base = cn(
       'inline-flex items-center justify-center gap-2',
       'whitespace-nowrap text-sm font-medium font-mono uppercase tracking-wide',
-      // Transitions
       'transition-all duration-150 ease-out',
-      // Focus state - sharp blue ring (not soft glow)
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2',
-      // Disabled state
-      'disabled:pointer-events-none disabled:opacity-50',
-      // SVG icon sizing
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--amber)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]',
+      'disabled:pointer-events-none disabled:opacity-40',
       "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
-      // Swiss Design: NO rounded corners
       'rounded-none'
     );
 
-    // Variant styles - each has distinct purpose and color
-    const variants = {
-      // PRIMARY - Whiskey Amber (#F59E0B / amber-500)
-      // Use for: Save, Submit, Create, Primary CTA
+    const variants: Record<string, string> = {
       default: cn(
-        'bg-amber-500 text-white',
-        'border border-black',
-        'shadow-[2px_2px_0px_0px_#000000]',
-        'hover:bg-amber-600',
-        'hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none',
-        'active:translate-y-[2px] active:translate-x-[2px]'
+        'bg-[var(--amber)] text-[var(--bg)] border border-[var(--amber)]',
+        'shadow-[0_0_20px_var(--glow-soft)]',
+        'hover:bg-[var(--amber-soft)] hover:shadow-[0_0_34px_var(--glow)]',
+        'active:translate-y-px'
       ),
-
-      // DESTRUCTIVE - Alert Red (#DC2626 / red-600)
-      // Use for: Delete, Remove, Destroy, Dangerous actions
       destructive: cn(
-        'bg-red-600 text-white',
-        'border border-black',
-        'shadow-[2px_2px_0px_0px_#000000]',
-        'hover:bg-red-700',
-        'hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none',
-        'active:translate-y-[2px] active:translate-x-[2px]'
+        'bg-[var(--red)] text-[var(--cream)] border border-[var(--red)]',
+        'hover:shadow-[0_0_24px_rgba(224,86,63,0.5)]',
+        'active:translate-y-px'
       ),
-
-      // SUCCESS - Signal Green (#15803D / green-700)
-      // Use for: Download, Confirm, Complete, Positive actions
       success: cn(
-        'bg-green-700 text-white',
-        'border border-black',
-        'shadow-[2px_2px_0px_0px_#000000]',
-        'hover:bg-green-800',
-        'hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none',
-        'active:translate-y-[2px] active:translate-x-[2px]'
+        'bg-[var(--green)] text-[var(--bg)] border border-[var(--green)]',
+        'hover:shadow-[0_0_20px_rgba(143,191,106,0.4)]',
+        'active:translate-y-px'
       ),
-
-      // WARNING - Alert Orange (#F97316 / orange-500)
-      // Use for: Reset, Clear, Undo, Caution actions
       warning: cn(
-        'bg-orange-500 text-white',
-        'border border-black',
-        'shadow-[2px_2px_0px_0px_#000000]',
+        'bg-orange-500 text-white border border-orange-500',
         'hover:bg-orange-600',
-        'hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none',
-        'active:translate-y-[2px] active:translate-x-[2px]'
+        'active:translate-y-px'
       ),
-
-      // OUTLINE - Transparent with black border
-      // Use for: Cancel, Back, Secondary actions, Navigation
       outline: cn(
-        'bg-transparent text-black',
-        'border border-black',
-        'shadow-[2px_2px_0px_0px_#000000]',
-        'hover:bg-gray-100',
-        'hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none',
-        'active:translate-y-[2px] active:translate-x-[2px]'
+        'bg-transparent text-[var(--dim)] border border-[var(--line)]',
+        'hover:border-[var(--cream)] hover:text-[var(--cream)]',
+        'active:translate-y-px'
       ),
-
-      // SECONDARY - Panel Grey (#E5E5E0)
-      // Use for: Less prominent actions, Toolbar buttons
       secondary: cn(
-        'bg-[#E5E5E0] text-black',
-        'border border-black',
-        'shadow-[2px_2px_0px_0px_#000000]',
-        'hover:bg-[#D8D8D2]',
-        'hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none',
-        'active:translate-y-[2px] active:translate-x-[2px]'
+        'bg-[var(--raise)] text-[var(--cream)] border border-[var(--line)]',
+        'hover:border-[var(--amber)] hover:text-[var(--amber)]',
+        'active:translate-y-px'
       ),
-
-      // GHOST - No background, minimal styling
-      // Use for: Icon buttons, Subtle navigation, Toolbars
       ghost: cn(
-        'bg-transparent text-black',
-        'border-none shadow-none',
-        'hover:bg-gray-100',
-        'active:bg-gray-200'
+        'bg-transparent text-[var(--dim)] border-none shadow-none',
+        'hover:text-[var(--cream)]'
       ),
-
-      // LINK - Text only with underline
-      // Use for: Inline links, Text navigation
       link: cn(
-        'bg-transparent text-blue-700',
-        'border-none shadow-none',
-        'underline-offset-4 hover:underline',
-        'p-0 h-auto'
+        'bg-transparent text-[var(--amber)] border-none shadow-none',
+        'underline-offset-4 hover:underline p-0 h-auto'
       ),
     };
 
-    // Size styles
-    const sizes = {
+    const sizes: Record<string, string> = {
       default: 'h-10 px-6 py-2',
       sm: 'h-8 px-4 py-1 text-xs',
       lg: 'h-12 px-8 py-3 text-base',
       icon: 'h-10 w-10 p-0',
     };
 
-    const variantClass = variants[variant];
-    const sizeClass = sizes[size];
-
     return (
-      <button ref={ref} className={cn(baseStyles, variantClass, sizeClass, className)} {...props} />
+      <button
+        ref={ref}
+        className={cn(base, variants[variant], sizes[size], className)}
+        {...props}
+      />
     );
   }
 );
