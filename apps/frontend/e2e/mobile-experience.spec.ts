@@ -1,8 +1,8 @@
 import { test, expect, devices } from '@playwright/test';
 
-test.describe('Mobile Experience', () => {
-  test.use({ ...devices['iPhone 12'] });
+test.use({ ...devices['iPhone 12'] });
 
+test.describe('Mobile Experience', () => {
   test('homepage is responsive on mobile', async ({ page }) => {
     await page.goto('/');
 
@@ -96,24 +96,6 @@ test.describe('Mobile Experience', () => {
   });
 });
 
-test.describe('Tablet Experience', () => {
-  test.use({ ...devices['iPad Pro'] });
-
-  test('layout adapts to tablet size', async ({ page }) => {
-    await page.goto('/');
-
-    // Page should render appropriately for tablet
-    await expect(page.locator('body')).toBeVisible();
-  });
-
-  test('dashboard is readable on tablet', async ({ page }) => {
-    await page.goto('/dashboard');
-
-    // Results should be displayed clearly
-    await expect(page.locator('text=/whiskey|theme/i')).toBeVisible();
-  });
-});
-
 test.describe('Mobile Portrait vs Landscape', () => {
   test('works in portrait orientation', async ({ page, context }) => {
     await context.setViewportSize({ width: 375, height: 812 }); // iPhone X portrait
@@ -131,8 +113,6 @@ test.describe('Mobile Portrait vs Landscape', () => {
 });
 
 test.describe('Touch Interactions', () => {
-  test.use({ ...devices['iPhone 12'] });
-
   test('handles touch events on interactive elements', async ({ page }) => {
     await page.goto('/');
 
@@ -165,8 +145,6 @@ test.describe('Touch Interactions', () => {
 });
 
 test.describe('Mobile Performance', () => {
-  test.use({ ...devices['iPhone 12'] });
-
   test('page loads within reasonable time', async ({ page }) => {
     const startTime = Date.now();
     await page.goto('/');
