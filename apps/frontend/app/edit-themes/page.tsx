@@ -28,32 +28,51 @@ export default function EditThemes() {
     if (localStorage.getItem('adminAuthenticated') !== 'true') router.push('/administration');
   }, [router]);
 
-  useEffect(() => { loadThemes(); }, []);
+  useEffect(() => {
+    loadThemes();
+  }, []);
 
   useEffect(() => {
     if (selectedTheme) loadWhiskeys(selectedTheme.id!);
   }, [selectedTheme]);
 
   async function loadThemes() {
-    try { const r = await fetchThemes(); setThemes(r.themes); }
-    catch (e) { console.error(e); }
-    finally { setLoading(false); }
+    try {
+      const r = await fetchThemes();
+      setThemes(r.themes);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function loadWhiskeys(id: number) {
-    try { setWhiskeys(await fetchWhiskeysByTheme(id)); }
-    catch (e) { console.error(e); }
+    try {
+      setWhiskeys(await fetchWhiskeysByTheme(id));
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function handleSaveTheme() {
     if (!selectedTheme) return;
     try {
-      await updateTheme(selectedTheme.id!, { name: selectedTheme.name, notes: selectedTheme.notes });
+      await updateTheme(selectedTheme.id!, {
+        name: selectedTheme.name,
+        notes: selectedTheme.notes,
+      });
       showToast('Theme updated successfully!', 'success');
-    } catch { showToast('Failed to update theme.', 'error'); }
+    } catch {
+      showToast('Failed to update theme.', 'error');
+    }
   }
 
-  function handleWhiskeyChange(index: number, field: 'name' | 'proof', value: string | number | null) {
+  function handleWhiskeyChange(
+    index: number,
+    field: 'name' | 'proof',
+    value: string | number | null
+  ) {
     const updated = [...whiskeys];
     updated[index] = { ...updated[index], [field]: value };
     setWhiskeys(updated);
@@ -62,9 +81,14 @@ export default function EditThemes() {
   async function handleSaveWhiskeys() {
     if (!selectedTheme) return;
     try {
-      await updateWhiskeys(selectedTheme.id!, whiskeys.map((w) => ({ name: w.name, proof: w.proof })));
+      await updateWhiskeys(
+        selectedTheme.id!,
+        whiskeys.map((w) => ({ name: w.name, proof: w.proof }))
+      );
       showToast('Whiskeys updated successfully!', 'success');
-    } catch { showToast('Failed to update whiskeys.', 'error'); }
+    } catch {
+      showToast('Failed to update whiskeys.', 'error');
+    }
   }
 
   async function handleDeleteTheme() {
@@ -74,13 +98,20 @@ export default function EditThemes() {
       showToast('Theme deleted successfully!', 'success');
       setSelectedTheme(null);
       loadThemes();
-    } catch { showToast('Failed to delete theme.', 'error'); }
+    } catch {
+      showToast('Failed to delete theme.', 'error');
+    }
   }
 
   if (loading) {
     return (
       <div className="ad-screen flex items-center justify-center">
-        <p className="font-mono text-[13px] uppercase tracking-[.22em]" style={{ color: 'var(--amber)' }}>{'// LOADING...'}</p>
+        <p
+          className="font-mono text-[13px] uppercase tracking-[.22em]"
+          style={{ color: 'var(--amber)' }}
+        >
+          {'// LOADING...'}
+        </p>
       </div>
     );
   }
@@ -91,14 +122,26 @@ export default function EditThemes() {
         <div className="ad-panel">
           <div className="ad-panel-head">
             <div>
-              <h1 className="font-fraunces font-black leading-[.94] tracking-[-0.02em] m-0" style={{ fontSize: 'clamp(40px, 6vw, 78px)', color: 'var(--cream)' }}>
+              <h1
+                className="font-fraunces font-black leading-[.94] tracking-[-0.02em] m-0"
+                style={{ fontSize: 'clamp(40px, 6vw, 78px)', color: 'var(--cream)' }}
+              >
                 EDIT THEMES
               </h1>
-              <p className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0" style={{ color: 'var(--amber)' }}>
+              <p
+                className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0"
+                style={{ color: 'var(--amber)' }}
+              >
                 {'// SELECT A THEME TO EDIT'}
               </p>
             </div>
-            <Button variant="outline" onClick={() => selectedTheme ? setSelectedTheme(null) : router.push('/administration')} className="whitespace-nowrap">
+            <Button
+              variant="outline"
+              onClick={() =>
+                selectedTheme ? setSelectedTheme(null) : router.push('/administration')
+              }
+              className="whitespace-nowrap"
+            >
               {selectedTheme ? '← THEMES' : '← ADMIN'}
             </Button>
           </div>
@@ -113,11 +156,19 @@ export default function EditThemes() {
                     className="ad-tile text-left"
                     style={{ minHeight: 120 }}
                   >
-                    <span className="ad-tile-sub">// {new Date(theme.created_at).toLocaleDateString()}</span>
-                    <span className="ad-tile-label" style={{ fontSize: 20 }}>{theme.name}</span>
+                    <span className="ad-tile-sub">
+                      // {new Date(theme.created_at).toLocaleDateString()}
+                    </span>
+                    <span className="ad-tile-label" style={{ fontSize: 20 }}>
+                      {theme.name}
+                    </span>
                     {theme.notes && (
-                      <span className="font-sans text-sm mt-1 relative z-10" style={{ color: 'var(--dim)' }}>
-                        {theme.notes.slice(0, 60)}{theme.notes.length > 60 ? '…' : ''}
+                      <span
+                        className="font-sans text-sm mt-1 relative z-10"
+                        style={{ color: 'var(--dim)' }}
+                      >
+                        {theme.notes.slice(0, 60)}
+                        {theme.notes.length > 60 ? '…' : ''}
                       </span>
                     )}
                   </button>
@@ -127,39 +178,103 @@ export default function EditThemes() {
               /* Edit form */
               <div className="flex flex-col gap-[22px]">
                 {/* Theme details card */}
-                <div className="border p-8" style={{ background: 'rgba(0,0,0,.22)', borderColor: 'var(--line)' }}>
-                  <h2 className="font-fraunces font-semibold text-[24px] mb-6 mt-0" style={{ color: 'var(--cream)' }}>
+                <div
+                  className="border p-8"
+                  style={{ background: 'rgba(0,0,0,.22)', borderColor: 'var(--line)' }}
+                >
+                  <h2
+                    className="font-fraunces font-semibold text-[24px] mb-6 mt-0"
+                    style={{ color: 'var(--cream)' }}
+                  >
                     {selectedTheme.name}
                   </h2>
                   <div className="flex flex-col gap-6">
                     <div className="flex flex-col gap-[9px]">
-                      <label className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>Theme Name</label>
-                      <input type="text" value={selectedTheme.name} onChange={(e) => setSelectedTheme({ ...selectedTheme, name: e.target.value })} className="ad-select" />
+                      <label
+                        className="font-mono text-[11px] uppercase tracking-[.18em]"
+                        style={{ color: 'var(--dim)' }}
+                      >
+                        Theme Name
+                      </label>
+                      <input
+                        type="text"
+                        value={selectedTheme.name}
+                        onChange={(e) =>
+                          setSelectedTheme({ ...selectedTheme, name: e.target.value })
+                        }
+                        className="ad-select"
+                      />
                     </div>
                     <div className="flex flex-col gap-[9px]">
-                      <label className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>Notes</label>
-                      <textarea value={selectedTheme.notes} onChange={(e) => setSelectedTheme({ ...selectedTheme, notes: e.target.value })} rows={4} className="ad-select resize-y" style={{ height: 'auto' }} />
+                      <label
+                        className="font-mono text-[11px] uppercase tracking-[.18em]"
+                        style={{ color: 'var(--dim)' }}
+                      >
+                        Notes
+                      </label>
+                      <textarea
+                        value={selectedTheme.notes}
+                        onChange={(e) =>
+                          setSelectedTheme({ ...selectedTheme, notes: e.target.value })
+                        }
+                        rows={4}
+                        className="ad-select resize-y"
+                        style={{ height: 'auto' }}
+                      />
                     </div>
                     <div className="flex gap-4 flex-wrap">
-                      <Button variant="default" onClick={handleSaveTheme}>Save Changes</Button>
-                      <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)}>Delete Theme</Button>
+                      <Button variant="default" onClick={handleSaveTheme}>
+                        Save Changes
+                      </Button>
+                      <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)}>
+                        Delete Theme
+                      </Button>
                     </div>
                   </div>
                 </div>
 
                 {/* Whiskeys card */}
-                <div className="border p-8" style={{ background: 'rgba(0,0,0,.22)', borderColor: 'var(--line)' }}>
-                  <h2 className="font-fraunces font-semibold text-[24px] mb-6 mt-0" style={{ color: 'var(--cream)' }}>
+                <div
+                  className="border p-8"
+                  style={{ background: 'rgba(0,0,0,.22)', borderColor: 'var(--line)' }}
+                >
+                  <h2
+                    className="font-fraunces font-semibold text-[24px] mb-6 mt-0"
+                    style={{ color: 'var(--cream)' }}
+                  >
                     Whiskeys
                   </h2>
                   <div className="flex flex-col gap-[10px]">
                     {whiskeys.map((w, i) => (
-                      <div key={w.id} className="grid items-center gap-3" style={{ gridTemplateColumns: '36px 1fr 110px' }}>
-                        <span className="font-mono text-[12px] font-medium" style={{ color: 'var(--amber)' }}>
+                      <div
+                        key={w.id}
+                        className="grid items-center gap-3"
+                        style={{ gridTemplateColumns: '36px 1fr 110px' }}
+                      >
+                        <span
+                          className="font-mono text-[12px] font-medium"
+                          style={{ color: 'var(--amber)' }}
+                        >
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        <input type="text" value={w.name} onChange={(e) => handleWhiskeyChange(i, 'name', e.target.value)} placeholder="Whiskey name…" className="ad-select" style={{ padding: '10px 12px', fontSize: 14 }} />
-                        <input type="number" value={w.proof ?? ''} onChange={(e) => handleWhiskeyChange(i, 'proof', parseFloat(e.target.value) || null)} placeholder="Proof" className="ad-select" style={{ padding: '10px 12px', fontSize: 14 }} />
+                        <input
+                          type="text"
+                          value={w.name}
+                          onChange={(e) => handleWhiskeyChange(i, 'name', e.target.value)}
+                          placeholder="Whiskey name…"
+                          className="ad-select"
+                          style={{ padding: '10px 12px', fontSize: 14 }}
+                        />
+                        <input
+                          type="number"
+                          value={w.proof ?? ''}
+                          onChange={(e) =>
+                            handleWhiskeyChange(i, 'proof', parseFloat(e.target.value) || null)
+                          }
+                          placeholder="Proof"
+                          className="ad-select"
+                          style={{ padding: '10px 12px', fontSize: 14 }}
+                        />
                       </div>
                     ))}
                   </div>

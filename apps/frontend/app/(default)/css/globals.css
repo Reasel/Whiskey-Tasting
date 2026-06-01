@@ -57,36 +57,75 @@
 
 /* ============ KEYFRAMES ============ */
 @keyframes screen-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes stagger-in {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes pip-pop {
-  0%   { transform: scaleY(0.6); }
-  60%  { transform: scaleY(1.12); }
-  100% { transform: scaleY(1); }
+  0% {
+    transform: scaleY(0.6);
+  }
+  60% {
+    transform: scaleY(1.12);
+  }
+  100% {
+    transform: scaleY(1);
+  }
 }
 @keyframes ad-pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 10px var(--amber); }
-  50%       { opacity: 0.4; box-shadow: 0 0 4px var(--amber); }
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 10px var(--amber);
+  }
+  50% {
+    opacity: 0.4;
+    box-shadow: 0 0 4px var(--amber);
+  }
 }
 @keyframes gradient {
-  to { background-position: 200% center; }
+  to {
+    background-position: 200% center;
+  }
 }
 
 /* ============ ANIMATION UTILITIES ============ */
 .screen-enter {
   animation: screen-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-.stagger-enter > *:nth-child(1) { animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.02s both; }
-.stagger-enter > *:nth-child(2) { animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both; }
-.stagger-enter > *:nth-child(3) { animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both; }
-.stagger-enter > *:nth-child(4) { animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.20s both; }
-.stagger-enter > *:nth-child(5) { animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both; }
-.stagger-enter > *:nth-child(6) { animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both; }
+.stagger-enter > *:nth-child(1) {
+  animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.02s both;
+}
+.stagger-enter > *:nth-child(2) {
+  animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+.stagger-enter > *:nth-child(3) {
+  animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+}
+.stagger-enter > *:nth-child(4) {
+  animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+.stagger-enter > *:nth-child(5) {
+  animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both;
+}
+.stagger-enter > *:nth-child(6) {
+  animation: stagger-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .screen-enter,
@@ -102,8 +141,7 @@
   padding: 40px 24px 80px;
   background:
     radial-gradient(120% 80% at 50% -10%, rgba(244, 169, 55, 0.16), transparent 60%),
-    radial-gradient(80% 60% at 80% 110%, rgba(201, 116, 42, 0.12), transparent 60%),
-    var(--bg);
+    radial-gradient(80% 60% at 80% 110%, rgba(201, 116, 42, 0.12), transparent 60%), var(--bg);
 }
 
 /* Main panel card */
@@ -159,7 +197,9 @@
 .ad-tile:hover {
   border-color: var(--amber);
   transform: translateY(-3px);
-  box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.8), 0 0 30px -8px var(--glow);
+  box-shadow:
+    0 18px 40px -16px rgba(0, 0, 0, 0.8),
+    0 0 30px -8px var(--glow);
 }
 .ad-tile:hover::after {
   opacity: 1;
@@ -371,7 +411,9 @@
   gap: 12px;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .ad-podium-col.rise {
   opacity: 1;

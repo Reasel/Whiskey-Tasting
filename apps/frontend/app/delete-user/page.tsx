@@ -28,7 +28,10 @@ export default function DeleteUser() {
   }, [showToast]);
 
   useEffect(() => {
-    if (localStorage.getItem('adminAuthenticated') !== 'true') { router.push('/administration'); return; }
+    if (localStorage.getItem('adminAuthenticated') !== 'true') {
+      router.push('/administration');
+      return;
+    }
     loadUsers();
   }, [router, loadUsers]);
 
@@ -51,7 +54,12 @@ export default function DeleteUser() {
   if (loading) {
     return (
       <div className="ad-screen flex items-center justify-center">
-        <p className="font-mono text-[13px] uppercase tracking-[.22em]" style={{ color: 'var(--amber)' }}>{'// LOADING...'}</p>
+        <p
+          className="font-mono text-[13px] uppercase tracking-[.22em]"
+          style={{ color: 'var(--amber)' }}
+        >
+          {'// LOADING...'}
+        </p>
       </div>
     );
   }
@@ -62,34 +70,55 @@ export default function DeleteUser() {
         <div className="ad-panel" style={{ maxWidth: 720 }}>
           <div className="ad-panel-head">
             <div>
-              <h1 className="font-fraunces font-black leading-[.94] tracking-[-0.02em] m-0" style={{ fontSize: 'clamp(40px, 6vw, 78px)', color: 'var(--cream)' }}>
+              <h1
+                className="font-fraunces font-black leading-[.94] tracking-[-0.02em] m-0"
+                style={{ fontSize: 'clamp(40px, 6vw, 78px)', color: 'var(--cream)' }}
+              >
                 DELETE USER
               </h1>
-              <p className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0" style={{ color: 'var(--amber)' }}>
+              <p
+                className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0"
+                style={{ color: 'var(--amber)' }}
+              >
                 {'// REMOVE A TASTER FROM THE SYSTEM'}
               </p>
             </div>
-            <Button variant="outline" onClick={() => router.push('/administration')} className="whitespace-nowrap">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/administration')}
+              className="whitespace-nowrap"
+            >
               ← ADMIN
             </Button>
           </div>
           <div className="ad-panel-body">
             {users.length === 0 ? (
-              <p className="font-sans text-sm" style={{ color: 'var(--muted)' }}>No users found to delete.</p>
+              <p className="font-sans text-sm" style={{ color: 'var(--muted)' }}>
+                No users found to delete.
+              </p>
             ) : (
               <div className="flex flex-col gap-6 max-w-md">
                 <div className="flex flex-col gap-[9px]">
-                  <label className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>
+                  <label
+                    className="font-mono text-[11px] uppercase tracking-[.18em]"
+                    style={{ color: 'var(--dim)' }}
+                  >
                     Select User to Delete
                   </label>
                   <select
                     value={selectedUser?.id ?? ''}
-                    onChange={(e) => setSelectedUser(users.find((u) => u.id === parseInt(e.target.value)) ?? null)}
+                    onChange={(e) =>
+                      setSelectedUser(users.find((u) => u.id === parseInt(e.target.value)) ?? null)
+                    }
                     className="ad-select"
                     required
                   >
                     <option value="">Choose a user…</option>
-                    {users.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <Button
@@ -100,7 +129,10 @@ export default function DeleteUser() {
                 >
                   {deleting ? 'DELETING…' : 'DELETE USER'}
                 </Button>
-                <p className="font-mono text-[11px] uppercase tracking-[.14em]" style={{ color: 'var(--red)' }}>
+                <p
+                  className="font-mono text-[11px] uppercase tracking-[.14em]"
+                  style={{ color: 'var(--red)' }}
+                >
                   WARNING — permanently removes the user and all their tasting data.
                 </p>
               </div>

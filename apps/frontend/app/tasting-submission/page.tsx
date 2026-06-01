@@ -32,7 +32,15 @@ export default function TastingSubmission() {
   const [isCustomUser, setIsCustomUser] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [scores, setScores] = useState<
-    Record<number, { aroma_score: number | ''; flavor_score: number | ''; finish_score: number | ''; personal_rank: number | '' }>
+    Record<
+      number,
+      {
+        aroma_score: number | '';
+        flavor_score: number | '';
+        finish_score: number | '';
+        personal_rank: number | '';
+      }
+    >
   >({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -82,7 +90,12 @@ export default function TastingSubmission() {
       whiskeys.forEach((w) => {
         const ex = data.tastings[w.id!];
         initial[w.id!] = ex
-          ? { aroma_score: ex.aroma_score, flavor_score: ex.flavor_score, finish_score: ex.finish_score, personal_rank: ex.personal_rank }
+          ? {
+              aroma_score: ex.aroma_score,
+              flavor_score: ex.flavor_score,
+              finish_score: ex.finish_score,
+              personal_rank: ex.personal_rank,
+            }
           : { aroma_score: '', flavor_score: '', finish_score: '', personal_rank: '' };
       });
       setScores(initial);
@@ -100,10 +113,18 @@ export default function TastingSubmission() {
 
       if (!silent) setSubmitting(true);
       try {
-        const validScores: Record<number, { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }> = {};
+        const validScores: Record<
+          number,
+          { aroma_score: number; flavor_score: number; finish_score: number; personal_rank: number }
+        > = {};
         let hasIncomplete = false;
         Object.entries(scores).forEach(([id, s]) => {
-          if (s.aroma_score !== '' && s.flavor_score !== '' && s.finish_score !== '' && s.personal_rank !== '') {
+          if (
+            s.aroma_score !== '' &&
+            s.flavor_score !== '' &&
+            s.finish_score !== '' &&
+            s.personal_rank !== ''
+          ) {
             validScores[parseInt(id)] = {
               aroma_score: s.aroma_score as number,
               flavor_score: s.flavor_score as number,
@@ -142,7 +163,9 @@ export default function TastingSubmission() {
   }, []);
 
   // ── effects ───────────────────────────────────────────────────────────────
-  useEffect(() => { loadInitialData(); }, []);
+  useEffect(() => {
+    loadInitialData();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -163,7 +186,9 @@ export default function TastingSubmission() {
     return () => window.removeEventListener('beforeunload', handler);
   }, [selectedUser, selectedThemeId, scores]);
 
-  useEffect(() => { if (selectedThemeId) loadWhiskeys(selectedThemeId); }, [selectedThemeId]);
+  useEffect(() => {
+    if (selectedThemeId) loadWhiskeys(selectedThemeId);
+  }, [selectedThemeId]);
 
   useEffect(() => {
     if (selectedUser && selectedThemeId && !isCustomUser) {
@@ -174,7 +199,9 @@ export default function TastingSubmission() {
   }, [selectedUser, selectedThemeId, isCustomUser]);
 
   // Rebuild score keys when whiskeys load
-  useEffect(() => { resetScores(); }, [whiskeys]);
+  useEffect(() => {
+    resetScores();
+  }, [whiskeys]);
 
   // ── derived progress ──────────────────────────────────────────────────────
   const totalFields = whiskeys.length * 4;
@@ -196,7 +223,10 @@ export default function TastingSubmission() {
   if (loading) {
     return (
       <div className="ad-screen flex items-center justify-center">
-        <p className="font-mono text-[13px] uppercase tracking-[.22em]" style={{ color: 'var(--amber)' }}>
+        <p
+          className="font-mono text-[13px] uppercase tracking-[.22em]"
+          style={{ color: 'var(--amber)' }}
+        >
           {'// LOADING...'}
         </p>
       </div>
@@ -217,11 +247,18 @@ export default function TastingSubmission() {
               >
                 TASTING SUBMISSION
               </h1>
-              <p className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0" style={{ color: 'var(--amber)' }}>
+              <p
+                className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0"
+                style={{ color: 'var(--amber)' }}
+              >
                 {'// SUBMIT OR EDIT TASTING SCORES'}
               </p>
             </div>
-            <Button variant="outline" onClick={() => router.push('/')} className="whitespace-nowrap">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/')}
+              className="whitespace-nowrap"
+            >
               ← HOME
             </Button>
           </div>
@@ -234,7 +271,10 @@ export default function TastingSubmission() {
                 {/* Taster */}
                 <div className="flex flex-col gap-[9px]">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-[11px] font-medium uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>
+                    <span
+                      className="font-mono text-[11px] font-medium uppercase tracking-[.18em]"
+                      style={{ color: 'var(--dim)' }}
+                    >
                       TASTER
                     </span>
                     <button
@@ -270,7 +310,9 @@ export default function TastingSubmission() {
                     >
                       <option value="">Choose a taster…</option>
                       {users.map((u) => (
-                        <option key={u.id} value={u.name}>{u.name}</option>
+                        <option key={u.id} value={u.name}>
+                          {u.name}
+                        </option>
                       ))}
                     </select>
                   )}
@@ -278,7 +320,10 @@ export default function TastingSubmission() {
 
                 {/* Theme */}
                 <div className="flex flex-col gap-[9px]">
-                  <span className="font-mono text-[11px] font-medium uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>
+                  <span
+                    className="font-mono text-[11px] font-medium uppercase tracking-[.18em]"
+                    style={{ color: 'var(--dim)' }}
+                  >
                     THEME
                   </span>
                   <select
@@ -289,7 +334,8 @@ export default function TastingSubmission() {
                     <option value="">Choose a theme…</option>
                     {themes.map((t) => (
                       <option key={t.id} value={t.id!.toString()}>
-                        {t.name}{t.id === activeTheme?.id ? ' (Active)' : ''}
+                        {t.name}
+                        {t.id === activeTheme?.id ? ' (Active)' : ''}
                       </option>
                     ))}
                   </select>
@@ -299,9 +345,18 @@ export default function TastingSubmission() {
               {/* Score section */}
               {selectedThemeId && whiskeys.length > 0 && (
                 <>
-                  <div className="flex items-center gap-3 flex-wrap border-t pt-[30px] mb-[10px]" style={{ borderColor: 'var(--line)' }}>
-                    <span className="w-3 h-3 inline-block" style={{ background: 'var(--amber)', boxShadow: '0 0 14px var(--glow)' }} />
-                    <h2 className="font-fraunces font-semibold text-[24px] m-0" style={{ color: 'var(--cream)' }}>
+                  <div
+                    className="flex items-center gap-3 flex-wrap border-t pt-[30px] mb-[10px]"
+                    style={{ borderColor: 'var(--line)' }}
+                  >
+                    <span
+                      className="w-3 h-3 inline-block"
+                      style={{ background: 'var(--amber)', boxShadow: '0 0 14px var(--glow)' }}
+                    />
+                    <h2
+                      className="font-fraunces font-semibold text-[24px] m-0"
+                      style={{ color: 'var(--cream)' }}
+                    >
                       // Scores
                     </h2>
                   </div>
@@ -317,14 +372,23 @@ export default function TastingSubmission() {
                           className="flex items-baseline gap-[14px] px-[26px] py-[20px]"
                           style={{ borderBottom: '1px solid var(--line)' }}
                         >
-                          <span className="font-mono font-medium text-[14px]" style={{ color: 'var(--amber)' }}>
+                          <span
+                            className="font-mono font-medium text-[14px]"
+                            style={{ color: 'var(--amber)' }}
+                          >
                             {String(idx + 1).padStart(2, '0')}
                           </span>
-                          <span className="font-fraunces font-semibold text-[23px]" style={{ color: 'var(--cream)' }}>
+                          <span
+                            className="font-fraunces font-semibold text-[23px]"
+                            style={{ color: 'var(--cream)' }}
+                          >
                             {whiskey.name}
                           </span>
                           {whiskey.proof && (
-                            <span className="ml-auto font-mono text-[11px] uppercase tracking-[.12em]" style={{ color: 'var(--muted)' }}>
+                            <span
+                              className="ml-auto font-mono text-[11px] uppercase tracking-[.12em]"
+                              style={{ color: 'var(--muted)' }}
+                            >
                               {whiskey.proof} PROOF
                             </span>
                           )}
@@ -333,31 +397,73 @@ export default function TastingSubmission() {
                         {/* Score grid: 4 cols → 2 cols → 1 col */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-[26px] py-[24px] pb-[28px]">
                           <div className="flex flex-col gap-[13px]">
-                            <span className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>AROMA</span>
+                            <span
+                              className="font-mono text-[11px] uppercase tracking-[.18em]"
+                              style={{ color: 'var(--dim)' }}
+                            >
+                              AROMA
+                            </span>
                             <PipRater
-                              value={typeof scores[whiskey.id!]?.aroma_score === 'number' ? scores[whiskey.id!].aroma_score as number : 0}
-                              onChange={(v) => updateScore(whiskey.id!, 'aroma_score', v === 0 ? '' : v)}
+                              value={
+                                typeof scores[whiskey.id!]?.aroma_score === 'number'
+                                  ? (scores[whiskey.id!].aroma_score as number)
+                                  : 0
+                              }
+                              onChange={(v) =>
+                                updateScore(whiskey.id!, 'aroma_score', v === 0 ? '' : v)
+                              }
                             />
                           </div>
                           <div className="flex flex-col gap-[13px]">
-                            <span className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>FLAVOR</span>
+                            <span
+                              className="font-mono text-[11px] uppercase tracking-[.18em]"
+                              style={{ color: 'var(--dim)' }}
+                            >
+                              FLAVOR
+                            </span>
                             <PipRater
-                              value={typeof scores[whiskey.id!]?.flavor_score === 'number' ? scores[whiskey.id!].flavor_score as number : 0}
-                              onChange={(v) => updateScore(whiskey.id!, 'flavor_score', v === 0 ? '' : v)}
+                              value={
+                                typeof scores[whiskey.id!]?.flavor_score === 'number'
+                                  ? (scores[whiskey.id!].flavor_score as number)
+                                  : 0
+                              }
+                              onChange={(v) =>
+                                updateScore(whiskey.id!, 'flavor_score', v === 0 ? '' : v)
+                              }
                             />
                           </div>
                           <div className="flex flex-col gap-[13px]">
-                            <span className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>FINISH</span>
+                            <span
+                              className="font-mono text-[11px] uppercase tracking-[.18em]"
+                              style={{ color: 'var(--dim)' }}
+                            >
+                              FINISH
+                            </span>
                             <PipRater
-                              value={typeof scores[whiskey.id!]?.finish_score === 'number' ? scores[whiskey.id!].finish_score as number : 0}
-                              onChange={(v) => updateScore(whiskey.id!, 'finish_score', v === 0 ? '' : v)}
+                              value={
+                                typeof scores[whiskey.id!]?.finish_score === 'number'
+                                  ? (scores[whiskey.id!].finish_score as number)
+                                  : 0
+                              }
+                              onChange={(v) =>
+                                updateScore(whiskey.id!, 'finish_score', v === 0 ? '' : v)
+                              }
                             />
                           </div>
                           <div className="flex flex-col gap-[13px]">
-                            <span className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>RANK</span>
+                            <span
+                              className="font-mono text-[11px] uppercase tracking-[.18em]"
+                              style={{ color: 'var(--dim)' }}
+                            >
+                              RANK
+                            </span>
                             <RankPills
                               count={whiskeys.length}
-                              value={typeof scores[whiskey.id!]?.personal_rank === 'number' ? scores[whiskey.id!].personal_rank as number : 0}
+                              value={
+                                typeof scores[whiskey.id!]?.personal_rank === 'number'
+                                  ? (scores[whiskey.id!].personal_rank as number)
+                                  : 0
+                              }
                               onChange={(v) => updateScore(whiskey.id!, 'personal_rank', v)}
                             />
                           </div>
@@ -369,7 +475,10 @@ export default function TastingSubmission() {
               )}
 
               {/* Submit bar */}
-              <div className="flex items-center gap-6 flex-wrap border-t pt-7" style={{ borderColor: 'var(--line)' }}>
+              <div
+                className="flex items-center gap-6 flex-wrap border-t pt-7"
+                style={{ borderColor: 'var(--line)' }}
+              >
                 <div className="ad-progress flex-1">
                   <div className="ad-progress-fill" style={{ width: `${progress * 100}%` }} />
                 </div>
@@ -391,8 +500,14 @@ export default function TastingSubmission() {
         open={showCelebrate}
         userName={currentUserName}
         themeName={currentThemeName}
-        onSeeResults={() => { setShowCelebrate(false); router.push('/data-view'); }}
-        onHome={() => { setShowCelebrate(false); router.push('/'); }}
+        onSeeResults={() => {
+          setShowCelebrate(false);
+          router.push('/data-view');
+        }}
+        onHome={() => {
+          setShowCelebrate(false);
+          router.push('/');
+        }}
       />
     </>
   );

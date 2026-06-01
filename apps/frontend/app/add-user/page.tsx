@@ -36,21 +36,34 @@ export default function AddUser() {
       <div className="ad-panel" style={{ maxWidth: 720 }}>
         <div className="ad-panel-head">
           <div>
-            <h1 className="font-fraunces font-black leading-[.94] tracking-[-0.02em] m-0" style={{ fontSize: 'clamp(40px, 6vw, 78px)', color: 'var(--cream)' }}>
+            <h1
+              className="font-fraunces font-black leading-[.94] tracking-[-0.02em] m-0"
+              style={{ fontSize: 'clamp(40px, 6vw, 78px)', color: 'var(--cream)' }}
+            >
               ADD USER
             </h1>
-            <p className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0" style={{ color: 'var(--amber)' }}>
+            <p
+              className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0"
+              style={{ color: 'var(--amber)' }}
+            >
               {'// ADD A NEW TASTER'}
             </p>
           </div>
-          <Button variant="outline" onClick={() => router.push('/administration')} className="whitespace-nowrap">
+          <Button
+            variant="outline"
+            onClick={() => router.push('/administration')}
+            className="whitespace-nowrap"
+          >
             ← ADMIN
           </Button>
         </div>
         <div className="ad-panel-body">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-md">
             <div className="flex flex-col gap-[9px]">
-              <label className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>
+              <label
+                className="font-mono text-[11px] uppercase tracking-[.18em]"
+                style={{ color: 'var(--dim)' }}
+              >
                 User Name
               </label>
               <input
