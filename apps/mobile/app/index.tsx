@@ -87,20 +87,22 @@ export default function HomeScreen() {
           </View>
         ) : tonight ? (
           <View style={styles.tonightStrip}>
-            <View style={styles.tonightLeft}>
-              <PulsingDot size={8} color={colors.amber} />
-              <AppText style={styles.tonightLabel}>TONIGHT</AppText>
+            <View style={styles.tonightMeta}>
+              <View style={styles.tonightLeft}>
+                <PulsingDot size={8} color={colors.amber} />
+                <AppText style={styles.tonightLabel}>TONIGHT</AppText>
+              </View>
+              <View style={styles.tonightStats}>
+                <AppText style={styles.tonightStat}>
+                  <AppText style={styles.tonightStatBold}>{tonight.pours}</AppText> POURS
+                </AppText>
+                <View style={styles.sep} />
+                <AppText style={styles.tonightStat}>
+                  <AppText style={styles.tonightStatBold}>{tonight.tasters}</AppText> IN
+                </AppText>
+              </View>
             </View>
-            <AppText style={styles.tonightName} numberOfLines={1}>{tonight.theme.name}</AppText>
-            <View style={styles.tonightStats}>
-              <AppText style={styles.tonightStat}>
-                <AppText style={styles.tonightStatBold}>{tonight.pours}</AppText> POURS
-              </AppText>
-              <View style={styles.sep} />
-              <AppText style={styles.tonightStat}>
-                <AppText style={styles.tonightStatBold}>{tonight.tasters}</AppText> IN
-              </AppText>
-            </View>
+            <AppText style={styles.tonightName}>{tonight.theme.name}</AppText>
           </View>
         ) : (
           <View style={styles.tonightStrip}>
@@ -142,16 +144,18 @@ const styles = StyleSheet.create({
   },
 
   tonightStrip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    flexWrap: 'wrap',
     backgroundColor: 'rgba(0,0,0,0.3)',
     borderWidth: 1,
     borderColor: colors.line,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     marginBottom: spacing.xl,
+  },
+  tonightMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
   },
   tonightLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   tonightLabel: {
@@ -164,9 +168,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.serifSemi,
     fontSize: 20,
     color: colors.cream,
-    flex: 1,
   },
-  tonightStats: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginLeft: 'auto' },
+  tonightStats: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   tonightStat: { fontFamily: fonts.monoRegular, fontSize: 12, letterSpacing: 1.4, color: colors.dim },
   tonightStatBold: { fontFamily: fonts.monoBold, color: colors.amber },
   sep: { width: 1, height: 14, backgroundColor: colors.line },

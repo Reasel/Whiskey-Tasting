@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { colors, spacing, fonts } from '../../lib/theme';
 import { AppText } from '../ui/AppText';
+import { RichNotes } from '../ui/RichNotes';
 import { Card } from '../ui/Card';
 import { Accordion } from '../ui/Accordion';
 import { whiskeyBreakdown } from '../../lib/scoring';
@@ -29,9 +30,7 @@ export function ByThemeView({ allScores }: Props) {
           style={styles.themeCard}
         >
           {t.theme.notes ? (
-            <AppText variant="bodyMuted" style={styles.notes}>
-              {t.theme.notes}
-            </AppText>
+            <RichNotes text={t.theme.notes} variant="bodyMuted" style={styles.notes} />
           ) : null}
           {t.whiskeys.map((w) => (
             <WhiskeyAccordion key={w.whiskey_id} whiskey={w} />

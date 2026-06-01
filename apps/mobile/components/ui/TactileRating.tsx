@@ -121,7 +121,7 @@ export function TactileRating({ value, onChange, max = 5 }: TactileRatingProps) 
                 {frac > 0 && (
                   <View
                     pointerEvents="none"
-                    style={[styles.pipFill, { transform: [{ scaleY: frac }] }]}
+                    style={[styles.pipFill, { height: frac * PIP_H }]}
                   />
                 )}
                 <AppText style={[styles.pipNum, isActive && styles.pipNumActive]}>
@@ -182,9 +182,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: '100%',
     backgroundColor: colors.amber,
-    transformOrigin: 'bottom',
   },
   pipNum: {
     fontFamily: fonts.monoMedium,

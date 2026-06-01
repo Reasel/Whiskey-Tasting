@@ -17,6 +17,8 @@ export default function AdminIndexScreen() {
         <ScreenHeader
           title="ADMINISTRATION"
           eyebrow="MANAGE THEMES, USERS, AND SETTINGS"
+          backLabel="HOME"
+          onBack={() => router.push('/')}
         />
 
         <View style={styles.grid}>
