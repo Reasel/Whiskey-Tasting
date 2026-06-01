@@ -106,7 +106,7 @@ jobs:
     - name: Install Playwright browsers
       run: |
         cd apps/frontend
-        npx playwright install --with-deps chromium
+        npx playwright install --with-deps chromium webkit
 
     - name: Start test services
       run: |
