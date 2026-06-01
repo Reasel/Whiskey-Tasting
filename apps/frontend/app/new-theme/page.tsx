@@ -1,13 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createTheme, type CreateThemeRequest } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/toast';
 
 export default function NewTheme() {
@@ -19,25 +15,19 @@ export default function NewTheme() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const auth = localStorage.getItem('adminAuthenticated');
-    if (auth !== 'true') {
-      router.push('/administration');
-    }
+    if (localStorage.getItem('adminAuthenticated') !== 'true') router.push('/administration');
   }, [router]);
 
-  const handleThemeSubmit = async (e: React.FormEvent) => {
+  function stepWhiskeys(delta: number) {
+    setNumWhiskeys((n) => Math.max(1, Math.min(8, n + delta)));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!themeName.trim()) return;
-
     setSubmitting(true);
     try {
-      const request: CreateThemeRequest = {
-        name: themeName.trim(),
-        notes: themeNotes.trim(),
-        num_whiskeys: numWhiskeys,
-      };
-      await createTheme(request);
-      // Redirect to home page
+      await createTheme({ name: themeName.trim(), notes: themeNotes.trim(), num_whiskeys: numWhiskeys } as CreateThemeRequest);
       router.push('/');
     } catch (error) {
       console.error('Failed to create theme:', error);
@@ -45,77 +35,96 @@ export default function NewTheme() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-[#F0F0E8] flex justify-center items-start py-12 px-4 md:px-8">
-      <div className="w-full max-w-4xl border border-black bg-[#F0F0E8] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]">
-        {/* Header */}
-        <div className="border-b border-black p-8 md:p-12">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="font-serif text-5xl md:text-7xl text-black tracking-tight leading-[0.95]">
-                NEW THEME
-              </h1>
-              <p className="mt-6 text-sm font-mono text-steel-grey uppercase tracking-wide max-w-md font-bold">
-                {'// CREATE A NEW TASTING THEME'}
-              </p>
-            </div>
-            <Link href="/">
-              <Button variant="outline" className="font-mono text-sm uppercase tracking-wider">
-                ← HOME
-              </Button>
-            </Link>
+    <div className="ad-screen screen-enter">
+      <div className="ad-panel" style={{ maxWidth: 720 }}>
+        <div className="ad-panel-head">
+          <div>
+            <h1 className="font-fraunces font-black leading-[.94] tracking-[-0.02em] m-0" style={{ fontSize: 'clamp(40px, 6vw, 78px)', color: 'var(--cream)' }}>
+              NEW THEME
+            </h1>
+            <p className="font-mono font-medium text-[13px] uppercase tracking-[.22em] mt-4 mb-0" style={{ color: 'var(--amber)' }}>
+              {'// CREATE A NEW TASTING THEME'}
+            </p>
           </div>
+          <Button variant="outline" onClick={() => router.push('/administration')} className="whitespace-nowrap">
+            ← ADMIN
+          </Button>
         </div>
-
-        {/* Content */}
-        <div className="p-8 md:p-12">
-          <form onSubmit={handleThemeSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="themeName">Theme Name</Label>
-              <Input
-                id="themeName"
+        <div className="ad-panel-body">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-[26px]">
+            {/* Theme name */}
+            <div className="flex flex-col gap-[9px]">
+              <label className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>
+                Theme Name
+              </label>
+              <input
                 type="text"
                 value={themeName}
                 onChange={(e) => setThemeName(e.target.value)}
-                placeholder="Enter theme name..."
+                placeholder="Enter theme name…"
+                className="ad-select"
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="themeNotes">Description/Notes</Label>
-              <Textarea
-                id="themeNotes"
+            {/* Notes */}
+            <div className="flex flex-col gap-[9px]">
+              <label className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>
+                Description / Notes
+              </label>
+              <textarea
                 value={themeNotes}
                 onChange={(e) => setThemeNotes(e.target.value)}
-                placeholder="Enter theme description..."
+                placeholder="Enter theme description…"
                 rows={4}
+                className="ad-select resize-y"
+                style={{ height: 'auto' }}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="numWhiskeys">Number of Whiskeys</Label>
-              <Input
-                id="numWhiskeys"
-                type="number"
-                min="1"
-                max="20"
-                value={numWhiskeys}
-                onChange={(e) => setNumWhiskeys(parseInt(e.target.value) || 1)}
-                placeholder="Enter number of whiskeys..."
-                required
-              />
+            {/* Stepper */}
+            <div className="flex flex-col gap-[9px]">
+              <label className="font-mono text-[11px] uppercase tracking-[.18em]" style={{ color: 'var(--dim)' }}>
+                Number of Whiskeys
+              </label>
+              <div
+                className="inline-flex items-center w-max"
+                style={{ border: '1px solid var(--line)', background: 'rgba(0,0,0,0.3)' }}
+              >
+                <button
+                  type="button"
+                  onClick={() => stepWhiskeys(-1)}
+                  className="w-12 h-12 flex items-center justify-center font-mono text-[22px] transition-colors duration-150"
+                  style={{ color: 'var(--amber)' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--amber)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--bg)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--amber)'; }}
+                >
+                  –
+                </button>
+                <span
+                  className="w-[58px] text-center font-mono font-bold text-[18px] leading-[48px]"
+                  style={{ borderLeft: '1px solid var(--line)', borderRight: '1px solid var(--line)', color: 'var(--cream)' }}
+                >
+                  {numWhiskeys}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => stepWhiskeys(1)}
+                  className="w-12 h-12 flex items-center justify-center font-mono text-[22px] transition-colors duration-150"
+                  style={{ color: 'var(--amber)' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--amber)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--bg)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--amber)'; }}
+                >
+                  +
+                </button>
+              </div>
             </div>
 
-            <Button
-              type="submit"
-              variant="default"
-              disabled={submitting}
-              className="w-full md:w-auto"
-            >
-              {submitting ? 'CREATING...' : 'CREATE THEME'}
+            <Button type="submit" variant="default" disabled={submitting} className="self-start text-[15px] px-8 py-[17px] h-auto">
+              {submitting ? 'CREATING…' : 'CREATE THEME'}
             </Button>
           </form>
         </div>
