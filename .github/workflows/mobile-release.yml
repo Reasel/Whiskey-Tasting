@@ -6,10 +6,16 @@ name: Mobile Release
 # CI never handles it.
 #
 # Triggers:
-#   - push a tag `mobile-v*`  -> production AAB, auto-submitted to the Google
-#                                Play *internal testing* track
-#   - manual (Actions tab)    -> choose `preview` (shareable internal APK link)
-#                                or `production` (AAB, optionally submitted)
+#   - push a tag `mobile-v*`  -> production AAB auto-submitted to the Google
+#                                Play *internal testing* track, AND production
+#                                IPA auto-submitted to TestFlight
+#   - manual (Actions tab)    -> choose platform(s) and `preview` (shareable
+#                                internal APK link, Android only) or
+#                                `production` (optionally submitted)
+#
+# iOS submission uses the App Store Connect API key stored in EAS credentials
+# (set up during the first interactive `eas submit -p ios`) — no .p8 file or
+# Apple secrets are needed in CI, only EXPO_TOKEN.
 #
 # Decoupled from the backend `v*` tags used by ci-cd.yml.
 
@@ -18,13 +24,18 @@ on:
     tags: [ 'mobile-v*' ]
   workflow_dispatch:
     inputs:
+      platform:
+        description: 'Platform(s) to build'
+        type: choice
+        options: [ android, ios, all ]
+        default: android
       profile:
-        description: 'EAS build profile'
+        description: 'EAS build profile (preview is Android-only)'
         type: choice
         options: [ preview, production ]
         default: preview
       submit:
-        description: 'Submit production build to Play internal track'
+        description: 'Submit production build to Play internal / TestFlight'
         type: boolean
         default: false
 
@@ -33,7 +44,41 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  release:
+  notify-mobile-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify mobile deploy pending
+      env:
+        NTFY_URL: ${{ secrets.NTFY_URL }}
+        NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+        NTFY_AUTH_USER: ${{ secrets.NTFY_AUTH_USER }}
+        NTFY_AUTH_PASS: ${{ secrets.NTFY_AUTH_PASS }}
+      run: |
+        if [ -z "$NTFY_URL" ] || [ -z "$NTFY_TOPIC" ]; then
+          echo "NTFY not configured, skipping notification"
+          exit 0
+        fi
+        PROFILE="${{ inputs.profile || 'production' }}"
+        RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        AUTH_ARGS=()
+        if [ -n "$NTFY_TOKEN" ]; then
+          AUTH_ARGS+=(-H "Authorization: Bearer $NTFY_TOKEN")
+        elif [ -n "$NTFY_AUTH_USER" ] && [ -n "$NTFY_AUTH_PASS" ]; then
+          AUTH_ARGS+=(-u "$NTFY_AUTH_USER:$NTFY_AUTH_PASS")
+        fi
+        curl -sf \
+          "${AUTH_ARGS[@]}" \
+          -H "Title: Mobile deploy needs approval" \
+          -H "Priority: high" \
+          -H "Tags: iphone,rocket" \
+          -H "Click: $RUN_URL" \
+          -d "Mobile $PROFILE build (${{ github.ref_name }}) by ${{ github.actor }} is waiting for approval — tap to review." \
+          "$NTFY_URL/$NTFY_TOPIC" || true
+
+  release-android:
+    needs: [notify-mobile-deploy]
+    if: github.event_name == 'push' || inputs.platform == 'android' || inputs.platform == 'all'
     runs-on: ubuntu-latest
     environment: production
     defaults:
@@ -101,3 +146,55 @@ jobs:
       - name: Remove service-account key
         if: always()
         run: rm -f google-service-account.json
+
+  release-ios:
+    needs: [notify-mobile-deploy]
+    # iOS has no preview path: internal (ad-hoc) distribution requires
+    # registered device UDIDs, so only the production profile is built here.
+    if: github.event_name == 'push' || ((inputs.platform == 'ios' || inputs.platform == 'all') && inputs.profile == 'production')
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Resolve submit flag
+        id: cfg
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.submit }}" = "true" ]; then
+            echo "submit=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "submit=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/mobile/package-lock.json
+
+      - name: Set up EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Build (and auto-submit to TestFlight)
+        run: |
+          if [ "${{ steps.cfg.outputs.submit }}" = "true" ]; then
+            eas build --platform ios --profile production --non-interactive --auto-submit
+          else
+            eas build --platform ios --profile production --non-interactive --wait
+          fi
